@@ -80,11 +80,13 @@ class Admin_IndexController extends App_Controller_Action_Admin
 
     public function misDatosAction() {
         
-        
-    $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
-    $idUsuario = $sesion_usuario->sesion_usuario['id'];
+        Zend_Layout::getMvcInstance()->assign('padre', 1);
+        Zend_Layout::getMvcInstance()->assign('link', 'misdatos');
 
-    $this->view->data = $this->_usuarioModel->usuarioActual($idUsuario);
+        $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
+        $idUsuario = $sesion_usuario->sesion_usuario['id'];
+
+        $this->view->data = $this->_usuarioModel->usuarioActual($idUsuario);
         
     }
 

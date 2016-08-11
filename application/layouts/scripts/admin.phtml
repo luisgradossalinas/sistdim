@@ -60,7 +60,11 @@
 
 		<div id="user-nav" class="navbar">
                     <ul class="nav btn-group">
-                        <li class="btn btn-inverse" ><a title="" href="#"><i class="icon icon-user"></i> <span class="text">Usuario: <?=$this->layout()->user." (".$this->layout()->rol.")"?></span></a></li>
+                        <li class="btn btn-inverse" ><a title="" href="#"><i class="icon icon-user"></i> <span class="text">
+                <?php if ($this->layout()->id_rol != Application_Model_Rol::ADMINISTRADOR) { ?>
+                Proyecto: <?=$this->layout()->nombre_proyecto?> 
+                <?php } ?>
+                Usuario: <?=$this->layout()->user." (".$this->layout()->rol.")"?></span></a></li>
                         <li class="btn btn-mini btn-inverse"><a title="" href=<?=SITE_URL.'/logout'?> ><i class="icon icon-share-alt"></i> <span class="text">Salir</span></a></li>
                     </ul>
                 </div>

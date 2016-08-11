@@ -24,6 +24,19 @@ if(!empty($this->messages)) {?>
                 </div>
             </div>
         </div>
+        <div class="control-group">
+            <div class="controls">
+                <div class="input-prepend">
+                    <span class="add-on"><i class="icon-time"></i></span>
+                    <select name="proyecto" id="proyecto">
+                    <option value="">[Seleccione proyecto]</option>
+                    <?php foreach ($this->proyectos as $val){
+                       echo "<option value=".$val['id_proyecto'].">".$val['nombre']."(".$val['entidad'].")</option>"; 
+                    }?>
+                    </select>
+                </div>
+            </div>
+        </div>
         <div class="form-actions">
             
             <span class="pull-right"><input type="submit" class="btn btn-inverse" value="Login" /></span>

@@ -65,6 +65,16 @@ class Application_Model_Proyecto extends Zend_Db_Table
                 ->query()->fetchAll();
         
     }
+    
+    public function proyectosActivos()
+    {
+        return $this->getAdapter()->select()->from(array("a" => $this->_name))
+               ->joinInner(array('b' => Application_Model_Entidad::TABLA), 'b.id_entidad = a.id_entidad',
+                       array('entidad'=> 'b.nombre'))
+                ->where('a.estado = ?',self::ESTADO_ACTIVO)
+                ->query()->fetchAll();
+        
+    }
 
 
 }

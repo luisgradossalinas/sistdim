@@ -70,21 +70,14 @@ class Application_Model_Recurso extends Zend_Db_Table
     public function recursosPadre($rol)
     {
        
-       /* echo  $this->getAdapter()->select()->from($this->_name,array('padre','nombre','accion'))
-        ->where('padre in (select distinct r.padre FROM recurso r 
-                inner join rol_recurso rr ON rr.`id_recurso` = r.`id`
-                where rr.`id_rol` = '.$rol.' ORDER BY r.`id`)')
-                ->where('orden = ?', self::PADRE)
-                ->order(array('nombre asc','orden asc'));*/
-
-
 
         return $this->getAdapter()->select()->from($this->_name,array('padre','nombre','accion'))
         ->where('padre in (select distinct r.padre FROM recurso r 
                 inner join rol_recurso rr ON rr.`id_recurso` = r.`id`
                 where rr.`id_rol` = '.$rol.' ORDER BY r.`id`)')
                 ->where('orden = ?', self::PADRE)
-                ->order(array('nombre asc','orden asc'))->query()->fetchAll();
+                ->order(array('orden asc'))->query()->fetchAll();
+                //->order(array('nombre asc','orden asc'))->query()->fetchAll();
     }
     
     //Para generar el menú dinámico 
@@ -95,7 +88,8 @@ class Application_Model_Recurso extends Zend_Db_Table
                 ->where("b.id_rol = ?", $rol)->where("estado = ?",self::ESTADO_ACTIVO)
                 ->where('a.orden != ?', self::PADRE)
                 ->where('a.padre = ?', $padre)
-                ->order(array('a.nombre asc'))->query()->fetchAll();
+                ->order(array('a.orden asc'))->query()->fetchAll();
+                //->order(array('a.nombre asc'))->query()->fetchAll();
     }
     
     public function validaAcceso($rol, $url)

@@ -1,11 +1,7 @@
-<div class="alertas alertas-info">
-    <button class="close" data-dismiss="alert">×</button>
-    <strong>¡Mensaje!</strong> Bienvenido al sistema.
-</div>
 <?=$this->partial('_partials/mensajes.phtml',array('messages' => $this->messages,'tipoMessages' => $this->tipoMessages));?>
 <div class="widget-box">
     <div class="widget-title">	
-        <h5><?=$this->active?></h5>
+        <h5>Mis datos</h5>
     </div>
 <div class="widget-content nopadding">
     <table id='tabla' class="table table-condensed table-bordered">
