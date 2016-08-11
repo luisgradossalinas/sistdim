@@ -1,0 +1,31 @@
+<?=$this->partial('_partials/mensajes.phtml',array('messages' => $this->messages,'tipoMessages' => $this->tipoMessages));?>
+<div class="widget-box">
+    <div class="widget-title">	
+        <h5><?=$this->active?></h5>
+    </div>
+<div class="widget-content nopadding">
+    <table id='tabla' class="table table-condensed table-bordered" >
+        <thead>
+        $columnasBD
+        </thead>
+        <?php
+        echo '<tbody>';
+        foreach ($this->data as $value) {
+            $estado = 'checkmark.png';
+            echo '<tr>';
+            echo '<td width=5% class="taskOptions">';
+            echo '<a data-original-title="Editar" class="tip-top" href="#myModal" data-toggle="modal" onclick="editar('.$value['primaryKey'].')">';
+            echo '<i class="icon-pencil"></i></a>&nbsp;&nbsp;';
+            echo '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="elimina('.$value['primaryKey'].')">';
+            echo '<i class="icon-trash"></i></a>';
+            echo '</td>';
+        ?>   
+        $datosBD
+        <?php
+        }
+        echo '</tbody>';
+        ?>
+    </table>
+</div>
+</div>    
+<?=$this->partial('_partials/modal.phtml',array('model' => $this->model));?>

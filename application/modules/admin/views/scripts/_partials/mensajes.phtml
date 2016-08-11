@@ -1,0 +1,7 @@
+<?php 
+if(!empty($this->messages)) { ?>
+    <div class="alert alert-<?=$this->tipoMessages?>">
+        <button class="close" data-dismiss="alert">×</button>
+        <strong>¡Mensaje!</strong> <?php echo $this->messages; ?>
+    </div>
+<?php } ?>

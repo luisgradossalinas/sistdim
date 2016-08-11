@@ -1,0 +1,41 @@
+<div class="alertas alertas-info">
+    <button class="close" data-dismiss="alert">×</button>
+    <strong>¡Mensaje!</strong> Bienvenido al sistema.
+</div>
+<?=$this->partial('_partials/mensajes.phtml',array('messages' => $this->messages,'tipoMessages' => $this->tipoMessages));?>
+<div class="widget-box">
+    <div class="widget-title">	
+        <h5><?=$this->active?></h5>
+    </div>
+<div class="widget-content nopadding">
+    <table id='tabla' class="table table-condensed table-bordered">
+        <thead>
+            <tr><th></th><th>Nombre</th><th>Apellido</th><th>E-mail</th><th>Nombre Rol</th>
+                <th>Teléfono</th><th>Celular</th><th>Dirección</th></tr>
+        </thead>
+        <?php
+        echo '<tbody>';
+        foreach ($this->data as $value) {
+            echo '<tr>';
+            $estado = 'checkmark.png';
+            echo '<td width=5% class="taskOptions">';
+            echo '<a data-original-title="Editar" class="tip-top" href="#myModal" data-toggle="modal" onclick="editarUsuario('.$value['id'].')">';
+            echo '<i class="icon-pencil"></i></a>&nbsp;&nbsp;';
+            echo '</td>';
+
+            echo '<td>'.$value['nombres'].'</td>';
+            echo '<td>'.$value['apellidos'].'</td>';
+            echo '<td>'.$value['email'].'</td>';
+            echo '<td>'.$value['nom_rol'].'</td>';
+            echo '<td>'.$value['telefono'].'</td>';
+            echo '<td>'.$value['celular'].'</td>';
+            echo '<td>'.$value['direccion'].'</td>';
+            
+            echo '</tr>';
+        }
+        echo '</tbody>';
+        ?>
+    </table>
+</div>
+</div>
+<?=$this->partial('_partials/modal.phtml',array('model' => $this->model));?>

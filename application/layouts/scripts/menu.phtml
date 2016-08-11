@@ -1,0 +1,7 @@
+<?php
+
+$menu = new Application_Model_Recurso;
+$data = $menu->generacionMenu($this->padre, $this->active);
+echo $data['menu'];
+
+?>

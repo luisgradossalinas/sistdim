@@ -1,0 +1,31 @@
+<a href="#myModal" role="button" class="btn" id='btnNuevo' data-toggle="modal">Nuevo</a>
+<table id='tablaUsuario' class="table table-striped table-bordered">
+    <thead>
+        <tr><th>Id</th><th>Nombre</th><th>Apellido</th><th>E-mail</th><th>Rol</th><th>Registro</th></tr>
+    </thead>
+    <?php
+    echo '<tbody>';
+    foreach ($this->usuario as $value) {
+        echo '<tr>';
+        echo '<td>'.$value['id'].'</td>';
+        echo '<td>'.$value['nombres'].'</td>';
+        echo '<td>'.$value['apellidos'].'</td>';
+        echo '<td>'.$value['email'].'</td>';
+        echo '<td>'.$value['id_rol'].'</td>';
+        echo '<td>'.$value['fecha_registro'].'</td>';
+        echo '</tr>';
+    }
+    echo '</tbody>';
+    ?>
+</table>
+
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <h3 id="myModalLabel">Nuevo registro</h3>
+  </div>
+  <div class="modal-body"></div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Cerrar</button>
+    <button class="btn btn-primary">Grabar</button>
+  </div>
+</div>

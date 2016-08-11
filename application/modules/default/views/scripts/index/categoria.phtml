@@ -1,0 +1,37 @@
+<a href="#myModal" role="button" class="btn" id='btnNuevo' data-toggle="modal">Nuevo</a>
+<table id='tablaCategoria' class="table table-striped table-bordered" >
+    <thead>
+        <tr><th>Id</th><th>Descripción</th><th>Estado</th><th>Registro</th><th>Opciones</th></tr>
+    </thead>
+    <?php
+    echo '<tbody>';
+    foreach ($this->categoria as $value) {
+        $estado = 'checkmark.png';
+        echo '<tr>';
+        echo '<td>'.$value['id'].'</td>';
+        echo '<td>'.$value['nom_cat'].'</td>';
+        if ($value['estado'] == Application_Model_Categoria::INACTIVA)
+            $estado = 'error.png';
+        echo '<td width=8%><span style=display:none>'.$value['estado'].'</span><img src='.SITE_URL.'/jquery/css/images/'.$estado.' width=20%></td>';
+        echo '<td>'.$value['fecha_crea'].'</td>';
+        echo '<td width=15%><a  href="#myModal" role="button" class="btn btn-mini" data-toggle="modal" onclick="editar('.$value['id'].')">Editar</a>
+                <a  href="#" role="button" class="btn btn-mini" onclick="elimina('.$value['id'].')">Eliminar</a></td>';
+        echo '</tr>';
+    }
+    echo '</tbody>';
+    ?>
+</table>
+
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <h3 id="myModalLabel">Nuevo registro</h3>
+  </div>
+  <div class="modal-body"></div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Cerrar</button>
+    <button class="btn btn-primary">Grabar</button>
+  </div>
+</div>
+
+
+

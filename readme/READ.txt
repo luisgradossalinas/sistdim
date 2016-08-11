@@ -1,0 +1,10 @@
+Para usar este software todas las tablas de la base de datos deben tener estos campos:
+
+ALTER TABLE name ADD COLUMN estado  TINYINT(1) NOT NULL DEFAULT '1' COMMENT '0: Inactivo, 1: Activo, 2: Eliminado';
+ALTER TABLE name ADD COLUMN usuario_crea INT(10) UNSIGNED DEFAULT NULL COMMENT 'Usuario de creacion';
+ALTER TABLE name ADD COLUMN fecha_crea DATETIME DEFAULT NULL COMMENT 'Fecha de creacion';
+ALTER TABLE name ADD COLUMN usuario_actu INT(10) UNSIGNED DEFAULT NULL COMMENT 'Usuario que actualiza';
+ALTER TABLE name ADD COLUMN fecha_actu DATETIME DEFAULT NULL COMMENT 'Fecha de actualizacion';
+
+Después el software generará todos los mantenimientos automáticos:
+Creará el modelo de datos, el formulario y la vista por cada tabla de la BD.

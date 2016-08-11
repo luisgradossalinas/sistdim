@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Admin Test</title>
+		<meta charset="UTF-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <link rel="stylesheet" href=<?=SITE_URL."/css/bootstrap.min.css"?> />
+		<link rel="stylesheet" href=<?=SITE_URL."/css/bootstrap-responsive.min.css"?> />
+		<link rel="stylesheet" href=<?=SITE_URL."/css/uniform.css"?> />
+		<link rel="stylesheet" href=<?=SITE_URL."/css/chosen.css"?> />
+                <link rel="stylesheet" href=<?=SITE_URL."/css/unicorn.main.css"?> />
+		<link rel="stylesheet" href=<?=SITE_URL."/css/unicorn.".$this->layout()->css.".css"?> class="skin-color" />
+                <link rel="stylesheet" href="<?=SITE_URL?>/css/mensajes.css" />
+                <link rel="stylesheet" href="<?=SITE_URL?>/ui/css/custom-theme/jquery-ui-1.8.16.custom.css" />
+                
+                <link href=<?=SITE_URL."/kendo/content/shared/styles/examples-offline.css"?> rel="stylesheet">
+                <link href=<?=SITE_URL."/kendo/css/kendo.common.min.css"?> rel="stylesheet">
+                <link href=<?=SITE_URL."/kendo/css/kendo.default.min.css"?> rel="stylesheet">
+                <?=$this->headLink() ?>
+                
+                <script src=<?=SITE_URL."/js/excanvas.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.min.js"?> ></script>
+                <script src=<?=SITE_URL."/kendo/js/kendo.web.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.ui.custom.js"?> ></script>
+                <script src=<?=SITE_URL."/js/bootstrap.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.flot.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.flot.resize.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.peity.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/fullcalendar.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.uniform.js"?> ></script>
+                <script src=<?=SITE_URL."/js/bootstrap-colorpicker.js"?> ></script>
+                <script src=<?=SITE_URL."/js/bootstrap-datepicker.js"?> ></script>
+              
+                <script src=<?=SITE_URL."/ui/js/jquery-ui-1.8.16.custom.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.chosen.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.dataTables.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/unicorn.tables.js"?> ></script>
+                <script src=<?=SITE_URL."/js/unicorn.form_common.js"?> ></script>
+                <script src=<?=SITE_URL."/js/unicorn.js"?> ></script>
+                
+                <script src=<?=SITE_URL."/js/web/validate.js"?> ></script>
+                <script src="<?=SITE_URL?>/js/web/main.js"></script>
+                <script src=<?=SITE_URL."/js/web/mvc.js"?> ></script>
+                
+
+                <?=$this->headScript() ?>
+	</head>
+	<body>
+		
+		<div id="header">
+			<h1><a href="./dashboard.html">Admin Test</a></h1>		
+		</div>
+
+		<div id="user-nav" class="navbar">
+                    <ul class="nav btn-group">
+                        <li class="btn btn-inverse" ><a title="" href="#"><i class="icon icon-user"></i> <span class="text">Usuario: <?=$this->layout()->user?></span></a></li>
+                        <li class="btn btn-inverse dropdown" id="menu-messages"><a href="#" data-toggle="dropdown" data-target="#menu-messages" class="dropdown-toggle"><i class="icon icon-envelope"></i> <span class="text">Mensajes</span> <span class="label label-important">5</span> <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a class="sAdd" title="" href="#">new message</a></li>
+                                <li><a class="sInbox" title="" href="#">inbox</a></li>
+                                <li><a class="sOutbox" title="" href="#">outbox</a></li>
+                                <li><a class="sTrash" title="" href="#">trash</a></li>
+                            </ul>
+                        </li>
+                        <li class="btn btn-mini btn-inverse"><a title="" href=<?=SITE_URL.'/admin/mvc/configuracion'?>><i class="icon icon-cog"></i> <span class="text">Configuración</span></a></li>
+                        <li class="btn btn-mini btn-inverse"><a title="" href=<?=SITE_URL.'/logout'?> ><i class="icon icon-share-alt"></i> <span class="text">Salir</span></a></li>
+                    </ul>
+                </div>
+            
+		<div id="sidebar">
+			<a href="#" class="visible-phone"><i class="icon icon-home"></i>Dashboard</a>
+			<ul>
+                            <!-- Sería un menú dinámico -->
+				<?=$this->partial('menu.phtml',array('padre' => $this->layout()->padre, 'active' => $this->layout()->link));?>
+			</ul>
+		</div>
+		
+		<div id="content">
+			<div id="content-header">
+				<div class="btn-group">
+					<a class="btn btn-large tip-left" title="Administrar archivos"><i class="icon-file"></i></a>
+					<a href="<?=SITE_URL.'/admin/mvc/usuario'?>" class="btn btn-large tip-left" title="Administrar usuarios"><i class="icon-user"></i></a>
+					<a class="btn btn-large tip-left" title="Manage Comments"><i class="icon-comment"></i><span class="label label-important">5</span></a>
+					<a class="btn btn-large tip-left" title="Manage Orders"><i class="icon-shopping-cart"></i></a>
+				</div>
+			</div>
+                    
+			<div id="breadcrumb">
+				<a href="#" title="Ir al inicio" class="tip-bottom"><i class="icon-home"></i>Inicio</a>
+				<a href="#" class="current"><?=$this->layout()->active?></a>
+			</div>
+                    
+			<div class="container-fluid">      
+                            <?php echo $this->layout()->content;?>
+			</div>
+		</div>
+		
+	</body>
+</html>

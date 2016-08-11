@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<title><?=TITLE?></title>
+		<meta charset="UTF-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <link rel="stylesheet" href=<?=SITE_URL."/css/bootstrap.min.css"?> />
+		<link rel="stylesheet" href=<?=SITE_URL."/css/bootstrap-responsive.min.css"?> />
+		<link rel="stylesheet" href=<?=SITE_URL."/css/uniform.css"?> />
+		<link rel="stylesheet" href=<?=SITE_URL."/css/chosen.css"?> />
+                <link rel="stylesheet" href=<?=SITE_URL."/css/unicorn.main.css"?> />
+		<link rel="stylesheet" href=<?=SITE_URL."/css/unicorn.".$this->layout()->css.".css"?> class="skin-color" />
+                <link rel="stylesheet" href="<?=SITE_URL?>/css/mensajes.css" />
+                <link rel="stylesheet" href="<?=SITE_URL?>/ui/css/smoothness/jquery-ui-1.8.19.custom.css" />
+                
+                <!--<link rel="stylesheet" href="<?=SITE_URL?>/ui/css/custom-theme/jquery-ui-1.8.16.custom.css" />--!>
+                
+                <link href=<?=SITE_URL."/kendo/content/shared/styles/examples-offline.css"?> rel="stylesheet">
+                <link href=<?=SITE_URL."/kendo/css/kendo.common.min.css"?> rel="stylesheet">
+                <link href=<?=SITE_URL."/kendo/css/kendo.default.min.css"?> rel="stylesheet">
+                <?=$this->headLink() ?>
+                
+                <script src=<?=SITE_URL."/js/excanvas.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.min.js"?> ></script>
+                <script src=<?=SITE_URL."/kendo/js/kendo.web.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.ui.custom.js"?> ></script>
+                <script src=<?=SITE_URL."/js/bootstrap.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.flot.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.flot.resize.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.peity.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/fullcalendar.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.uniform.js"?> ></script>
+                <script src=<?=SITE_URL."/js/bootstrap-colorpicker.js"?> ></script>
+                <script src=<?=SITE_URL."/js/bootstrap-datepicker.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.ui.datepicker-es.js"?> ></script>
+                
+              
+                <script src=<?=SITE_URL."/ui/js/jquery-ui-1.8.16.custom.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.chosen.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.dataTables.min.js"?> ></script>
+                <script src=<?=SITE_URL."/js/unicorn.tables.js"?> ></script>
+                <script src=<?=SITE_URL."/js/unicorn.form_common.js"?> ></script>
+                <script src=<?=SITE_URL."/js/unicorn.js"?> ></script>
+                
+                <script src=<?=SITE_URL."/js/plugins/numeric.js"?> ></script>
+                <script src=<?=SITE_URL."/js/jquery.ajaxUpload.js"?> ></script>
+                
+                <script src=<?=SITE_URL."/js/web/validate.js"?> ></script>
+                <script src="<?=SITE_URL?>/js/web/main.js"></script>
+                <script src=<?=SITE_URL."/js/web/mvc.js"?> ></script>
+                
+                <?=$this->headScript() ?>
+	</head>
+	<body>
+		
+		<div id="header">
+        <img src="img/logo.png" alt="" />
+			<h1><a href="./dashboard.html">Admin Test</a></h1>		
+		</div>
+
+		<div id="user-nav" class="navbar">
+                    <ul class="nav btn-group">
+                        <li class="btn btn-inverse" ><a title="" href="#"><i class="icon icon-user"></i> <span class="text">Usuario: <?=$this->layout()->user." (".$this->layout()->rol.")"?></span></a></li>
+                        <li class="btn btn-mini btn-inverse"><a title="" href=<?=SITE_URL.'/logout'?> ><i class="icon icon-share-alt"></i> <span class="text">Salir</span></a></li>
+                    </ul>
+                </div>
+            
+		<div id="sidebar">
+			<a href="#" class="visible-phone"><i class="icon icon-home"></i>Dashboard</a>
+			<ul>
+                            <!-- Sería un menú dinámico -->
+				<?=$this->partial('menu.phtml',array('padre' => $this->layout()->padre
+                                , 'active' => $this->layout()->link));?>
+			</ul>
+		</div>
+		
+		<div id="content">
+			<div id="content-header">
+				<h1><?=$this->layout()->active?>&nbsp;
+                                    <!-- validara si tiene permiso el usuario -->
+                                    <?php if ($this->layout()->btnNuevo == 1) { ?>
+                                    <a href="#myModal" id="btnOpen" role="button" class="btn tip-right" title="Nuevo registro" onclick="nuevo()" data-toggle="modal">
+                                        <li class="icon-plus-sign"></li>Nuevo
+                                    </a> 
+                                    <?php } ?>
+                                </h1>
+                                
+				<div class="btn-group">
+                <?php if (Application_Model_Rol::ADMINISTRADOR == $this->layout()->idrol) { ?>
+					<a href="<?=SITE_URL.'/admin/mvc/usuario'?>" class="btn btn-large tip-left" title="Administrar usuarios"><i class="icon-user"></i></a>
+                <?php } ?>
+				</div>
+			</div>
+                    
+			<div id="breadcrumb">
+				<a href="#" title="Ir al inicio" class="tip-bottom"><i class="icon-home"></i>Inicio</a>
+				<a href="#" class="current"><?=$this->layout()->active?></a>
+			</div>
+                    
+			<div class="container-fluid">
+                                                                        
+                            <?php echo $this->layout()->content;?>
+				<?=$this->render('pie.phtml');?>
+			</div>
+                    
+                    <div id="ventana-modal" style="overflow: auto">
+                        
+                    </div>
+		
+	</body>
+</html>

@@ -1,0 +1,33 @@
+<div class="alertas alertas-info">
+    <button class="close" data-dismiss="alert">×</button>
+    <strong>¡Mensaje!</strong> Bienvenido al sistema.
+</div>
+<?=$this->partial('_partials/mensajes.phtml',array('messages' => $this->messages,'tipoMessages' => $this->tipoMessages));?>
+<div class="widget-box">
+    <div class="widget-title">	
+        <h5><?=$this->active?></h5>
+    </div>
+<div class="widget-content nopadding">
+    <table id='tabla' class="table table-condensed table-bordered" >
+        <thead>
+            <tr><th>N</th><th>Nombre</th><th>Tipo</th><th>Descripción</th><th>Url</th></tr>
+        </thead>
+        <?php
+        $num = 1;
+        echo '<tbody>';
+        foreach ($this->data as $value) {
+            echo '<tr>';
+            echo '<td class="taskOptions">'.$num.'</td>';
+            echo '<td>'.$value['nombre'].'</td>';
+            echo '<td>'.$value['info'].'</td>';
+            echo '<td>'.$value['accion'].'</td>';
+            echo '<td><a href='.SITE_URL.'/'.$value['url'].'>'.SITE_URL.'/'.$value['url'].'</a></td>';
+            echo '</tr>';
+            $num++;
+        }
+        echo '</tbody>';
+        ?>
+    </table>
+</div>
+</div>
+<?=$this->partial('_partials/modal.phtml',array('model' => $this->model));?>
