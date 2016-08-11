@@ -22,7 +22,7 @@
             echo '<td>'.$value['nombre'].'</td>';
             if ($value['estado'] == Admin_MvcController::INACTIVO)
                 $estado = 'error.png';
-            echo '<td width=8%><span style=display:none>'.$value['estado'].'</span><img src='.SITE_URL.'/img/'.$estado.' width=15%></td>';
+            echo '<td width=8%><center><span style=display:none>'.$value['estado'].'</span><img src='.SITE_URL.'/img/'.$estado.' width=15%></center></td>';
             echo '<td>'.$value['url'].'</td>';
             echo '</tr>';
         }
