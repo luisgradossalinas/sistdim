@@ -122,6 +122,7 @@ class Application_Model_Recurso extends Zend_Db_Table
                     rr.id_rol = '.$rol.' LIMIT 1)'))
                 ->where("a.estado = ?",self::ESTADO_ACTIVO)
                 ->where("a.orden  != ?",self::PADRE)
+                ->where("a.servir = ?",0)
                 ->order(array('a.padre asc','a.orden asc'))->query()->fetchAll();
     }
     

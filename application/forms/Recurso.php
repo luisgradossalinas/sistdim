@@ -19,7 +19,7 @@ class Application_Form_Recurso extends Zend_Form
         $nombre->addFilter('StripTags');
         $nombre->setAttrib('maxlength', 50);
         $nombre->addValidator(new Zend_Validate_StringLength(array('min' => 3)));
-        $nombre->addValidator('Alpha', false, array('allowWhiteSpace' => true));
+        //$nombre->addValidator('Alpha', false, array('allowWhiteSpace' => true));
         $this->addElement($nombre);
         
         $access = new Zend_Form_Element_Text('access');
@@ -80,6 +80,13 @@ class Application_Form_Recurso extends Zend_Form
         $estado->setMultiOptions(array('1' => 'Activo', '0' => 'Inactivo'));
         $estado->addFilter('StripTags');
         $this->addElement($estado);
+        
+        $servir = new Zend_Form_Element_Select('servir');
+        $servir->setLabel('¿Servir?');
+        $servir->setRequired();
+        $servir->setMultiOptions(array('0' => 'No', '1' => 'Sí'));
+        $servir->addFilter('StripTags');
+        $this->addElement($servir);
    
     }
 

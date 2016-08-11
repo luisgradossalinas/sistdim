@@ -18,6 +18,7 @@ class Admin_RecursoController extends App_Controller_Action_Admin
         $this->_recurso = new Application_Model_Recurso;
     }
     
+    //Respuesta ajax
     public function listadoAction()
     {
         $this->_helper->layout->disableLayout();
