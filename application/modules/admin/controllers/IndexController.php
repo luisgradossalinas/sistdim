@@ -95,7 +95,7 @@ class Admin_IndexController extends App_Controller_Action_Admin
 
         $generator = new Generator_Modelo;
         $sesionMvc  = new Zend_Session_Namespace('sesion_mvc');
-        $primaryKey = $generator->getPrimaryKey($sesionMvc->model);
+        $primaryKey = $generator->getPrimaryKey('usuario');
         $data = $this->_getAllParams();
         
 
