@@ -64,6 +64,16 @@ class Application_Model_Usuario extends Zend_Db_Table
                 ->query()->fetchAll();
         
     }
+
+    public function usuariosActivos()
+    {
+        return $this->getAdapter()->select()->from(array("a" => $this->_name))
+               ->joinInner(array('b' => Application_Model_Rol::TABLA), 'b.id = a.id_rol',
+                       array('nom_rol'=> 'nombre'))
+                ->where('a.estado = ?',self::ESTADO_ACTIVO)
+                ->where('a.id_rol != ?', Application_Model_Rol::ADMINISTRADOR)
+                ->query()->fetchAll();
+    }
     
     
 }

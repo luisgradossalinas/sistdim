@@ -1,0 +1,6 @@
+se crea el campo
+id_usuario en la tabla 
+rol_recurso
+
+http://pruebatest.pe:81/admin/proyecto/proyecto-usuario
+Avanzar permisos

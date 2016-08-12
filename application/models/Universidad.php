@@ -42,6 +42,8 @@ class Application_Model_Universidad extends Zend_Db_Table
         return $this->getAdapter()->select()->from($this->_name)->query()->fetchAll();
     }
 
+    
+
 
 }
 

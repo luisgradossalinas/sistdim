@@ -13,7 +13,7 @@ class Application_Model_ProyectoUsuario extends Zend_Db_Table
 
     const ESTADO_ELIMINADO = 2;
 
-    const TABLA = 'proyecto';
+    const TABLA = 'proyecto_usuario';
 
     public function guardar($datos)
     {
@@ -33,9 +33,10 @@ class Application_Model_ProyectoUsuario extends Zend_Db_Table
         return $id;
     }
 
-    public function listado_()
+    public function listadoProyUsuario($usuario)
     {
-        return $this->getAdapter()->select()->from($this->_name)->query()->fetchAll();
+        return $this->getAdapter()->select()->from($this->_name)->where("id_usuario = ?",$usuario)
+        ->query()->fetchAll();
     }
 
     
