@@ -1,11 +1,11 @@
 <?php
 
-class Application_Model_Calidad extends Zend_Db_Table
+class Application_Model_Tipoproceso extends Zend_Db_Table
 {
 
-    protected $_name = 'calidad';
+    protected $_name = 'tipoproceso';
 
-    protected $_primary = 'id';
+    protected $_primary = 'codigo_tipoproceso';
 
     const ESTADO_INACTIVO = 0;
 
@@ -13,7 +13,7 @@ class Application_Model_Calidad extends Zend_Db_Table
 
     const ESTADO_ELIMINADO = 2;
 
-    const TABLA = 'calidad';
+    const TABLA = 'tipoproceso';
 
     public function guardar($datos)
     {
@@ -26,13 +26,9 @@ class Application_Model_Calidad extends Zend_Db_Table
         $datos = array_intersect_key($datos, array_flip($this->_getCols()));
         
         if ($id > 0) {
-        	$datos['fecha'] = new Zend_Date($datos['fecha'],'yyyy-mm-dd');
-        	$datos['fecha'] = $datos['fecha']->get('yyyy-mm-dd');
-        	$cantidad = $this->update($datos, 'id = ' . $id);
+        	$cantidad = $this->update($datos, 'codigo_tipoproceso = ' . $id);
         	$id = ($cantidad < 1) ? 0 : $id;
         } else {
-        	$datos['fecha'] = new Zend_Date($datos['fecha'],'yyyy-mm-dd');
-        	$datos['fecha'] = $datos['fecha']->get('yyyy-mm-dd');
         	$id = $this->insert($datos);
         }
         

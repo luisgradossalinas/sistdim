@@ -3,16 +3,12 @@
 class Admin_IndexController extends App_Controller_Action_Admin
 {
     private $_usuarioModel = null;
-    private $_productoModel = null;
-    private $_categoriaModel = null;
     private $_usuarioForm = null;
 
     public function init()
     {
         parent::init();
         $this->_usuarioModel = new Application_Model_Usuario;
-        $this->_productoModel = new Application_Model_Producto;
-        $this->_categoriaModel = new Application_Model_Categoria;
         $this->_usuarioForm = new Application_Form_Usuario;
     }
 

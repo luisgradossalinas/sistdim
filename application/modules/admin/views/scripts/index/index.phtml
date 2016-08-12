@@ -3,27 +3,8 @@
     <div class="widget-title">	
         <h5><?=$this->active?></h5>
     </div>
-<div class="widget-content nopadding">
-    <table id='tabla' class="table table-condensed table-bordered" >
-        <thead>
-            <tr><th>N</th><th>Nombre</th><th>Tipo</th><th>Descripción</th><th>Url</th></tr>
-        </thead>
-        <?php
-        $num = 1;
-        echo '<tbody>';
-        foreach ($this->data as $value) {
-            echo '<tr>';
-            echo '<td class="taskOptions">'.$num.'</td>';
-            echo '<td>'.$value['nombre'].'</td>';
-            echo '<td>'.$value['info'].'</td>';
-            echo '<td>'.$value['accion'].'</td>';
-            echo '<td><a href='.SITE_URL.'/'.$value['url'].'>'.SITE_URL.'/'.$value['url'].'</a></td>';
-            echo '</tr>';
-            $num++;
-        }
-        echo '</tbody>';
-        ?>
-    </table>
+<div class="widget-content nopadding" style="height: 350px">
+    <center><img src="<?=SITE_URL?>/img/logo-inicio.png"></center>
 </div>
 </div>
 <?=$this->partial('_partials/modal.phtml',array('model' => $this->model));?>

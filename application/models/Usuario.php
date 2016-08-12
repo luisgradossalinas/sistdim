@@ -72,6 +72,7 @@ class Application_Model_Usuario extends Zend_Db_Table
                        array('nom_rol'=> 'nombre'))
                 ->where('a.estado = ?',self::ESTADO_ACTIVO)
                 ->where('a.id_rol != ?', Application_Model_Rol::ADMINISTRADOR)
+                ->order('a.nombres asc')
                 ->query()->fetchAll();
     }
     

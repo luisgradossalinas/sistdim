@@ -4,7 +4,7 @@ class Admin_ProyectoController extends App_Controller_Action_Admin
 {
     
 	private $_usuarioModel;
-	private $_proyectoUsuarioModel;
+	private $_recursoModel;
 	private $_proyectoModel;
 
     public function init()
@@ -12,7 +12,7 @@ class Admin_ProyectoController extends App_Controller_Action_Admin
         parent::init();
 
         $this->_usuarioModel = new Application_Model_Usuario;
-        $this->_proyectoUsuarioModel = new Application_Model_ProyectoUsuario;
+        $this->_recursoModel = new Application_Model_Recurso;
         $this->_proyectoModel = new Application_Model_Proyecto;
 
     }
@@ -24,17 +24,13 @@ class Admin_ProyectoController extends App_Controller_Action_Admin
         Zend_Layout::getMvcInstance()->assign('active', 'Proyecto / Usuario');
         Zend_Layout::getMvcInstance()->assign('padre', 2);
         Zend_Layout::getMvcInstance()->assign('link', 'proyusuario');
-
-
-        //Listar usuarios;
+        
     	$this->view->usuarios = $this->_usuarioModel->usuariosActivos();
     	$this->view->proyecto = $this->_proyectoModel->proyectosActivos();
-
-
         
     }
 
-    public function listadoProyectosAction() {
+    public function permisoUsuarioAction() {
 
     	$this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
@@ -52,12 +48,10 @@ class Admin_ProyectoController extends App_Controller_Action_Admin
 
         
         if ($this->_hasParam('usuario')) {
-            $usuario= $this->_getParam('usuario');
-            //$listadoRecursos = $recurso->fetchAll('estado ='. self::ACTIVO)->toArray();
-            $listadoProy = $this->_proyectoUsuarioModel->listadoProyUsuario($usuario);
+            $usuario = $this->_getParam('usuario');
+            $proyecto = $this->_getParam('proyecto');
+            $listadoProy = $this->_recursoModel->recursosUsuario($usuario,$proyecto);
             echo Zend_Json::encode($listadoProy);
-
-            
             
         }
         

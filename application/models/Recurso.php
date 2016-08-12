@@ -13,6 +13,8 @@ class Application_Model_Recurso extends Zend_Db_Table
     
     const PADRE = 1;
     
+    const SERVIR = 1;
+    
     const FUNCION_LISTADO = 'fetchAll';
       
     public function guardar($datos)
@@ -59,7 +61,6 @@ class Application_Model_Recurso extends Zend_Db_Table
     
     public function listaRecursosPadre()
     {
-        //SELECT nombre,padre FROM recurso WHERE orden = 1
         return $this->getAdapter()->select()->from(
                     $this->_name,
                     array('key' => 'padre','value' => 'nombre')
@@ -69,8 +70,6 @@ class Application_Model_Recurso extends Zend_Db_Table
     //Para generar el menú dinámico 
     public function recursosPadre($rol)
     {
-       
-
         return $this->getAdapter()->select()->from($this->_name,array('padre','nombre','accion'))
         ->where('padre in (select distinct r.padre FROM recurso r 
                 inner join rol_recurso rr ON rr.`id_recurso` = r.`id`
@@ -85,7 +84,7 @@ class Application_Model_Recurso extends Zend_Db_Table
     {   
         return $this->getAdapter()->select()->from(array("a" => $this->_name))
                 ->joinInner(array("b" => "rol_recurso"), "b.id_recurso = a.id",null)
-                ->where("b.id_rol = ?", $rol)->where("estado = ?",self::ESTADO_ACTIVO)
+                ->where("b.id_rol = ?", $rol)->where("a.estado = ?",self::ESTADO_ACTIVO)
                 ->where('a.orden != ?', self::PADRE)
                 ->where('a.padre = ?', $padre)
                 ->order(array('a.orden asc'))->query()->fetchAll();
@@ -177,6 +176,18 @@ class Application_Model_Recurso extends Zend_Db_Table
          return array("menu" => $menu,"registro" => $nReg);
     }
     
+    //Recursos por usuario
+    public function recursosUsuario($usuario,$proyecto) {
+        
+        return $this->getAdapter()->select()->from(array("r" => $this->_name),
+                array(
+                    'r.nombre','estado_permiso' => new Zend_Db_Expr("IFNULL(rr.estado,0)")))
+                ->joinLeft(array("rr" => Application_Model_RolRecurso::TABLA), 'rr.id_recurso = r.id',array())
+                ->joinLeft(array("u" => Application_Model_Usuario::TABLA), 'u.id = rr.id_usuario',array())
+                ->where("r.servir = ?",self::SERVIR)
+                ->where("r.orden  <> ?",self::PADRE)->query()->fetchAll();
+        
+    }
     
 
 

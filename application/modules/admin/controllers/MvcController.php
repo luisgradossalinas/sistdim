@@ -56,7 +56,7 @@ class Admin_MvcController extends App_Controller_Action_Admin
         $padre = 0;
         $estado = 0;
         $sesionMvc  = new Zend_Session_Namespace('sesion_mvc');
-        
+                
         if ($dataRecurso) {
             $padre = $dataRecurso[0];
             $funcionListado = $dataRecurso[1];
