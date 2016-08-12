@@ -1,0 +1,36 @@
+<?=$this->partial('_partials/mensajes.phtml',array('messages' => $this->messages,'tipoMessages' => $this->tipoMessages));?>
+<div class="widget-box">
+    <div class="widget-title">	
+        <h5>Naturaleza orgánica</h5>
+    </div>
+<div class="widget-content nopadding">
+    <table id='tabla' class="table table-condensed table-bordered" >
+        <thead>
+        <tr><th></th><th>Descripcion</th><th>Estado</th></tr>
+        </thead>
+        <?php
+        echo '<tbody>';
+        foreach ($this->data as $value) {
+            $estado = 'checkmark.png';
+            echo '<tr>';
+            echo '<td width=5% class="taskOptions">';
+            echo '<a data-original-title="Editar" class="tip-top" href="#myModal" data-toggle="modal" onclick="editar('.$value['codigo_natuorganica'].')">';
+            echo '<i class="icon-pencil"></i></a>&nbsp;&nbsp;';
+            echo '</td>';
+        ?>   
+        <?php 
+	echo "<td>".$value['descripcion']."</td>";
+	if ($value['estado'] == Admin_MvcController::INACTIVO)
+            $estado = 'error.png';
+        echo '<td width=7%><center><span style=display:none>'.$value['estado'].'</span><img src='.SITE_URL.'/img/'.$estado.' width=15%><center></td>';
+	
+	echo "</tr>";
+	?>
+        <?php
+        }
+        echo '</tbody>';
+        ?>
+    </table>
+</div>
+</div>    
+<?=$this->partial('_partials/modal.phtml',array('model' => $this->model));?>
