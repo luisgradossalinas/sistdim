@@ -43,6 +43,12 @@ class Application_Model_Familia extends Zend_Db_Table
                 ->query()->fetchAll();
     }
 
+    public function combo()
+    {
+        return $this->getAdapter()->select()->from($this->_name,array('key' => 'codigo_familia', 'value' => 'descripcion'))
+                ->where('estado = ?',self::ESTADO_ACTIVO)->query()->fetchAll();
+    }
+
 
 }
 

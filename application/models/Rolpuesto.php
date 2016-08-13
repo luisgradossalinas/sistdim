@@ -37,7 +37,9 @@ class Application_Model_Rolpuesto extends Zend_Db_Table
 
     public function listado()
     {
-        return $this->getAdapter()->select()->from($this->_name)->query()->fetchAll();
+        return $this->getAdapter()->select()->from(array("rp" =>$this->_name))
+        ->joinInner(array("f" => Application_Model_Familia::TABLA),"f.codigo_familia = rp.codigo_familia",array("nom_familia" => 'f.descripcion'))
+        ->query()->fetchAll();
     }
 
 

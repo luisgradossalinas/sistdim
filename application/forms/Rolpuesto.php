@@ -3,6 +3,8 @@
 class Application_Form_Rolpuesto extends Zend_Form
 {
 
+    private $_familia;
+
     public function init()
     {
         $this->setAttrib('id', 'form');
@@ -21,14 +23,16 @@ class Application_Form_Rolpuesto extends Zend_Form
         $estado->addFilter('StripTags');
         $this->addElement($estado);
         
-        $codigo_familia = new Zend_Form_Element_Text('codigo_familia');
-        $codigo_familia->setLabel('Codigo_familia:');
+        $this->_familia = new Application_Model_Familia;        
+        $dataFamilia = $this->_familia->combo();
+        array_unshift($dataFamilia,array('key'=> '', 'value' => 'Seleccione'));
+        
+        $codigo_familia = new Zend_Form_Element_Select('codigo_familia');
+        $codigo_familia->setLabel('Familia:');
         $codigo_familia->setRequired();
-        $codigo_familia->addValidator(new Zend_Validate_Int());
-        $codigo_familia->setAttrib('maxlength',9);
-        $codigo_familia->setAttrib('class','v_numeric');
-        $codigo_familia->addFilter('StripTags');
+        $codigo_familia->setMultiOptions($dataFamilia);
         $this->addElement($codigo_familia);
+
     }
 
     public function populate($data)
