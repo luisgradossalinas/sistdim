@@ -1,7 +1,12 @@
 <?php
 
+//Rol
+$servir = 1;
+if ($this->rol == Application_Model_Rol::ADMINISTRADOR) {
+    $servir = 0;
+}
+
 $menu = new Application_Model_Recurso;
-$data = $menu->generacionMenu($this->padre, $this->active);
+$data = $menu->generacionMenu($this->padre, $this->active, $servir, $this->proyecto, $this->usuario);
 echo $data['menu'];
 
-?>

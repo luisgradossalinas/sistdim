@@ -23,8 +23,7 @@ class Admin_IndexController extends App_Controller_Action_Admin
                 " (".$sesion_usuario->sesion_usuario['nombre_rol'].")";
 
         $id = $sesion_usuario->sesion_usuario['id'];
-
-
+        
        // $this->view->idrol = $sesion_usuario->sesion_usuario['id_rol'];
 
         $this->view->data = $this->_usuarioModel->recursosPorUsuario($id);

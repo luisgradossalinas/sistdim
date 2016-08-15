@@ -65,16 +65,22 @@
                 Proyecto: <?=$this->layout()->nombre_proyecto?> 
                 <?php } ?>
                 Usuario: <?=$this->layout()->user." (".$this->layout()->rol.")"?></span></a></li>
-                        <li class="btn btn-mini btn-inverse"><a title="" href=<?=SITE_URL.'/logout'?> ><i class="icon icon-share-alt"></i> <span class="text">Salir</span></a></li>
-                    </ul>
+                <?php if ($this->layout()->id_rol != Application_Model_Rol::ADMINISTRADOR) { ?>
+                <li class="btn btn-mini btn-inverse"><a title="" href=<?=SITE_URL.'/lista-proyectos'?> ><span class="text">Cambiar proyecto</span></a></li>    
+                <?php } ?>
+                <li class="btn btn-mini btn-inverse"><a title="" href=<?=SITE_URL.'/logout'?> ><i class="icon icon-share-alt"></i> <span class="text">Salir</span></a></li>
+                </ul>
                 </div>
             
 		<div id="sidebar">
 			<a href="#" class="visible-phone"><i class="icon icon-home"></i>Dashboard</a>
 			<ul>
                             <!-- Sería un menú dinámico -->
-				<?=$this->partial('menu.phtml',array('padre' => $this->layout()->padre
-                                , 'active' => $this->layout()->link));?>
+				<?=$this->partial('menu.phtml',array('padre' => $this->layout()->padre,
+                                    'active' => $this->layout()->link, 'rol' => $this->layout()->id_rol, 
+                                    'proyecto' => $this->layout()->id_proyecto,
+                                    'usuario' => $this->layout()->id_usuario
+                                    ));?>
 			</ul>
 		</div>
 		
@@ -95,7 +101,7 @@
                 <?php } ?>
 				</div>
 			</div>
-                    
+                  
 			<div id="breadcrumb">
 				<a href="#" title="Ir al inicio" class="tip-bottom"><i class="icon-home"></i>Inicio</a>
 				<a href="#" class="current"><?=$this->layout()->active?></a>

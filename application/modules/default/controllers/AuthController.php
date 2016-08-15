@@ -25,8 +25,6 @@ class Default_AuthController extends Zend_Controller_Action
     {
         $this->view->messages = "";
         
-        $this->view->proyectos = $this->_proyectoModel->proyectosActivos();
-        
         //Si está logueado y vuelve atràs o por url lo envia al admin
         $auth = Zend_Auth::getInstance();
         if ($auth->hasIdentity()) {
@@ -40,7 +38,6 @@ class Default_AuthController extends Zend_Controller_Action
 
                 $username = $f->filter($data['usuario']);
                 $password = $f->filter($data['clave']);
-                $proyecto = $f->filter($data['proyecto']);
 
                 Zend_Loader::loadClass('Zend_Auth_Adapter_DbTable');
                 $dbAdapter = $this->_usuarioModel->getAdapter();
@@ -60,24 +57,27 @@ class Default_AuthController extends Zend_Controller_Action
                     $data = $authAdapter->getResultRowObject(null, 'password');
                     $auth->getStorage()->write($data);
 
-                    if (!$this->_validaAccesoProyecto($data,$proyecto)) {
+                    $dataValida = $this->_validaAccesoProyecto($data);
+                    if ($dataValida['code'] == 0) {
                         Zend_Auth::getInstance()->clearIdentity();
-                        $this->view->messages = 'No tiene permiso para acceder al proyecto.';
+                        $this->view->messages = $dataValida['msg'];
                     } else {
-                        $this->_guardarSesion($data,$proyecto);
+                        //Si tiene proyectos
+                        if($dataValida['code'] == 1) {
+                            $this->_guardarSesion($data);
+                            $this->_redirect('lista-proyectos');
+                        }
+                        
+                        //Si es administrador
+                        $this->_guardarSesion($data);
                         $this->_redirect('admin');
                     }
-                    
-                    
                 } else {
                     //$this->_redirect('login');
                     $this->view->messages = 'Usuario o clave incorrectos.';
                     //return;
                 }
         }
-        //$this->render('login');
-        
-      //  $this->view->form = $this->_formLogin;
     }
     
     public function logoutAction()
@@ -92,18 +92,17 @@ class Default_AuthController extends Zend_Controller_Action
      * Guarda el username en la sesión
      * @param String $username 
      */
-    private function _guardarSesion($username,$proyecto) {
+    private function _guardarSesion($username) {
         
         settype($username,'array');
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
         $rolModelo = new Application_Model_Rol;
-        $proyectoModelo = new Application_Model_Proyecto;
+        
         $dataRol = $rolModelo->fetchRow("id = " . $username['id_rol'])->toArray();
         $usuario = $username;
         $usuario['nombre_rol'] = $dataRol['nombre'];
-        $dataProyecto = $proyectoModelo->fetchRow("id_proyecto = " .$proyecto)->toArray();
-        $usuario['id_proyecto'] = $proyecto;
-        $usuario['nombre_proyecto'] = $dataProyecto['nombre'];
+        $usuario['id_proyecto'] = '';
+        $usuario['nombre_proyecto'] = '';
         $usuario['nombre_completo'] = $username['nombres'] . " " . $username['apellidos'];
         $sesion_usuario->sesion_usuario = $usuario;
         
@@ -121,22 +120,47 @@ class Default_AuthController extends Zend_Controller_Action
         
     }
     
-    //Si es admin no validarlo
-    public function _validaAccesoProyecto($data,$proyecto) {
+    //Si es admin no validarlo (retornar mensaje)
+    public function _validaAccesoProyecto($data) {
         
-        $proyectoUsuarioModel = new Application_Model_ProyectoUsuario;
+        $rolRecursoModel = new Application_Model_RolRecurso;
         $usuario = $data->id;
         $rol = $data->id_rol;
         
         if ($rol != Application_Model_Rol::ADMINISTRADOR) {
-            $validaAcceso = $proyectoUsuarioModel->validarAccesoProyUsuario($usuario, $proyecto);
+            $validaAcceso = $rolRecursoModel->validarUsuario($usuario);
             if (empty($validaAcceso)) {
-                return false;
+                return array('code' => 0,'msg' => 'No tiene proyectos asignados');
+            } else {
+                return array('code' => 1,'msg' => 'Redireccionar a lista proyectos');
             } 
         }
         
-        return true;
+        return array('code' => 2,'msg' => 'Acceso administrador');
 
+    }
+    
+    public function listaProyectosAction() {
+        
+        $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
+        $usuario = $sesion_usuario->sesion_usuario['id'];
+        $this->view->proyectos = $this->_proyectoModel->proyectosActivosUsuario($usuario);
+        
+        if ($this->getRequest()->isPost()) {
+            
+            //setear sesión 
+            $data = $this->_getAllParams();
+            $f = new Zend_Filter_StripTags();
+            $proyecto = $f->filter($data['proyecto']);
+            $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
+            $proyectoModelo = new Application_Model_Proyecto;
+            $dataProyecto = $proyectoModelo->fetchRow("id_proyecto = " .$proyecto)->toArray();
+            $sesion_usuario->sesion_usuario['id_proyecto'] = $proyecto;
+            $sesion_usuario->sesion_usuario['nombre_proyecto'] = $dataProyecto['nombre'];
+            
+            $this->_redirect('admin');
+            
+        } 
     }
 
 }

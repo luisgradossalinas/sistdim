@@ -50,10 +50,7 @@ $(function(){
                 required: true,
                 minlength:6,
                 maxlength:20
-            },
-            proyecto:{
-                required:true
-            },
+            }
         },
         errorClass: "help-inline",
         errorElement: "span",
@@ -70,9 +67,6 @@ $(function(){
                 required: "*"
             },
             clave: {
-                required: "*"
-            },
-            proyecto: {
                 required: "*"
             }
         }

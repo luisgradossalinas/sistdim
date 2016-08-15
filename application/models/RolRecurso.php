@@ -29,6 +29,26 @@ class Application_Model_RolRecurso extends Zend_Db_Table
         }
         return $id;
     }
+    /*
+    Verifica si existe datos de un usuario con su proyecto en la tabla rol_recurso
+    */
+    public function validaRecursoUsuario($usuario,$proyecto) {
+        
+        return $this->getAdapter()->select()->from(Application_Model_RolRecurso::TABLA)
+                ->where("id_proyecto = ?",$proyecto)
+                ->where("id_usuario = ?",$usuario)->query()->fetchAll();
+        
+    }
+    
+    //Validar si pertenece a un proyecto
+    public function validarUsuario($usuario)
+    {
+        return $this->getAdapter()->select()->from($this->_name)
+                ->where('estado = ?',self::ESTADO_ACTIVO)
+                ->where('id_usuario = ?',$usuario)
+                ->query()->fetchAll();
+        
+    }
 
 
 }

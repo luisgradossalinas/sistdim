@@ -3,7 +3,7 @@
     <div class="widget-title">	
         <h5><?=$this->active?></h5>
     </div>
-<div class="widget-content nopadding" style="height:400px">
+<div class="widget-content nopadding" style="height:360px">
 <select id="usuario" name="usuario">
 <option value=''>[Seleccione usuario]</option>
 <?php foreach ($this->usuarios as $val){
@@ -16,7 +16,7 @@
    echo "<option value=".$val['id_proyecto'].">".$val['nombre']."(".$val['entidad'].")</option>"; 
 }?>
 </select>
-<input type="submit" id="grabarPermisos" name="grabarPermisos" class="btn btn-inverse" value="Grabar permisos" style="margin-top:-23px" />
+<input type="submit" id="grabarPermisos" class="btn btn-inverse" value="Grabar permisos" style="margin-top:-23px" />
 
 <table id='' class="table table-condensed table-bordered" style="width: 60%">
     <thead>

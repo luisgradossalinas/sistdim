@@ -19,10 +19,10 @@ $(document).ready(function () {
             return false;
         }
 
-
         $.ajax({
             url: urls.siteUrl + '/admin/proyecto/permiso-usuario',
-            data: {usuario: usuario},
+            data: {usuario: usuario,
+                   proyecto: proyecto},
             type: 'post',
             dataType: 'json',
             success: function (result) {
@@ -36,28 +36,18 @@ $(document).ready(function () {
                     html += "<td>" + obj['nombre'] + "</td>";
 
                     if (obj['estado_permiso'] == 1) {
-                        html += "<td><center><input type='checkbox' name='estado_permiso' value=1 checked></center></td>";
+                        html += "<td><center><input type='checkbox' name='estado_permiso' value="+obj['id_recurso']+" checked></center></td>";
                     } else {
-                        html += "<td><center><input type='checkbox' name='estado_permiso' value=0></center></td>";
+                        html += "<td><center><input type='checkbox' name='estado_permiso' value="+obj['id_recurso']+"></center></td>";
                     }
-
                     html += "</tr>";
-
-
                 });
 
                 $('#controla').val(1);
                 $('#permisos').empty().html(html);
-
             }
-
-
-        })
-        
-        
-        
+        })                
     });
-
 
     $("#proyecto").change(function () {
 
@@ -78,10 +68,11 @@ $(document).ready(function () {
             return false;
         }
 
-
         $.ajax({
             url: urls.siteUrl + '/admin/proyecto/permiso-usuario',
-            data: {usuario: usuario},
+            data: {usuario: usuario,
+                   proyecto: proyecto
+               },
             type: 'post',
             dataType: 'json',
             success: function (result) {
@@ -95,24 +86,17 @@ $(document).ready(function () {
                     html += "<td>" + obj['nombre'] + "</td>";
 
                     if (obj['estado_permiso'] == 1) {
-                        html += "<td><center><input type='checkbox' name='estado_permiso' value=1 checked></center></td>";
+                        html += "<td><center><input type='checkbox' name='estado_permiso' value="+obj['id_recurso']+" checked></center></td>";
                     } else {
-                        html += "<td><center><input type='checkbox' name='estado_permiso' value=0></center></td>";
+                        html += "<td><center><input type='checkbox' name='estado_permiso' value="+obj['id_recurso']+"></center></td>";
                     }
-
                     html += "</tr>";
-
-
                 });
 
                 $('#controla').val(1);
                 $('#permisos').empty().html(html);
-
             }
-
-
         })
-
     });
     
     $("#grabarPermisos").click(function(){
@@ -124,8 +108,44 @@ $(document).ready(function () {
        
        var usuario = $("#usuario").val();
        var proyecto = $("#proyecto").val();
+        
+        var selectedItems = new Array();
+        var NoSelectedItems = new Array();
+        var recursosAdd = '';
+        var recursosDelete = '';
+        $("#permisos tr td input[@name='estado_permiso[]']:checked").each(function(){
+                selectedItems.push($(this).val());
+                recursosAdd += $(this).val() + ',';
+        });
+
+        $("#permisos tr td input[@name='estado_permiso[]']:not(:checked)").each(function(){
+            if ($(this).val() != '') {
+                NoSelectedItems.push($(this).val());
+                recursosDelete += $(this).val() + ',';
+            }
+                
+        });     
+        
+        //alert(selectedItems);
+        //alert(NoSelectedItems);
        
-       alert("Grabar!!!!!");
+       //Llamar a ajax
+       $.ajax({
+            url: urls.siteUrl + '/admin/proyecto/grabar-permisos',
+            data: {
+                usuario: usuario,
+                proyecto: proyecto,
+                rec_add:selectedItems,
+                rec_del:NoSelectedItems
+            },
+            type: 'post',
+            dataType: 'json',
+            success: function (result) {
+                //location.reload();
+            }
+        });
+       
+       alert("Permisos grabados");
         
         
     });

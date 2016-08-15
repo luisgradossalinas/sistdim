@@ -15,7 +15,9 @@ class App_Controller_Action_Admin extends App_Controller_Action
         
         Zend_Layout::getMvcInstance()->assign('user', $sesion_usuario->sesion_usuario['nombre_completo']);
         Zend_Layout::getMvcInstance()->assign('rol', $sesion_usuario->sesion_usuario['nombre_rol']);
+        Zend_Layout::getMvcInstance()->assign('id_usuario', $sesion_usuario->sesion_usuario['id']);
         Zend_Layout::getMvcInstance()->assign('id_rol', $sesion_usuario->sesion_usuario['id_rol']);
+        Zend_Layout::getMvcInstance()->assign('id_proyecto', $sesion_usuario->sesion_usuario['id_proyecto']);
         Zend_Layout::getMvcInstance()->assign('nombre_proyecto', $sesion_usuario->sesion_usuario['nombre_proyecto']);
         Zend_Layout::getMvcInstance()->assign('css', $this->getConfig()->app->estiloCss);
         

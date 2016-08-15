@@ -20,7 +20,13 @@ class Application_Model_Usuario extends Zend_Db_Table
         unset($datos['id']);
 
         $datos = array_intersect_key($datos, array_flip($this->_getCols()));
-        $datos['clave'] = md5($datos['clave']);
+        
+        if (!empty($datos['clave'])) {
+            $datos['clave'] = md5($datos['clave']);
+        } else {
+            unset($datos['clave']);
+        }
+        
 
         if ($id > 0) {
             $cantidad = $this->update($datos, 'id = ' . $id);
