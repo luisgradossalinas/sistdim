@@ -19,6 +19,7 @@ class Default_AuthController extends Zend_Controller_Action {
     }
 
     public function loginAction() {
+        
         $this->view->messages = "";
         $this->view->msg = "";
 
@@ -67,8 +68,9 @@ class Default_AuthController extends Zend_Controller_Action {
                         $this->view->msg = 'alert-success';
                     } catch (Exception $e) {
                         $sent = false;
-                        echo "no se pudo enviar el correo";
-                        print_r($e);
+                        $this->view->messages = 'No se pudo enviar el correo.';
+                        $this->view->msg = 'alert-error';
+                        //print_r($e);
                     }
                 }
             }
