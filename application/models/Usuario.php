@@ -71,6 +71,9 @@ class Application_Model_Usuario extends Zend_Db_Table
         
     }
 
+    /*
+    Lista todos los usuarios activos que no son administradores
+    */
     public function usuariosActivos()
     {
         return $this->getAdapter()->select()->from(array("a" => $this->_name))
@@ -82,6 +85,41 @@ class Application_Model_Usuario extends Zend_Db_Table
                 ->query()->fetchAll();
     }
     
+    /*
+    Usado para recuperar contraseñas de usuarios
+    */
+    public function existeUsuarioEmail($correo) {   
+        return $this->getAdapter()->select()->from($this->_name)
+                ->where('email = ?', $correo)->query()->fetchAll();   
+    }
+    
+    /*
+    Usado para recuperar contraseñas de usuarios - validación de token
+    */
+    public function existeToken($token) {   
+        return $this->getAdapter()->select()->from($this->_name)
+                ->where('token = ?', $token)->query()->fetchAll();   
+    }
+    
+    public function generarToken($correo, $token) {
+        
+        $data['token'] = $token;
+        $where = array();
+        $where[] = $this->getAdapter()->quoteInto('email = ?',$correo);
+        return $this->update($data, $where);
+        
+    }
+    
+    public function cambiarClave($correo,$clave, $token) {
+        
+        $data['clave'] = md5($clave);
+        $where = array();
+        $where[] = $this->getAdapter()->quoteInto('email = ?',$correo);
+        $where[] = $this->getAdapter()->quoteInto('token = ?',$token);
+        
+        return $this->update($data, $where);
+        
+    }
     
 }
 

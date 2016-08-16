@@ -29,6 +29,7 @@ class Application_Model_RolRecurso extends Zend_Db_Table
         }
         return $id;
     }
+    
     /*
     Verifica si existe datos de un usuario con su proyecto en la tabla rol_recurso
     */

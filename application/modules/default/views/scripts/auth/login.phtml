@@ -1,9 +1,9 @@
 <?php 
 if(!empty($this->messages)) {?>
 <div class="messagelog">
-    <div class="alert alert-error">
+    <div class="alert <?=$this->msg?>">
         <button class="close" data-dismiss="alert">×</button>
-        <strong>Error!</strong> <?php echo $this->messages; ?>
+        <?php echo $this->messages; ?>
     </div>
 </div>
 <?php }?>
@@ -25,11 +25,11 @@ if(!empty($this->messages)) {?>
             </div>
         </div>
         <div class="form-actions">
-            
+            <span class="pull-left"><a href="#" class="flip-link" id="fliptorecover">¿Olvidaste tu contraseña?</a></span>
             <span class="pull-right"><input type="submit" class="btn btn-inverse" value="Login" /></span>
         </div>
     </form>
-    <form id="recoverform" action="/recover" class="form-vertical" method="post">
+    <form id="recoverform" action="/login" class="form-vertical" method="post">
         <p>Ingrese su e-mail y le enviaremos instrucciones de cómo recuperar una contraseña.</p>
         <div class="control-group">
             <div class="controls">

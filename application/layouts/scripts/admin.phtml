@@ -96,9 +96,11 @@
                                 </h1>
                                 
 				<div class="btn-group">
-                <?php if (Application_Model_Rol::ADMINISTRADOR == $this->layout()->idrol) { ?>
-					<a href="<?=SITE_URL.'/admin/mvc/usuario'?>" class="btn btn-large tip-left" title="Administrar usuarios"><i class="icon-user"></i></a>
-                <?php } ?>
+                                <?php if (Application_Model_Rol::ADMINISTRADOR == $this->layout()->id_rol) { ?>
+                                <a href="<?=SITE_URL.'/admin/mvc/usuario'?>" class="btn btn-large tip-left" title="Administrar usuarios"><i class="icon-user"></i></a>
+                                <?php } else { ?>
+                                <a href="<?=SITE_URL.'/admin/index/mis-datos'?>" class="btn btn-large tip-left" title="Editar mis datos"><i class="icon-user"></i></a>
+                                <?php } ?>
 				</div>
 			</div>
                   

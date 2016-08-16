@@ -97,8 +97,6 @@ class Application_Model_Recurso extends Zend_Db_Table {
 
         return $sqlHijo->query()->fetchAll();
 
-        //->query()->fetchAll();
-        //->order(array('a.nombre asc'))->query()->fetchAll();
     }
 
     public function validaAcceso($rol, $url) {
