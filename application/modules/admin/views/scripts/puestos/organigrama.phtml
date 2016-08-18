@@ -1,10 +1,37 @@
 <?=$this->partial('_partials/mensajes.phtml',array('messages' => $this->messages,'tipoMessages' => $this->tipoMessages));?>
-<div class="widget-box">
-    <div class="widget-title">	
-        <h5><?=$this->active?></h5>
-    </div>
-<div class="widget-content nopadding">
-    
+
+<div class="col-sm-6">
+<div class="tabbable inline">
+<ul class="nav nav-tabs tab-bricky" id="myTab">
+<li class="active">
+<a data-toggle="tab" href="#panel_tab2_example1">
+Órgano
+</a>
+</li>
+<li class="">
+<a data-toggle="tab" href="#panel_tab2_example2">
+Unidad orgánica
+</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="panel_tab2_example1" class="tab-pane active">
+<p>
+Órgano
+</p>
+<div class="alert alert-info">
+<p>
+Mensaje
+</p>
 </div>
 </div>
+<div id="panel_tab2_example2" class="tab-pane">
+<p>
+Unidad orgánica
+</p>
+</div>
+</div>
+</div>
+</div>
+
 <?=$this->partial('_partials/modal.phtml',array('model' => $this->model));?>

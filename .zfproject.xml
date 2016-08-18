@@ -27,6 +27,7 @@
         <dbTableDirectory>
           <dbTableFile dbTableName="AnuncioWeb"/>
         </dbTableDirectory>
+        <modelFile modelName="Organigrama"/>
       </modelsDirectory>
       <modulesDirectory>
         <moduleDirectory moduleName="default">

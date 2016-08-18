@@ -3,6 +3,35 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/xampp/htdocs/servir/application/modules/default/views/scripts/auth/login.phtml</file>
+            <file>file:/C:/xampp/htdocs/servir/application/modules/admin/controllers/IndexController.php</file>
+            <file>file:/C:/xampp/htdocs/servir/application/modules/admin/views/scripts/proyecto/proyecto-usuario.phtml</file>
+            <file>file:/C:/xampp/htdocs/servir/application/layouts/scripts/admin.phtml</file>
+            <file>file:/C:/xampp/htdocs/servir/application/Bootstrap.php</file>
+            <file>file:/C:/xampp/htdocs/servir/public/js/web/mvc.js</file>
+            <file>file:/C:/xampp/htdocs/servir/application/layouts/scripts/login.phtml</file>
+            <file>file:/C:/xampp/htdocs/servir/application/configs/application.ini</file>
+            <file>file:/C:/xampp/htdocs/servir/application/modules/default/views/scripts/auth/lista-proyectos.phtml</file>
+            <file>file:/C:/xampp/htdocs/servir/public/js/web/login.js</file>
+            <file>file:/C:/xampp/htdocs/servir/application/modules/admin/views/scripts/index/index.phtml</file>
+            <file>file:/C:/xampp/htdocs/servir/application/modules/admin/controllers/MvcController.php</file>
+            <file>file:/C:/xampp/htdocs/servir/application/modules/default/views/scripts/auth/index.phtml</file>
+            <file>file:/C:/xampp/htdocs/servir/application/configs/routes.ini</file>
+            <file>file:/C:/xampp/htdocs/servir/library/App/Controller/Action/Admin.php</file>
+            <file>file:/C:/xampp/htdocs/servir/public/js/web/proyecto-usuario.js</file>
+            <file>file:/C:/xampp/htdocs/servir/application/models/Rol.php</file>
+            <file>file:/C:/xampp/htdocs/servir/application/models/Recurso.php</file>
+            <file>file:/C:/xampp/htdocs/servir/application/modules/admin/controllers/RecursoController.php</file>
+            <file>file:/C:/xampp/htdocs/servir/application/models/Usuario.php</file>
+            <file>file:/C:/xampp/htdocs/servir/application/modules/default/controllers/IndexController.php</file>
+            <file>file:/C:/xampp/htdocs/servir/application/models/RolRecurso.php</file>
+            <file>file:/C:/xampp/htdocs/servir/application/layouts/scripts/menu.phtml</file>
+            <file>file:/C:/xampp/htdocs/servir/application/modules/default/controllers/AuthController.php</file>
+            <file>file:/C:/xampp/htdocs/servir/application/modules/admin/views/scripts/mvc/recurso.phtml</file>
+            <file>file:/C:/xampp/htdocs/servir/application/modules/default/views/scripts/auth/recuperar-clave.phtml</file>
+            <file>file:/C:/xampp/htdocs/servir/application/models/ProyectoUsuario.php</file>
+            <file>file:/C:/xampp/htdocs/servir/application/modules/admin/controllers/ProyectoController.php</file>
+        </group>
     </open-files>
 </project-private>
