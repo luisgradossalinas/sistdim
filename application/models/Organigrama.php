@@ -1,6 +1,6 @@
 <?php
 
-class Application_Model_Orgigrama extends Zend_Db_Table
+class Application_Model_Organigrama extends Zend_Db_Table
 {
 
     protected $_name = 'organigrama';
@@ -39,7 +39,20 @@ class Application_Model_Orgigrama extends Zend_Db_Table
     {
         return $this->getAdapter()->select()->from($this->_name)->query()->fetchAll();
     }
-
+    
+    /*
+    Obtiene todos los órganos que tiene un proyecto
+    */
+    function obtenerNaturalezaOrgano($proyecto) {
+        
+        return $this->getAdapter()->select()->from(array('o' => self::TABLA),array('id_organigrama','organo'))
+                ->joinInner(array('n' => Application_Model_Natuorganica::TABLA), 
+                        'n.codigo_natuorganica = o.codigo_natuorganica',
+                        array('naturaleza' => 'descripcion'))
+                ->where('o.id_proyecto = ?', $proyecto)->query()->fetchAll();
+        
+        
+    }
 
 }
 

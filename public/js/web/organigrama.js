@@ -2,16 +2,15 @@ var codigo = 0;
 var sentencia_crud = '';
 $(document).ready(function(){
         
-    configModal = function(id, ope, titulo,usuario){
-
-        controlador = 'mvc';
-        if (usuario == "usuario") {//Viene por misdatos
-            controlador = 'index';
-        }
+    configModal = function(id, ope, titulo,usuario,tipo){
+        
+        controlador = 'puestos';
+        alert(tipo);
+        
         codigo = id;
         sentencia_crud = ope;
         $.ajax({
-            url: urls.siteUrl + '/admin/'+controlador+'/operacion/ajax/form',
+            url: urls.siteUrl + '/admin/puestos/organo/ajax/form/tipo/'+tipo,
             data:{id:id},
             type:'post',
             success: function(result) {
@@ -24,22 +23,6 @@ $(document).ready(function(){
                     changeYear: true
                     });
                     
-                $("#padre").change(function(){
-                    var padre = $("#padre").val();
-                    
-                    $.ajax({
-                        url:urls.siteUrl + '/admin/recurso/num-recurso-correlativo',
-                        data:{padre:padre},
-                        type:'post',
-                        dataType:'json',
-                        success: function(result) {
-                            $('#orden').val(result);
-                        }
-                        
-                        
-                    })
-                    
-               })
                    
                 $('#ventana-modal').dialog({
                 //height: 'auto',
@@ -54,7 +37,7 @@ $(document).ready(function(){
                     dialog = $(this);
                     
                     $.ajax({
-                    url: urls.siteUrl + '/admin/'+controlador+'/operacion/ajax/validar',
+                    url: urls.siteUrl + '/admin/'+controlador+'/operacion/ajax/validar/tipo/',
                     data: $('#form').serialize(),
                     type:'post',
                     success: function(result) {
@@ -83,16 +66,12 @@ $(document).ready(function(){
         })     
     }
     
-    nuevo = function() {
-        configModal(0, 'nuevo','Nuevo registro');
+    nuevoRegistro = function(tipo) {
+        configModal(0, 'nuevo','Nuevo registro',null);
     }
     
-    editar = function(id){
+    editarRegistro = function(id){
         configModal(id, 'edit','Editar registro',null);
-    }
-
-    editarUsuario = function(id){
-        configModal(id, 'edit','Editar registro','usuario');
     }
     
     
@@ -128,16 +107,7 @@ $(document).ready(function(){
          
     }
     
-    verRecursos = function (id) {
-        $.ajax({
-            url: urls.siteUrl + '/admin/recurso/listado/ajax/listado/id_rol/' + id,
-            type: 'post',
-            dataType: 'json',
-            success: function(result) {
-                tablaRecurso(result,id);
-            }
-        })
-    }
+
     
     seleccionaTodos = function() {
         alert('Falta programar');

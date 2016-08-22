@@ -126,9 +126,6 @@ $(document).ready(function () {
                 
         });     
         
-        //alert(selectedItems);
-        //alert(NoSelectedItems);
-       
        //Llamar a ajax
        $.ajax({
             url: urls.siteUrl + '/admin/proyecto/grabar-permisos',

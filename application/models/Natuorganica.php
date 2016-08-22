@@ -39,6 +39,12 @@ class Application_Model_Natuorganica extends Zend_Db_Table
     {
         return $this->getAdapter()->select()->from($this->_name)->query()->fetchAll();
     }
+    
+    public function combo() {
+        return $this->getAdapter()->select()->from(
+                        $this->_name, array('key' => 'codigo_natuorganica', 'value' => 'descripcion'))
+                ->query()->fetchAll();
+    }
 
 
 }
