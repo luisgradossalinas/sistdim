@@ -5,8 +5,8 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
     
     private $_organoModel;
     private $_organoForm;
-    private $_uorganicaModel;
-    private $_uorganicaForm;
+    private $_unidadModel;
+    private $_unidadForm;
     
     const INACTIVO = 0;
     const ACTIVO = 1;
@@ -16,8 +16,8 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
     {
         $this->_organoModel = new Application_Model_Organo;
         $this->_organoForm = new Application_Form_Organo;
-        $this->_uorganicaModel = new Application_Model_UnidadOrganica;
-        $this->_uorganicaForm = new Application_Form_UnidadOrganica;
+        $this->_unidadModel = new Application_Model_UnidadOrganica;
+        $this->_unidadForm = new Application_Form_UnidadOrganica;
         
         $this->view->headScript()->appendFile(SITE_URL . '/js/web/organigrama.js');
         Zend_Layout::getMvcInstance()->assign('show','1'); //No mostrar en el menú la barra horizontal
@@ -35,7 +35,9 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
         $proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
         
         $this->view->organo = $this->_organoModel->obtenerOrgano($proyecto);
-        $this->view->unidad = $this->_uorganicaModel->obtenerUOrganica($proyecto);
+        $this->view->unidad = $this->_unidadModel->obtenerUOrganica($proyecto);
+        
+        //print_r($this->_organoModel->obtenerOrganoProyecto($proyecto));
         
     }
     
@@ -56,9 +58,16 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
             $data[$key] = $filtro->filter(trim($val));
         }
         
-        $tipo = $data['tipo'];
-        $modelo = "this_".$tipo."Model";
-        $form = "this_".$tipo."Form";
+        if ($data['tipo'] == 'organo') {
+            $modelo = $this->_organoModel;
+            $form = $this->_organoForm;
+            $primary = "id_organo";
+        } else if ($data['tipo'] == 'unidad') {
+            $modelo = $this->_unidadModel;
+            $form = $this->_unidadForm;
+            $primary = "id_uorganica";
+        }
+     
         
         if ($this->_getParam('ajax') == 'form') {
             
@@ -66,22 +75,22 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
                 
                 $id = $this->_getParam('id');
                 if ($id != 0) {
-                    $data = ${$modelo}->fetchRow('id_organo = '.$id);
-                    ${$form}->populate($data->toArray());
+                    $data = $modelo->fetchRow($primary. '= '.$id);
+                    $form->populate($data->toArray());
                 }
             }
             //$this->_organoForm->getElement('email')->setAttrib('readonly','readonly');   
             //$this->_organoForm->removeElement('unidad_organica');
-            echo ${$form};         
+            echo $form;         
         }
         
         if ($this->_getParam('ajax') == 'validar') {
-                echo ${$form}->processAjax($data);
+                echo $form->processAjax($data);
         }
         
         if ($this->_getParam('ajax') == 'delete') {
             $where = $this->getAdapter()->quoteInto('id_organigrama = ?',$data['id']);
-            ${$modelo}->update(array('estado' => self::ELIMINADO),$where);
+            $modelo->update(array('estado' => self::ELIMINADO),$where);
             
             $sesionMvc->messages = 'Registro eliminado';
             $sesionMvc->tipoMessages = self::SUCCESS;
@@ -104,7 +113,7 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
             
             $sesionMvc->tipoMessages = self::SUCCESS;
             
-            ${$modelo}->guardar($data);
+            $modelo->guardar($data);
         }
         
     }

@@ -64,11 +64,11 @@ $(document).ready(function(){
     }
     
     nuevoRegistro = function(tipo) {
-        configModal(0, 'nuevo','Nuevo órgano',null,tipo);
+        configModal(0, 'nuevo','Nuevo registro',null,tipo);
     }
     
     editarRegistro = function(id,tipo){
-        configModal(id, 'edit','Editar órgano',null,tipo);
+        configModal(id, 'edit','Editar registro',null,tipo);
     }
     
     grabarDatos = function(tipo) {

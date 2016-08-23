@@ -35,7 +35,7 @@ Unidad orgánica
             $estado = 'checkmark.png';
             echo '<tr>';
             echo '<td width=5% class="taskOptions">';
-            echo '<a data-original-title="Editar" class="tip-top" href="#myModal" data-toggle="modal" onclick="editarRegistro('.$value['id_organo'].')">';
+            echo '<a data-original-title="Editar" class="tip-top" href="#myModal" data-toggle="modal" onclick="editarRegistro('.$value['id_organo'].',"organo")">';
             echo '<i class="icon-pencil"></i></a>';
             echo '</td>';
             echo '<td width=20%>'.$this->Naturaleza($value['codigo_natuorganica'],$contador).'</td>';
@@ -73,10 +73,10 @@ Unidad orgánica
             $estado = 'checkmark.png';
             echo '<tr>';
             echo '<td width=5% class="taskOptions">';
-            echo '<a data-original-title="Editar" class="tip-top" href="#myModal" data-toggle="modal" onclick="editarRegistro('.$value['id_uorganica'].')">';
+            echo '<a data-original-title="Editar" class="tip-top" href="#myModal" data-toggle="modal" onclick="editarRegistro('.$value['id_uorganica'].',"\'"unidad"\'")">';
             echo '<i class="icon-pencil"></i></a>';
             echo '</td>';
-            echo '<td width=20%>'.$this->Organo($value['id_organo'],$contador).'</td>';
+            echo '<td width=20%>'.$value['id_organo'].$this->Organo($value['id_organo'],$value['id_proyecto'],$contador).'</td>';
             echo '<td><input type=text value="'.$value['descripcion'].'" style="width:90%"></td>';
             if ($value['estado'] == Admin_OrganigramaController::INACTIVO)
                 $estado = 'error.png';

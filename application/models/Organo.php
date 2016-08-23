@@ -65,7 +65,7 @@ class Application_Model_Organo extends Zend_Db_Table
     function obtenerOrganoProyecto($proyecto) {
         
         return $this->getAdapter()->select()->from(self::TABLA,
-                array('id_organo','organo','estado','id_proyecto','codigo_natuorganica'))
+                array('id_organo','organo','estado','id_proyecto'))
                 ->where('id_proyecto = ?', $proyecto)->query()->fetchAll();
     }
 

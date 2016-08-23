@@ -3,23 +3,23 @@
 class App_View_Helper_Organo extends Zend_View_Helper_HtmlElement
 {
     
-    private $_organigrama;
+    private $_organo;
     
-    public function Organo($id, $contador)
+    public function Organo($organo, $proyecto, $contador)
     {
-        
-        $this->_organigrama = new Application_Model_Organigrama;
-        $data = $this->_organigrama->obtenerOrganoProyecto($id);
+        //$this->Organo($value['id_organo'],$value['id_proyecto'],$contador)
+        $this->_organo = new Application_Model_Organo;
+        $data = $this->_organo->obtenerOrganoProyecto($proyecto);
         $organo = "organo_".$contador;
         
         $html = '';
         $html .= "<select id=".$organo." name=".$organo.">";
         foreach ($data as $value) {
             
-            if ($id == $value['organo']) {
-                $html .= "<option value='".$value['organo']."' selected>".$value['organo']."</option>";
+            if ($organo == $value['id_organo']) {
+                $html .= "<option value='".$value['id_organo']."' selected>".$value['organo']."</option>";
             } else {
-                $html .= "<option value='".$value['codigo_natuorganica']."'>".$value['descripcion']."</option>";
+                $html .= "<option value='".$value['id_organo']."'>".$value['organo']."</option>";
             }
         }
         
