@@ -2,15 +2,14 @@ var codigo = 0;
 var sentencia_crud = '';
 $(document).ready(function(){
         
-    configModal = function(id, ope, titulo,usuario,tipo){
+    configModal = function(id, ope, titulo,usuario, tipo){
         
-        controlador = 'puestos';
-        alert(tipo);
+        controlador = 'organigrama';
         
         codigo = id;
         sentencia_crud = ope;
         $.ajax({
-            url: urls.siteUrl + '/admin/puestos/organo/ajax/form/tipo/'+tipo,
+            url: urls.siteUrl + '/admin/'+controlador+'/operacion/ajax/form/tipo/'+tipo,
             data:{id:id},
             type:'post',
             success: function(result) {
@@ -22,8 +21,7 @@ $(document).ready(function(){
                     changeMonth: true,
                     changeYear: true
                     });
-                    
-                   
+                     
                 $('#ventana-modal').dialog({
                 //height: 'auto',
                 height:500,
@@ -35,15 +33,14 @@ $(document).ready(function(){
                 buttons: {
                     "Guardar": function() {
                     dialog = $(this);
-                    
                     $.ajax({
-                    url: urls.siteUrl + '/admin/'+controlador+'/operacion/ajax/validar/tipo/',
+                    url: urls.siteUrl + '/admin/'+controlador+'/operacion/ajax/validar/tipo/'+tipo,
                     data: $('#form').serialize(),
                     type:'post',
                     success: function(result) {
                        if(validarCampos(result)){
                            $.ajax({
-                               url: urls.siteUrl + '/admin/'+controlador+'/operacion/ajax/save/scrud/' + sentencia_crud + '/id/'+ codigo,
+                               url: urls.siteUrl + '/admin/'+controlador+'/operacion/ajax/save/scrud/' + sentencia_crud + '/id/'+ codigo + '/tipo/' + tipo,
                                data: $("#form").serialize(),
                                success: function(result){
                                     location.reload();
@@ -67,47 +64,19 @@ $(document).ready(function(){
     }
     
     nuevoRegistro = function(tipo) {
-        configModal(0, 'nuevo','Nuevo registro',null);
+        configModal(0, 'nuevo','Nuevo órgano',null,tipo);
     }
     
-    editarRegistro = function(id){
-        configModal(id, 'edit','Editar registro',null);
+    editarRegistro = function(id,tipo){
+        configModal(id, 'edit','Editar órgano',null,tipo);
     }
     
-    
-    elimina = function(id){
+    grabarDatos = function(tipo) {
         
-        codigo = id;
-   
-                $('#ventana-modal').empty().html('¿Está seguro que desea eliminar registro?');
-                $('#ventana-modal').dialog({
-                height: 'auto',
-                width: 350, 
-                modal: true,
-                resizable: false,
-                title:'Mensaje del sistema',
-                buttons: {
-                    "Eliminar": function() {
-                    dialog = $(this);
-                    $.ajax({
-                        url: urls.siteUrl + '/admin/mvc/operacion/ajax/delete',
-                        data:{id:codigo},
-                        success: function(result){
-                            location.reload();
-                        }
-                    });
-                    },
-                     "Cancelar": function() {
-                       $(this).dialog("close"); 
-                    }
-                },
-                close: function() {//$("#ventana-modal").remove();
-                }
-                });
-         
+        
+        alert($("#naturaleza_1").val() + "-" +$("#naturaleza_1 option:selected" ).text());
+        alert($("#naturaleza_12").val() + "-" +$("#naturaleza_12 option:selected" ).text());
     }
-    
-
     
     seleccionaTodos = function() {
         alert('Falta programar');
@@ -182,66 +151,6 @@ $(document).ready(function(){
                 
 	});
         
-        $('#ventana-modal').dialog({
-                height: 'auto',
-                width: 1000, 
-                modal: true,
-                resizable: false,
-                title:'Lista de recursos',
-                buttons: {
-                    "Guardar": function() {
-                    dialog = $(this);
-                    
-                    //Recorrer y guardar los recursos
-                    //alert($('input[name="check_recursos"]:checked').val());
-                    var selectedItems = new Array();
-                    var recursosAdd = '';
-                    var recursosDelete = '';
-                    var pr = '';
-		
-                    $("input[@name='check_recursos[]']:checked").each(function(){
-                            selectedItems.push($(this).val());
-                            recursosAdd += $(this).val() + ',';
-                    });
-                    
-                    $("input[@name='check_recursos[]']:not(:checked)").each(function(){
-                        if ($(this).val() != '')
-                            recursosDelete += $(this).val() + ',';
-                    });
-            
-                    $.ajax({
-                        url: urls.siteUrl + '/admin/recurso/agregar-recursos',
-                        data:{
-                            rec_add:selectedItems,
-                            rec_del:recursosDelete,
-                            rol:rol
-                        },
-                        type:'post',
-                        success:function (result) {
-                             location.reload();
-                             //$(this).dialog("close");
-                        }
-                    })
-                    
-                    
-                    
-                    //alert(selectedItems);
-
-                    },
-                     "Cancelar": function() {
-                       $(this).dialog("close");
-                        
-                    }
-                },
-                close: function() {//$("#ventana-modal").remove();
-                }
-                });
-        
-     
-        
     }
     
-    
- 
-  
 })

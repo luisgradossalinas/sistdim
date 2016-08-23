@@ -1,23 +1,31 @@
 <?php
 
-class Admin_PuestosController extends App_Controller_Action_Admin
+class Admin_OrganigramaController extends App_Controller_Action_Admin
 {
     
-    private $_organigramaModel;
-    private $_formOrganigrama;
+    private $_organoModel;
+    private $_organoForm;
+    private $_uorganicaModel;
+    private $_uorganicaForm;
+    
+    const INACTIVO = 0;
+    const ACTIVO = 1;
+    const ELIMINADO = 2;
     
     public function init()
     {
-        $this->_organigramaModel = new Application_Model_Organigrama;
-        $this->_formOrganigrama = new Application_Form_Organigrama;
+        $this->_organoModel = new Application_Model_Organo;
+        $this->_organoForm = new Application_Form_Organo;
+        $this->_uorganicaModel = new Application_Model_UnidadOrganica;
+        $this->_uorganicaForm = new Application_Form_UnidadOrganica;
         
         $this->view->headScript()->appendFile(SITE_URL . '/js/web/organigrama.js');
-        
+        Zend_Layout::getMvcInstance()->assign('show','1'); //No mostrar en el menú la barra horizontal
         parent::init();
         
     }
     
-    public function organigramaAction() {
+    public function indexAction() {
         
         Zend_Layout::getMvcInstance()->assign('active', 'Organigrama');
         Zend_Layout::getMvcInstance()->assign('padre', 3);
@@ -26,11 +34,12 @@ class Admin_PuestosController extends App_Controller_Action_Admin
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
         $proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
         
-        $this->view->data = $this->_organigramaModel->obtenerNaturalezaOrgano($proyecto);
+        $this->view->organo = $this->_organoModel->obtenerOrgano($proyecto);
+        $this->view->unidad = $this->_uorganicaModel->obtenerUOrganica($proyecto);
         
     }
     
-    public function organoAction () 
+    public function operacionAction () 
     {
         
         $this->_helper->layout->disableLayout();
@@ -40,12 +49,16 @@ class Admin_PuestosController extends App_Controller_Action_Admin
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
         $proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
         $data = $this->_getAllParams();
-
+        
         //Previene vulnerabilidad XSS (Cross-site scripting)
         $filtro = new Zend_Filter_StripTags();
         foreach ($data as $key => $val) {
             $data[$key] = $filtro->filter(trim($val));
         }
+        
+        $tipo = $data['tipo'];
+        $modelo = "this_".$tipo."Model";
+        $form = "this_".$tipo."Form";
         
         if ($this->_getParam('ajax') == 'form') {
             
@@ -53,22 +66,22 @@ class Admin_PuestosController extends App_Controller_Action_Admin
                 
                 $id = $this->_getParam('id');
                 if ($id != 0) {
-                    //$data = $this->_clase->fetchRow(''.$primaryKey.' = '.$id);
-                    $this->_formOrganigrama->populate($data->toArray());
+                    $data = ${$modelo}->fetchRow('id_organo = '.$id);
+                    ${$form}->populate($data->toArray());
                 }
             }
-            //$this->_formOrganigrama->getElement('email')->setAttrib('readonly','readonly');   
-            $this->_formOrganigrama->removeElement('unidad_organica');
-            echo $this->_formOrganigrama;         
+            //$this->_organoForm->getElement('email')->setAttrib('readonly','readonly');   
+            //$this->_organoForm->removeElement('unidad_organica');
+            echo ${$form};         
         }
         
         if ($this->_getParam('ajax') == 'validar') {
-                echo $this->_formOrganigrama->processAjax($data);
+                echo ${$form}->processAjax($data);
         }
         
         if ($this->_getParam('ajax') == 'delete') {
             $where = $this->getAdapter()->quoteInto('id_organigrama = ?',$data['id']);
-            $this->_organigramaModel->update(array('estado' => self::ELIMINADO),$where);
+            ${$modelo}->update(array('estado' => self::ELIMINADO),$where);
             
             $sesionMvc->messages = 'Registro eliminado';
             $sesionMvc->tipoMessages = self::SUCCESS;
@@ -91,7 +104,7 @@ class Admin_PuestosController extends App_Controller_Action_Admin
             
             $sesionMvc->tipoMessages = self::SUCCESS;
             
-            $this->_organigramaModel->guardar($data);
+            ${$modelo}->guardar($data);
         }
         
     }

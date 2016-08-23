@@ -1,0 +1,111 @@
+<?=$this->partial('_partials/mensajes.phtml',array('messages' => $this->messages,'tipoMessages' => $this->tipoMessages));?>
+<div class="widget-box">
+<div class="col-sm-6">
+<div class="tabbable inline">
+<ul class="nav nav-tabs tab-bricky" id="myTab">
+<li class="active">
+<a data-toggle="tab" href="#panel_tab2_example1">
+Órgano
+</a>
+</li>
+<li class="">
+<a data-toggle="tab" href="#panel_tab2_example2">
+Unidad orgánica
+</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="panel_tab2_example1" class="tab-pane active"> 
+<a href="#myModal" id="btnOpen" role="button" class="btn tip-right" title="Nuevo órgano" onclick="nuevoRegistro('organo')" data-toggle="modal">
+    <li class="icon-plus-sign"></li>Nuevo órgano
+</a>
+<a href="#myModal" id="btnOpen" role="button" class="btn tip-right" title="Grabar registros" onclick="grabarDatos('organo')" data-toggle="modal">
+    <li class="icon-check"></li>Grabar registros
+</a>
+<div class="widget-content nopadding">
+    <table id='tabla' class="table table-condensed table-bordered" style="">
+        <thead>
+            <tr><th></th><th>Naturaleza</th><th>Órgano</th><th>Estado</th></tr>
+        </thead>
+        <?php
+        echo '<tbody>';
+        $contador = 0;
+        foreach ($this->organo as $value) {
+            $contador++;
+            $estado = 'checkmark.png';
+            echo '<tr>';
+            echo '<td width=5% class="taskOptions">';
+            echo '<a data-original-title="Editar" class="tip-top" href="#myModal" data-toggle="modal" onclick="editarRegistro('.$value['id_organo'].')">';
+            echo '<i class="icon-pencil"></i></a>';
+            echo '</td>';
+            echo '<td width=20%>'.$this->Naturaleza($value['codigo_natuorganica'],$contador).'</td>';
+            echo '<td><input type=organo value="'.$value['organo'].'" style="width:90%"></td>';
+            if ($value['estado'] == Admin_OrganigramaController::INACTIVO)
+                $estado = 'error.png';
+            echo '<td width=7%><center><span style=display:none>'.$value['estado'].'</span><img src='.SITE_URL.'/img/'.$estado.' width=15%><center></td>';
+            echo '</tr>';
+        }
+        echo '</tbody>';
+        ?>
+    </table>
+</div>
+
+</div>
+    
+
+<div id="panel_tab2_example2" class="tab-pane">
+<a href="#myModal" id="btnOpen" role="button" class="btn tip-right" title="Nueva unidad orgánica" onclick="nuevoRegistro('unidad')" data-toggle="modal">
+    <li class="icon-plus-sign"></li>Nueva unidad orgánica
+</a>
+<a href="#myModal" id="btnOpen" role="button" class="btn tip-right" title="Grabar registros" onclick="grabarDatos('unidad')" data-toggle="modal">
+    <li class="icon-check"></li>Grabar registros
+</a>
+<div class="widget-content nopadding">
+    <table id='tabla' class="table table-condensed table-bordered" style="">
+        <thead>
+            <tr><th></th><th>Órgano</th><th>Unidad Orgánica</th><th>Estado</th></tr>
+        </thead>
+        <?php
+        echo '<tbody>';
+        $contador = 0;
+        foreach ($this->unidad as $value) {
+            $contador++;
+            $estado = 'checkmark.png';
+            echo '<tr>';
+            echo '<td width=5% class="taskOptions">';
+            echo '<a data-original-title="Editar" class="tip-top" href="#myModal" data-toggle="modal" onclick="editarRegistro('.$value['id_uorganica'].')">';
+            echo '<i class="icon-pencil"></i></a>';
+            echo '</td>';
+            echo '<td width=20%>'.$this->Organo($value['id_organo'],$contador).'</td>';
+            echo '<td><input type=text value="'.$value['descripcion'].'" style="width:90%"></td>';
+            if ($value['estado'] == Admin_OrganigramaController::INACTIVO)
+                $estado = 'error.png';
+            echo '<td width=7%><center><span style=display:none>'.$value['estado'].'</span><img src='.SITE_URL.'/img/'.$estado.' width=15%><center></td>';
+            echo '</tr>';
+        }
+        echo '</tbody>';
+        ?>
+    </table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<?=$this->partial('_partials/modal.phtml',array('model' => $this->model));?>
+<div id="data" style="display: none">
+    <table class="tejem">
+    <tr>
+        <td>Num</td>
+            <td>
+                <select class="naturaleza">
+                    <option value="">Seleccione</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                </select>
+            </td>
+            <td><input type="text" class="nombre" /></td>
+            <td class="eliminar">Eliminar</td>
+    </tr>
+    </table>
+</div>
+</div>

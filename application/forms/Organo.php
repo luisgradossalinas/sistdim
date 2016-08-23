@@ -1,6 +1,6 @@
 <?php
 
-class Application_Form_Organigrama extends Zend_Form
+class Application_Form_Organo extends Zend_Form
 {
     private $_natuorganica;
     
@@ -25,21 +25,13 @@ class Application_Form_Organigrama extends Zend_Form
         $organo->setRequired();
         $organo->addFilter('StripTags');
         $this->addElement($organo);
-        
-        $unidadOrganica = new Zend_Form_Element_Text('unidad_organica');
-        $unidadOrganica->setLabel('Unidad Orgánica:');
-        $unidadOrganica->setRequired();
-        $unidadOrganica->addFilter('StripTags');
-        $this->addElement($unidadOrganica);
-        
-        
+
         $estado = new Zend_Form_Element_Select('estado');
         $estado->setLabel('Estado:');
         $estado->setRequired();
         $estado->setMultiOptions(array('1' => 'Activo', '0' => 'Inactivo'));
         $estado->addFilter('StripTags');
         $this->addElement($estado);
-        
    
     }
 

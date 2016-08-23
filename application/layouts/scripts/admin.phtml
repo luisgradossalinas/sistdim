@@ -104,10 +104,12 @@
 				</div>
 			</div>
                   
+                        <?php if (!isset($this->layout()->show)){ ?>
 			<div id="breadcrumb">
 				<a href="#" title="Ir al inicio" class="tip-bottom"><i class="icon-home"></i>Inicio</a>
 				<a href="#" class="current"><?=$this->layout()->active?></a>
 			</div>
+                        <?php } ?>
                     
 			<div class="container-fluid">
                                                                         
