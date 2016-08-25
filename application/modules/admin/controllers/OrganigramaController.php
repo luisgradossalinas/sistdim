@@ -2,7 +2,6 @@
 
 class Admin_OrganigramaController extends App_Controller_Action_Admin
 {
-    
     private $_organoModel;
     private $_organoForm;
     private $_unidadModel;
@@ -36,14 +35,10 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
         
         $this->view->organo = $this->_organoModel->obtenerOrgano($proyecto);
         $this->view->unidad = $this->_unidadModel->obtenerUOrganica($proyecto);
-        
-        //print_r($this->_organoModel->obtenerOrganoProyecto($proyecto));
-        
     }
     
     public function operacionAction () 
-    {
-        
+    {   
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
         
@@ -67,12 +62,9 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
             $form = $this->_unidadForm;
             $primary = "id_uorganica";
         }
-     
         
         if ($this->_getParam('ajax') == 'form') {
-            
             if ($this->_hasParam('id')) {
-                
                 $id = $this->_getParam('id');
                 if ($id != 0) {
                     $data = $modelo->fetchRow($primary. '= '.$id);
@@ -87,14 +79,11 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
         if ($this->_getParam('ajax') == 'validar') {
                 echo $form->processAjax($data);
         }
-        
         if ($this->_getParam('ajax') == 'delete') {
             $where = $this->getAdapter()->quoteInto('id_organigrama = ?',$data['id']);
             $modelo->update(array('estado' => self::ELIMINADO),$where);
-            
             $sesionMvc->messages = 'Registro eliminado';
             $sesionMvc->tipoMessages = self::SUCCESS;
-                    
         }
         
         if ($this->_getParam('ajax') == 'save') {
@@ -112,12 +101,49 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
             }
             
             $sesionMvc->tipoMessages = self::SUCCESS;
-            
             $modelo->guardar($data);
         }
-        
     }
     
+    public function grabarAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
+        $usuario = $sesion_usuario->sesion_usuario['id'];
+        
+        $data = $this->_getAllParams();        
+        $datos = $data['datos'];
+        $tipo = $data['tipo'];
+
+        if ($tipo == 'organo') {
+            $modelo = $this->_organoModel;
+        } else if ($tipo == 'unidad') {
+            $modelo = $this->_unidadModel;
+        }
+  
+        if (count($datos) > 0) {
+            foreach ($datos as $reg) {
+                $add = explode("|", $reg);
+                if ($tipo == 'organo') {
+                    $where = $this->getAdapter()->quoteInto('id_organo = ?',$add[0]);
+                    $dataNueva = array('organo' => $add[1],'codigo_natuorganica' => $add[2],
+                    'usuario_actu' => $usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                } else {
+                    $where = $this->getAdapter()->quoteInto('id_uorganica = ?',$add[0]);
+                    $dataNueva = array('descripcion' => $add[1],'id_organo' => $add[2],
+                    'usuario_actu' => $usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                }
+                
+                $modelo->update($dataNueva,$where);   
+            }
+        }
+        echo Zend_Json::encode('Registros actualizados');
+    }
     
     public function registroAction() {
         
@@ -126,7 +152,6 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
         Zend_Layout::getMvcInstance()->assign('link', 'regpuestos');
         
     }
-    
 
 }
 

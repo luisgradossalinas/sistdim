@@ -10,10 +10,10 @@ class App_View_Helper_Organo extends Zend_View_Helper_HtmlElement
         //$this->Organo($value['id_organo'],$value['id_proyecto'],$contador)
         $this->_organo = new Application_Model_Organo;
         $data = $this->_organo->obtenerOrganoProyecto($proyecto);
-        $organo = "organo_".$contador;
+        $organoDes = "organo_".$contador;
         
         $html = '';
-        $html .= "<select id=".$organo." name=".$organo.">";
+        $html .= "<select id=".$organoDes." name=".$organoDes.">";
         foreach ($data as $value) {
             
             if ($organo == $value['id_organo']) {

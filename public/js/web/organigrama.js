@@ -2,6 +2,32 @@ var codigo = 0;
 var sentencia_crud = '';
 $(document).ready(function(){
         
+        
+    $('#tablaorgano').dataTable({
+		"bJQueryUI": true,
+               // searching: false,
+               // paging: true,
+               // scrollY: 400,
+		"sPaginationType": "full_numbers"
+               // "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>"
+		//"sDom": '<""l>t<"F"fp>'
+    });
+    
+    /*
+    $('#tablaorgano').dataTable({
+		"bJQueryUI": true,
+		"sPaginationType": "full_numbers",
+               // "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>"
+		"sDom": '<""l>t<"F"fp>'
+	});*/
+    
+    $('#tablaunidad').dataTable({
+		"bJQueryUI": true,
+		"sPaginationType": "full_numbers"
+               // "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>"
+		//"sDom": '<""l>t<"F"fp>'
+    });
+        
     configModal = function(id, ope, titulo,usuario, tipo){
         
         controlador = 'organigrama';
@@ -23,11 +49,9 @@ $(document).ready(function(){
                     });
                      
                 $('#ventana-modal').dialog({
-                //height: 'auto',
-                height:500,
-                width: 620, //1050
+                height: 'auto',
+                width: 620,
                 modal: true,
-                //maxHeight: 400,
                 resizable: false,
                 title:titulo,
                 buttons: {
@@ -61,96 +85,79 @@ $(document).ready(function(){
                 });
             }
         })     
-    }
+    };
     
     nuevoRegistro = function(tipo) {
+        /*var table = $('#tablaorgano').DataTable();
+        table.search('Despacho');
+        table.draw();*/
         configModal(0, 'nuevo','Nuevo registro',null,tipo);
-    }
+    };
     
     editarRegistro = function(id,tipo){
         configModal(id, 'edit','Editar registro',null,tipo);
-    }
+    };
     
     grabarDatos = function(tipo) {
         
+        var data = new Array();
+        var validar = '';
         
-        alert($("#naturaleza_1").val() + "-" +$("#naturaleza_1 option:selected" ).text());
-        alert($("#naturaleza_12").val() + "-" +$("#naturaleza_12 option:selected" ).text());
-    }
-    
-    seleccionaTodos = function() {
-        alert('Falta programar');
-		var checkedStatus = $("#title-table-checkbox").checked;
-		var checkbox = $("#myModal").parents('.widget-box').find('tr td:first-child input:checkbox');		
-		checkbox.each(function() {
-			$("#title-table-checkbox").checked = checkedStatus;
-			if (checkedStatus == $("#title-table-checkbox").checked) {
-				$("#title-table-checkbox").closest('.checker > span').removeClass('checked');
-			}
-			if ($("#title-table-checkbox").checked) {
-				$("#title-table-checkbox").closest('.checker > span').addClass('checked');
-			}
-		});
+       // if (tipo == "organo") {
+            //Recorrer la tabla organo
+            $("#tabla"+tipo+" tbody tr").each(function(){
+                var id = $(this).attr("data-"+tipo);
+                var descripcion = $(this).find("td input").eq(1).val();
+                var idp = $(this).find("td select").eq(0).val();
+                validar = $(this).find("td").eq(0).text();
+                data.push(id+"|"+descripcion+"|"+idp);
+            });
+            
+            if (validar == 'No hay registros' || validar == 'No hay datos en la tabla') {
+                alert("No hay registros que actualizar");
+                return false;
+            }
+
+            $.ajax({
+                url: urls.siteUrl + '/admin/organigrama/grabar/tipo/'+tipo,
+                data: {
+                    datos : data
+                },
+                type:'post',
+                dataType: 'json',
+                success: function(result) {
+                    alert(result);
+                    location.reload();
+                }
+            });
+            
+      /*  } else if (tipo == 'unidad') {
+            //Recorrer la tabla unidad
+            $("#tablaUnidad tbody tr").each(function(){
+                var id_uorganica = $(this).attr("data-unidad");
+                var id_organo = $(this).find("td select").eq(0).val();
+                var unidad = $(this).find("td input").eq(1).val();
+                validar = $(this).find("td").eq(0).text();
+                data.push(id_uorganica+"|"+unidad+"|"+id_organo);
+            });
+            
+            if (validar == 'No hay registros') {
+                alert("No hay registro que actualizar");
+                return false;
+            }
+
+            $.ajax({
+                url: urls.siteUrl + '/admin/organigrama/grabar/tipo/'+tipo,
+                data: {
+                    datos : data
+                },
+                type:'post',
+                dataType: 'json',
+                success: function(result) {
+                    alert(result);
+                    location.reload();
+                }
+            });
+        }*/
     };
-    
-    tablaRecurso = function(data,rol) {
-        
-        $('.modal-body').empty();
-        html = '';
-        html += '<div class="widget-box">';
-        html += '<div class="widget-title">';	
-        html += '<h5>Recursos</h5>';
-        html += '</div>';
-        html += '<div class="widget-content nopadding">';
-        html += '<table id="tablaRecurso" class="table table-condensed table-bordered">';
-        html += '<thead>';
-        html += '<tr><th></th><th>Nombre</th><th>Descripción</th><th>Estado</th><th>Url</th></tr>';
-        html += '</thead>';
-        html += '<tbody>';
-        
-        $.each(data, function(key,obj) {
-                    estado = 'checkmark.png';
-                    html += '<tr>';
-                    checked = ''
-                    if (obj['checked']== 1)
-                    checked = 'checked';
-                    
-                    html += '<td style="text-align:center"><input type="checkbox" name="check_recursos" '+checked+' value="'+obj['id']+'" /></td>';
-                    html += '<td>' + obj['nombre'] + '</td>';
-                    accion = obj['accion'];
-                    if (obj['accion'] == '' || obj['accion'] == null) {
-                        accion = '';
-                    }
-                    html += '<td>' + accion + '</td>';
-                    
-                    if (obj['estado'] == 0) {
-                        estado = 'error.png';
-                    }
-                    
-                    html += '<td width=8%><center><span style=display:none>';
-                    html += obj['estado'] + '</span><img src='  + urls.siteUrl + '/img/' + estado + ' width=15%></center></td>';
-                    url = obj['url'];
-                    if (obj['url'] == '' || obj['url'] == null) {
-                        url = '';
-                    }
-                    html += '<td>' + url + '</td>';
-                    html += '</tr>';
- 
-        })
-        
-        html += '</tbody>';
-        html += '</table>';
-        html += '</div>';
-        html += '</div>';
-        
-        $('#ventana-modal').empty().html(html);
-        $('#tablaRecurso').dataTable({
-		"bJQueryUI": true,
-		"sPaginationType": "full_numbers",
-		"sDom": '<""l>t<"F"fp>'
-                
-	});
-        
-    }
-    
 })

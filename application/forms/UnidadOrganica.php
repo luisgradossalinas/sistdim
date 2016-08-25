@@ -20,11 +20,17 @@ class Application_Form_UnidadOrganica extends Zend_Form
         $naturaleza->setMultiOptions($dataOrgano);
         $this->addElement($naturaleza);
         
-        $organo = new Zend_Form_Element_Text('descripcion');
-        $organo->setLabel('Unidad Orgánica:');
-        $organo->setRequired();
-        $organo->addFilter('StripTags');
-        $this->addElement($organo);
+        $unidad = new Zend_Form_Element_Textarea('descripcion');
+        $unidad->setLabel('Unidad Orgánica:');
+        $unidad->setRequired();
+        $unidad->setAttrib('rows', 2);
+        $unidad->addFilter('StripTags');
+        $this->addElement($unidad);
+        
+        $siglas = new Zend_Form_Element_Text('siglas');
+        $siglas->setLabel('Siglas:');
+        $siglas->addFilter('StripTags');
+        $this->addElement($siglas);
 
         $estado = new Zend_Form_Element_Select('estado');
         $estado->setLabel('Estado:');

@@ -108,7 +108,6 @@ class Admin_MvcController extends App_Controller_Action_Admin
         $sesionMvc  = new Zend_Session_Namespace('sesion_mvc');
         $primaryKey = $generator->getPrimaryKey($sesionMvc->model);
         $data = $this->_getAllParams();
-        
 
         //Previene vulnerabilidad XSS (Cross-site scripting)
         $filtro = new Zend_Filter_StripTags();
@@ -149,6 +148,9 @@ class Admin_MvcController extends App_Controller_Action_Admin
                 $data['fecha_crea'] = date("Y-m-d H:i:s");
                 $data['usuario_crea'] = Zend_Auth::getInstance()->getIdentity()->id;
                 $sesionMvc->messages = 'Registro agregado satisfactoriamente';
+                
+                //Si es usuario enviar correo electrónico para que acceda con su clave
+                
             } else {
                 $data['fecha_actu'] = date("Y-m-d H:i:s");
                 $data['usuario_actu'] = Zend_Auth::getInstance()->getIdentity()->id;

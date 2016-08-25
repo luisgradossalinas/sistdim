@@ -52,7 +52,7 @@ class Application_Model_Organo extends Zend_Db_Table
     function obtenerOrgano($proyecto) {
         
         return $this->getAdapter()->select()->from(array('o' => self::TABLA),
-                array('id_organo','organo','estado','id_proyecto','codigo_natuorganica'))
+                array('id_organo','organo','estado','id_proyecto','codigo_natuorganica','siglas'))
                 ->joinInner(array('n' => Application_Model_Natuorganica::TABLA), 
                         'n.codigo_natuorganica = o.codigo_natuorganica',
                         array('naturaleza' => 'descripcion'))

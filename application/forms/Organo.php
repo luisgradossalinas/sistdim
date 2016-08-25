@@ -20,11 +20,17 @@ class Application_Form_Organo extends Zend_Form
         $naturaleza->setMultiOptions($dataNaturaleza);
         $this->addElement($naturaleza);
         
-        $organo = new Zend_Form_Element_Text('organo');
+        $organo = new Zend_Form_Element_Textarea('organo');
         $organo->setLabel('Órgano:');
+        $organo->setAttrib('rows', 2);
         $organo->setRequired();
         $organo->addFilter('StripTags');
         $this->addElement($organo);
+        
+        $siglas = new Zend_Form_Element_Text('siglas');
+        $siglas->setLabel('Siglas:');
+        $siglas->addFilter('StripTags');
+        $this->addElement($siglas);
 
         $estado = new Zend_Form_Element_Select('estado');
         $estado->setLabel('Estado:');
