@@ -5,7 +5,7 @@ class Application_Form_Organo extends Zend_Form
     private $_natuorganica;
     
     public function init()
-    {
+    {        
         $this->_natuorganica = new Application_Model_Natuorganica;
         
         $this->setAttrib('id', 'form');

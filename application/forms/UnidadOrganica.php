@@ -6,11 +6,14 @@ class Application_Form_UnidadOrganica extends Zend_Form
     
     public function init()
     {
+        $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
+        $proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
+
         $this->_organo = new Application_Model_Organo;
         
         $this->setAttrib('id', 'form');
         
-        $dataOrgano = $this->_organo->combo();
+        $dataOrgano = $this->_organo->combo($proyecto);
         array_unshift($dataOrgano,array('key'=> '', 'value' => 'Seleccione'));
         
         $naturaleza = new Zend_Form_Element_Select('id_organo');

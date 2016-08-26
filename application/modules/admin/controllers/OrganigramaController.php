@@ -7,16 +7,22 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
     private $_unidadModel;
     private $_unidadForm;
     
+    private $_proyecto;
+    
     const INACTIVO = 0;
     const ACTIVO = 1;
     const ELIMINADO = 2;
     
     public function init()
     {
+        
         $this->_organoModel = new Application_Model_Organo;
         $this->_organoForm = new Application_Form_Organo;
         $this->_unidadModel = new Application_Model_UnidadOrganica;
         $this->_unidadForm = new Application_Form_UnidadOrganica;
+        
+        $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
+        $this->_proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
         
         $this->view->headScript()->appendFile(SITE_URL . '/js/web/organigrama.js');
         Zend_Layout::getMvcInstance()->assign('show','1'); //No mostrar en el menú la barra horizontal
@@ -30,11 +36,8 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
         Zend_Layout::getMvcInstance()->assign('padre', 3);
         Zend_Layout::getMvcInstance()->assign('link', 'organigrama');
         
-        $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
-        $proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
-        
-        $this->view->organo = $this->_organoModel->obtenerOrgano($proyecto);
-        $this->view->unidad = $this->_unidadModel->obtenerUOrganica($proyecto);
+        $this->view->organo = $this->_organoModel->obtenerOrgano($this->_proyecto);
+        $this->view->unidad = $this->_unidadModel->obtenerUOrganica($this->_proyecto, null);
     }
     
     public function operacionAction () 
@@ -43,8 +46,6 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
         $this->_helper->viewRenderer->setNoRender(true);
         
         $sesionMvc  = new Zend_Session_Namespace('sesion_mvc');
-        $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
-        $proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
         $data = $this->_getAllParams();
         
         //Previene vulnerabilidad XSS (Cross-site scripting)
@@ -91,12 +92,12 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
             if ($this->_getParam('scrud') == 'nuevo') {
                 $data['fecha_crea'] = date("Y-m-d H:i:s");
                 $data['usuario_crea'] = Zend_Auth::getInstance()->getIdentity()->id;
-                $data['id_proyecto'] = $proyecto;
+                $data['id_proyecto'] = $this->_proyecto;
                 $sesionMvc->messages = 'Registro agregado satisfactoriamente';
             } else {
                 $data['fecha_actu'] = date("Y-m-d H:i:s");
                 $data['usuario_actu'] = Zend_Auth::getInstance()->getIdentity()->id;
-                $data['id_proyecto'] = $proyecto;
+                $data['id_proyecto'] = $this->_proyecto;
                 $sesionMvc->messages = 'Registro actualizado satisfactoriamente';
             }
             
@@ -145,11 +146,45 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
         echo Zend_Json::encode('Registros actualizados');
     }
     
-    public function registroAction() {
+    public function puestoAction() {
         
         Zend_Layout::getMvcInstance()->assign('active', 'Registrar puestos');
         Zend_Layout::getMvcInstance()->assign('padre', 3);
         Zend_Layout::getMvcInstance()->assign('link', 'regpuestos');
+        //Listado de órganos registrados del proyecto
+        $this->view->organo = $this->_organoModel->obtenerOrgano($this->_proyecto);
+    }
+    
+    public function obtenerUorganicaAction() {
+        
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $data = $this->_getAllParams();
+
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        if ($this->_hasParam('organo')) {
+            $organo = $this->_getParam('organo');
+            $proyecto = $this->_proyecto;
+            $dataUOrganica = $this->_unidadModel->obtenerUOrganica($proyecto, $organo);
+            
+            //Enviar select con html
+            $option = "<select id='unidad'>";
+            foreach ($dataUOrganica as $value) {
+                $option.="<option value='".$value['id_uorganica']."'>".$value['descripcion']."</option>";
+            }
+            $option.="</select>";
+            echo $option;
+           // echo Zend_Json::encode($dataUOrganica);
+        }
         
     }
 

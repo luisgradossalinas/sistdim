@@ -2,7 +2,60 @@ var codigo = 0;
 var sentencia_crud = '';
 $(document).ready(function(){
         
+    //Personalizar el listado de órganos
+    $("#organo_chzn").css('width','440px');
+    $("#organo_chzn .chzn-drop").css('width','430px');
+    $("#organo_chzn .chzn-drop .chzn-search input").css('width','380px');
+    
+    $("#unidad_chzn").css('width','300px');
+    $("#unidad_chzn .chzn-drop").css('width','290px');
+    $("#unidad_chzn .chzn-drop .chzn-search input").css('width','240px');
+    
+    $("#capa #unidadt").change(function(){
         
+        var unidad = $("#unidadt").val();
+        alert(unidad)
+    });
+    
+    $("#organo").change(function(){
+        
+        var organo = $("#organo").val();
+        
+        if (organo == '') {
+            return false;
+        }
+        //Realizar ajax para buscar unidades orgánicas
+        $.ajax({
+            url: urls.siteUrl + '/admin/organigrama/obtener-uorganica',
+            data: {
+                organo : organo
+            },
+            type:'post',
+            //dataType: 'json',
+            //Probar generando el html
+            success: function(result){
+                
+                $("#capa").html(result);
+ 
+                 //location.reload();
+                 /*contador = 1;
+                 $("#unidad").empty().append("<option value=''>[Seleccione unidad orgánica]</option>");
+                 $.each(result, function(key,obj){
+                    $("#unidad").append("<option value='"+obj['id_uorganica']+"'>"+obj['descripcion']+"</option>");
+                    //$(".con-json select").append('<option value="'+id+'">'+value+'</option>');
+                    html = "<li id='unidad_chzn_o_"+contador+"' class='active-result'>"+obj['descripcion'] +"</li>";
+                    $("#unidad_chzn .chzn-drop .chzn-results").append(html);
+                    contador++;
+                 });*/
+                 
+            }
+        });
+        
+        
+        
+    })
+    
+    
     $('#tablaorgano').dataTable({
 		"bJQueryUI": true,
                // searching: false,
@@ -98,13 +151,11 @@ $(document).ready(function(){
         configModal(id, 'edit','Editar registro',null,tipo);
     };
     
+    //Actualizar las tablas de los órganos y las unidades orgánicas
     grabarDatos = function(tipo) {
         
         var data = new Array();
         var validar = '';
-        
-       // if (tipo == "organo") {
-            //Recorrer la tabla organo
             $("#tabla"+tipo+" tbody tr").each(function(){
                 var id = $(this).attr("data-"+tipo);
                 var descripcion = $(this).find("td input").eq(1).val();
@@ -130,34 +181,6 @@ $(document).ready(function(){
                     location.reload();
                 }
             });
-            
-      /*  } else if (tipo == 'unidad') {
-            //Recorrer la tabla unidad
-            $("#tablaUnidad tbody tr").each(function(){
-                var id_uorganica = $(this).attr("data-unidad");
-                var id_organo = $(this).find("td select").eq(0).val();
-                var unidad = $(this).find("td input").eq(1).val();
-                validar = $(this).find("td").eq(0).text();
-                data.push(id_uorganica+"|"+unidad+"|"+id_organo);
-            });
-            
-            if (validar == 'No hay registros') {
-                alert("No hay registro que actualizar");
-                return false;
-            }
 
-            $.ajax({
-                url: urls.siteUrl + '/admin/organigrama/grabar/tipo/'+tipo,
-                data: {
-                    datos : data
-                },
-                type:'post',
-                dataType: 'json',
-                success: function(result) {
-                    alert(result);
-                    location.reload();
-                }
-            });
-        }*/
     };
 })

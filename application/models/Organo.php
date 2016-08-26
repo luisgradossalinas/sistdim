@@ -40,9 +40,10 @@ class Application_Model_Organo extends Zend_Db_Table
         return $this->getAdapter()->select()->from($this->_name)->query()->fetchAll();
     }
     
-    public function combo() {
+    public function combo($proyecto) {
         return $this->getAdapter()->select()->from(
                         $this->_name, array('key' => 'id_organo', 'value' => 'organo'))
+                ->where('id_proyecto = ?', $proyecto)
                 ->query()->fetchAll();
     }
     

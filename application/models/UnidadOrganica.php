@@ -49,11 +49,17 @@ class Application_Model_UnidadOrganica extends Zend_Db_Table
     /*
     Obtiene todos las unidades orgánicas que tiene un proyecto
     */
-    function obtenerUOrganica($proyecto) {
+    function obtenerUOrganica($proyecto, $organo) {
         
-        return $this->getAdapter()->select()->from(self::TABLA,
+        $sql = $this->getAdapter()->select()->from(self::TABLA,
                 array('id_uorganica','descripcion','estado','id_proyecto','id_organo','siglas'))
-                ->where('id_proyecto = ?', $proyecto)->query()->fetchAll();
+                ->where('id_proyecto = ?', $proyecto);
+        
+        if (!is_null($organo)) 
+            $sql->where ('id_organo = ?', $organo);
+        
+        return $sql->query()->fetchAll();
+        
     }
     
    
