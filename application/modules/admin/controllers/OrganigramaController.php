@@ -177,9 +177,10 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
             $dataUOrganica = $this->_unidadModel->obtenerUOrganica($proyecto, $organo);
             
             //Enviar select con html
-            $option = "<select id='unidad'>";
+            $option = "<select id='unidad' style='width:320px'>";
+            $option .= "<option value=''>[Seleccione unidad orgánica]</option>";
             foreach ($dataUOrganica as $value) {
-                $option.="<option value='".$value['id_uorganica']."'>".$value['descripcion']."</option>";
+                $option .= "<option value='".$value['id_uorganica']."'>".$value['descripcion']."</option>";
             }
             $option.="</select>";
             echo $option;
