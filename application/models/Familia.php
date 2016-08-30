@@ -48,6 +48,12 @@ class Application_Model_Familia extends Zend_Db_Table
         return $this->getAdapter()->select()->from($this->_name,array('key' => 'codigo_familia', 'value' => 'descripcion'))
                 ->where('estado = ?',self::ESTADO_ACTIVO)->query()->fetchAll();
     }
+    
+    public function obtenerFamilias($grupo)
+    {
+        return $this->getAdapter()->select()->from($this->_name,array('codigo_familia','descripcion'))
+                ->where('codigo_grupo = ?', $grupo)->query()->fetchAll();
+    }
 
 
 }

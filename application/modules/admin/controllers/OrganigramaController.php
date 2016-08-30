@@ -6,6 +6,11 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
     private $_organoForm;
     private $_unidadModel;
     private $_unidadForm;
+    private $_puestoModel;
+    private $_familiaModel;
+    private $_rolPuestoModel;
+    
+    private $_grupoModel;
     
     private $_proyecto;
     
@@ -20,6 +25,10 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
         $this->_organoForm = new Application_Form_Organo;
         $this->_unidadModel = new Application_Model_UnidadOrganica;
         $this->_unidadForm = new Application_Form_UnidadOrganica;
+        $this->_puestoModel = new Application_Model_Puesto;
+        $this->_grupoModel = new Application_Model_Grupo;
+        $this->_familiaModel = new Application_Model_Familia;
+        $this->_rolPuestoModel = new Application_Model_Rolpuesto;
         
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
         $this->_proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
@@ -139,7 +148,7 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
                     $dataNueva = array('descripcion' => $add[1],'id_organo' => $add[2],
                     'usuario_actu' => $usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
                 }
-                
+                //Registro actualizado
                 $modelo->update($dataNueva,$where);   
             }
         }
@@ -186,8 +195,99 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
             echo $option;
            // echo Zend_Json::encode($dataUOrganica);
         }
+    }
+    
+    public function obtenerPuestosAction() {
+        
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $data = $this->_getAllParams();
+
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+        
+        $unidad = $data['unidad'];
+        $dataPuesto = $this->_puestoModel->obtenerPuestos($unidad);
+        $contador = 0;
+        foreach ($dataPuesto as $value) {
+            $dataPuesto[$contador]['grupo'] = $this->getHelper('grupo')->select($value['codigo_grupo'],$contador+1);
+            $dataPuesto[$contador]['familia'] = $this->getHelper('familia')->select($value['codigo_familia'],$contador+1);
+            $dataPuesto[$contador]['rpuesto'] = $this->getHelper('rolpuesto')->select($value['codigo_rol_puesto'],$contador+1);
+            $contador++;
+        }
+        
+        echo Zend_Json::encode($dataPuesto);
+        
         
     }
+    
+    public function obtenerGruposAction() {
+        
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+        
+        $dataGrupo = $this->_grupoModel->listado();
+        echo Zend_Json::encode($dataGrupo);
+        
+    }
+    
+    public function obtenerFamiliasAction() {
+        
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $data = $this->_getAllParams();
+
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+        
+        $grupo = $data['grupo'];
+        
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+        
+        $dataFamilia = $this->_familiaModel->obtenerFamilias($grupo);
+        echo Zend_Json::encode($dataFamilia);
+        
+    }
+    
+    public function obtenerRolesAction() {
+        
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $data = $this->_getAllParams();
+
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+        
+        $familia = $data['familia'];
+        
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+        
+        $dataRol = $this->_rolPuestoModel->obtenerRoles($familia);
+        echo Zend_Json::encode($dataRol);
+        
+    }
+    
+    
 
 }
 
