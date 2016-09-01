@@ -1,3 +1,9 @@
+<style>
+#tabla input, #tabla select {
+    font-size:8pt
+}    
+</style>
+
 <?=$this->partial('_partials/mensajes.phtml',array('messages' => $this->messages,'tipoMessages' => $this->tipoMessages));?>
 <div class="widget-box">
     <div class="widget-title">	
@@ -10,13 +16,14 @@
 <?php foreach ($this->organo as $val){
    echo "<option value=".$val['id_organo'].">".$val['organo']."</option>"; 
 }?>
-</select>    
+</select>
+<input type="hidden" id="mapaPuesto" name="mapaPuesto" value="<?=$this->mapaPuesto?>">
 </div>
 <div id="capa" style="float:left"></div>
 <a id="nuevoPuesto" role="button" class="btn tip-right" title="Nuevo puesto" >
     <li class="icon-plus-sign"></li>Nuevo puesto
 </a>
-<a  id="btnOpen"  role="button" class="btn tip-right" onclick="grabarPuestos()" title="Grabar puestos" >
+<a  id="btnOpen"  role="button" class="btn tip-right" onclick="grabarPuestos()" title="Grabar puestos">
     <li class="icon-check"></li>Grabar puestos
 </a>
 <span class="btn btn-small tip-bottom" title="Servidores civiles de Carreras:<br>

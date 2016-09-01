@@ -9,7 +9,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin
 
     }
     
-    public function inventarioAction() {
+    public function indexAction() {
         
         Zend_Layout::getMvcInstance()->assign('active', 'Registrar inventario');
         Zend_Layout::getMvcInstance()->assign('padre', 4);

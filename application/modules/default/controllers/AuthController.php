@@ -205,7 +205,6 @@ class Default_AuthController extends Zend_Controller_Action {
     /*
       Cambiar contraseña de usuario
      */
-
     public function recuperarClaveAction() {
 
         if (!$this->_getParam('token')) {

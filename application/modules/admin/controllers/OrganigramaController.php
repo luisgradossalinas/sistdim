@@ -12,6 +12,7 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
     private $_grupoModel;
     private $_proyecto;
     private $_usuario;
+    private $_mapaPuesto;
 
     const INACTIVO = 0;
     const ACTIVO = 1;
@@ -31,7 +32,8 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
         $this->_proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
         $this->_usuario = $sesion_usuario->sesion_usuario['id'];
-
+        $this->_mapaPuesto = $sesion_usuario->sesion_usuario['mapa_puesto'];
+        
         $this->view->headScript()->appendFile(SITE_URL . '/js/web/organigrama.js');
         Zend_Layout::getMvcInstance()->assign('show', '1'); //No mostrar en el menú la barra horizontal
         parent::init();
@@ -146,8 +148,7 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
 
     /*
       Actualizar registros de órganos y unidades orgánica
-     */
-
+    */
     public function grabarAction() {
 
         $this->_helper->layout->disableLayout();
@@ -192,6 +193,7 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
         Zend_Layout::getMvcInstance()->assign('link', 'regpuestos');
         //Listado de órganos registrados del proyecto
         $this->view->organo = $this->_organoModel->obtenerOrgano($this->_proyecto);
+        $this->view->mapaPuesto = $this->_mapaPuesto;
     }
 
     public function obtenerUorganicaAction() {
@@ -231,7 +233,6 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
         $this->_helper->viewRenderer->setNoRender(true);
 
         $data = $this->_getAllParams();
-
         //Previene vulnerabilidad XSS (Cross-site scripting)
         $filtro = new Zend_Filter_StripTags();
         foreach ($data as $key => $val) {
@@ -250,7 +251,6 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
             $dataPuesto[$contador]['rpuesto'] = $this->getHelper('rolpuesto')->select($value['codigo_familia'], $value['codigo_rol_puesto'], $contador + 1);
             $contador++;
         }
-
         echo Zend_Json::encode($dataPuesto);
     }
 
@@ -311,17 +311,14 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
 
         $puestos = isset($data['puestos']) ? $data['puestos'] : array();
         $puestosNuevo = isset($data['nuevo']) ? $data['nuevo'] : array();
-
         //Actualizando puestos
         if (count($puestos) > 0) {
             foreach ($puestos as $reg) {
                 $add = explode("|", $reg);
-                //$where = $this->getAdapter()->quoteInto('id_puesto = ?',$add[0]);
                 $dataNueva = array('id_puesto' => $add[0], 'descripcion' => $add[2], 'id_uorganica' => $add[7],
                     'num_correlativo' => $add[1], 'cantidad' => $add[3], 'codigo_grupo' => $add[4],
                     'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6],
                     'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
-                //$this->_puestoModel->update($dataNueva,$where);   
                 $this->_puestoModel->guardar($dataNueva);
             }
         }
@@ -331,9 +328,8 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
                 $add = explode("|", $reg);
                 $dataNueva = array('descripcion' => $add[2], 'id_uorganica' => $add[7],
                     'num_correlativo' => $add[1], 'cantidad' => $add[3], 'codigo_grupo' => $add[4],
-                    'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6], 'estado' => 1,
+                    'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6],
                     'usuario_crea' => $this->_usuario, 'fecha_crea' => date("Y-m-d H:i:s"));
-                //$this->_puestoModel->insert($dataNueva);   
                 $this->_puestoModel->guardar($dataNueva);
             }
         }

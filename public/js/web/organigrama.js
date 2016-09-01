@@ -5,7 +5,13 @@ $(document).ready(function () {
     //Ocultar el botón listar puestos y nuevo puesto;
     $("#nuevoPuesto").hide();
     $("#grabarPuestos").hide();
-
+    
+    //Si en el proyecto no se tiene previamente el mapa de puestos, no se debe mostrar 
+    //el campo de número correlativo
+    if ($("#mapaPuesto").val() == 1) {
+        $("#tabla").DataTable().column(3).visible( false );
+    }
+    
     $('#tabla').on('change', 'tr td select', function () {
 
         var id = ($(this).attr("id"));
@@ -103,9 +109,15 @@ $(document).ready(function () {
     
     grabarPuestos = function () {
         
+        var mapaPuesto = $("#mapaPuesto").val();
+        var control = 0;
         if ($('#tabla').DataTable().data().count() == 0) {
             alert('No existen puestos para grabar');
             return false;
+        }
+        
+        if (mapaPuesto == 1) {
+            control = 1;
         }
         
         var dataPuesto = new Array();
@@ -119,18 +131,27 @@ $(document).ready(function () {
             contador++;
             var id_puesto = $(this).find("td input").val();
             //Se muestra cuando si tiene mapa de puesto, agregar condicional
-            var correlativo = $(this).find("td input").eq(1).val(); 
-            var nom_puesto = $(this).find("td input").eq(2).val();
-            var cantidad = $(this).find("td input").eq(3).val();
+            var correlativo = $(this).find("td input").eq(1-control).val(); 
+            var nom_puesto = $(this).find("td input").eq(2-control).val();
+            var cantidad = $(this).find("td input").eq(3-control).val();
             var grupo = $(this).find("td select").eq(0).val();
             var familia = $(this).find("td select").eq(1).val();
             var rol = $(this).find("td select").eq(2).val();
-            var unidad = $(this).find("td input").eq(4).val();
+            var unidad = $(this).find("td input").eq(4-control).val();
             
-            if ((correlativo == '' || correlativo == 0) || nom_puesto == '' || 
-                    (cantidad == '' || cantidad == 0) || grupo == '' || familia == '' || rol == '') {
-                mensaje += "En la fila " + contador +": Debe completar todos los campos \n";
-                mostrarMensaje = 1;
+            
+            if (mapaPuesto == 0) {
+               if ((correlativo == '' || correlativo == 0) || nom_puesto == '' || 
+                        (cantidad == '' || cantidad == 0) || grupo == '' || familia == '' || rol == '') {
+                    mensaje += "En la fila " + contador +": Debe completar todos los campos \n";
+                    mostrarMensaje = 1;
+                } 
+            } else if (mapaPuesto == 1) {
+                if (nom_puesto == '' || (cantidad == '' || cantidad == 0) || grupo == '' || familia == '' || rol == '') {
+                    mensaje += "En la fila " + contador +": Debe completar todos los campos \n";
+                    mostrarMensaje = 1;
+                }    
+                correlativo = '';
             }
             
             if (id_puesto == 0) {
@@ -159,7 +180,57 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (result) {
                 alert(result);
-                location.reload();
+                //No refrescar página, sino actualizar con ajac los id
+                var organo = $("#organo").val();
+                    var unidad = $("#unidad").val();
+                    var nomunidad = $("#unidad option:selected").text();
+
+                    if (organo == '') {
+                        alert('Seleccione órgano');
+                        $('#tabla').DataTable().clear().draw();
+                        return false;
+                    }
+                    if (unidad == '') {
+                        $('#tabla').DataTable().clear().draw();
+                        return false;
+                    }
+                    //Buscar y pintar la tabla de los puestos obtenidos
+                    $.ajax({
+                        url: urls.siteUrl + '/admin/organigrama/obtener-puestos',
+                        data: {
+                            unidad: unidad
+                        },
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (result) {
+
+                            var html = '';
+                            var contador = 0;
+
+                             if (result == '' || result == []) {
+                             alert('No existen puestos, ingrese Nuevos puestos');
+                             $('#tabla').DataTable().clear().draw();
+                             return false;
+                             }
+
+                            $('#tabla').DataTable().clear().draw();
+                            $.each(result, function (key, obj) {
+                                contador++;
+                                $('#tabla').DataTable().row.add([
+                                    contador,
+                                    "<input type=hidden name=id_puesto value='" + obj['id_puesto'] + "'>" + obj['organo'],
+                                    obj['unidad'],
+                                    "<input type=number name=num_cor value='" + obj['numcor'] + "' style='width:50%'>",
+                                    "<input type=textarea name=puesto class='puesto_validate' value='" + obj['puesto'] + "'>",
+                                    "<input type=number name=cantidad value='" + obj['cantidad'] + "' style='width:50%'>",
+                                    obj['grupo'],
+                                    obj['familia'],
+                                    obj['rpuesto'] + "<input type=hidden name=unidadT value='"+unidad+"'>"
+                                ]).draw(false);
+                            });
+                        }
+                    });
+                //location.reload();
             }
         });
     };
@@ -192,7 +263,7 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (result) {
                 alert(result);
-                location.reload();
+                //location.reload();
             }
         });
 

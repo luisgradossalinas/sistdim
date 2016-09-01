@@ -5,7 +5,6 @@ class Generator_Form extends Zend_Db_Table
  
     public function cuerpoFormulario($tabla)
     {
-        
         $db = $this->getAdapter();
         $dataTabla = $db->describeTable($tabla);
         
@@ -78,11 +77,9 @@ class Generator_Form extends Zend_Db_Table
                 }
                 
                 $cuerpo .= '$'. $campo.'->addFilter(\'StripTags\');'. "\n";
-                $cuerpo .= '$this->addElement($'.$campo.');'. "\n\n";
-              
+                $cuerpo .= '$this->addElement($'.$campo.');'. "\n\n"; 
             }
         }
-        
         return $cuerpo;
     }
     
@@ -110,10 +107,6 @@ class Generator_Form extends Zend_Db_Table
         }
         
         $populate .= 'return $this->setDefaults($data);'. "\n";
-        
         return $populate;
-        
     }
-
-   
 }
