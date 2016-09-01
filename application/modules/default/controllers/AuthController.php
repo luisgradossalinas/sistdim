@@ -196,6 +196,7 @@ class Default_AuthController extends Zend_Controller_Action {
             $dataProyecto = $proyectoModelo->fetchRow("id_proyecto = " . $proyecto)->toArray();
             $sesion_usuario->sesion_usuario['id_proyecto'] = $proyecto;
             $sesion_usuario->sesion_usuario['nombre_proyecto'] = $dataProyecto['nombre'];
+            $sesion_usuario->sesion_usuario['mapa_puesto'] = $dataProyecto['mapa_puesto'];
 
             $this->_redirect('admin');
         }

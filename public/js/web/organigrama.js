@@ -3,9 +3,55 @@ var sentencia_crud = '';
 $(document).ready(function () {
 
     //Ocultar el botón listar puestos y nuevo puesto;
-    $("#buscar").hide();
     $("#nuevoPuesto").hide();
     $("#grabarPuestos").hide();
+
+    $('#tabla').on('change', 'tr td select', function () {
+
+        var id = ($(this).attr("id"));
+        var valor = $(this).val();
+        var result = id.split('_');
+        var tipo = result[0];
+        var num = result[1];
+        //Llenar familia y limpiar rol
+        if (tipo == 'grupo') {
+            $.ajax({
+                url: urls.siteUrl + '/admin/organigrama/obtener-familias',
+                data: {
+                    grupo: valor
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function (result) {
+                    //Llenar familia
+                    $("#familia_" + num).empty().append("<option value=''>Familia</option>");
+                    $("#rol_" + num).empty().append("<option value=''>Rol</option>");
+                    $.each(result, function (key, obj) {
+                        $("#familia_" + num).append("<option value='" + obj['codigo_familia'] + "'>" + obj['descripcion'] + "</option>");
+                    });
+                }
+            });
+        }
+
+        //Llenar roles y limpiar rol
+        if (tipo == 'familia') {
+            $.ajax({
+                url: urls.siteUrl + '/admin/organigrama/obtener-roles',
+                data: {
+                    familia: valor
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function (result) {
+                    //Llenar rol
+                    $("#rol_" + num).empty().append("<option value=''>Rol</option>");
+                    $.each(result, function (key, obj) {
+                        $("#rol_" + num).append("<option value='" + obj['codigo_rol_puesto'] + "'>" + obj['descripcion'] + "</option>");
+                    });
+                }
+            });
+        }
+    });
 
     //Personalizar el listado de órganos
     $("#organo_chzn").css('width', '420px');
@@ -16,25 +62,30 @@ $(document).ready(function () {
     $("#unidad_chzn .chzn-drop").css('width', '290px');
     $("#unidad_chzn .chzn-drop .chzn-search input").css('width', '240px');
 
-    $("#unidad").change(function () {
-
-        var unidad = $("#unidad").val();
-        alert(unidad);
-    });
-
     $("#nuevoPuesto").click(function () {
 
-        var numReg = ($('#tabla').DataTable().data().count() / 8) + 1;
+        var numReg = ($('#tabla').DataTable().data().count() / 9) + 1;
+        var organo = $("#organo").val();
+        var unidad = $("#unidad").val();
+        
+        if (organo == '') {
+            alert("Seleccione órgano");return false;
+        }
+        
+        if (unidad == '') {
+            alert("Seleccione unidad orgánica");return false;
+        }
 
         $('#tabla').DataTable().row.add([
-            $("#organo option:selected").text(),
+            numReg,
+            "<input type=hidden name=id_puesto value=0>" + $("#organo option:selected").text(),
             $("#unidad option:selected").text(),
             "<input type=number name=num_cor title='Ingrese el número correlativo del puesto' style='width:50%'>",
             "<input type=textarea name=puesto>",
             "<input type=number name=cantidad style='width:50%'>",
             "<select style='width:90%' id=grupo_" + numReg + " name=grupo_" + numReg + "><option value=''>[Grupo]</option></select>",
             "<select style='width:90%' id=familia_" + numReg + " name=familia><option value=''>[Familia]</option></select>",
-            "<select style='width:90%' id=rol_" + numReg + " name=rol><option value=''>[Rol]</option></select>"
+            "<select style='width:90%' id=rol_" + numReg + " name=rol><option value=''>[Rol]</option></select><input type=hidden name=unidadT value='"+unidad+"'>"
         ]).draw(false);
 
         $.ajax({
@@ -48,161 +99,104 @@ $(document).ready(function () {
                 });
             }
         });
-
-        $('#tabla').on('change', 'tr td select', function () {
-
-            var id = ($(this).attr("id"));
-            var valor = $(this).val();
-            var result = id.split('_');
-            var tipo = result[0];
-            var num = result[1];
-            //alert("Tipo:"+tipo +"- Num:"+num );
-            //Llenar familia y limpiar rol
-            if (tipo == 'grupo') {
-                $.ajax({
-                    url: urls.siteUrl + '/admin/organigrama/obtener-familias',
-                    data: {
-                        grupo: valor
-                    },
-                    type: 'post',
-                    dataType: 'json',
-                    success: function (result) {
-                        //Llenar familia
-                        $("#familia_" + num).empty().append("<option value=''>Familia</option>");
-                        $("#rol_" + num).empty().append("<option value=''>Rol</option>");
-                        $.each(result, function (key, obj) {
-                            $("#familia_" + num).append("<option value='" + obj['codigo_familia'] + "'>" + obj['descripcion'] + "</option>");
-                        });
-                    }
-                });
+    });
+    
+    grabarPuestos = function () {
+        
+        if ($('#tabla').DataTable().data().count() == 0) {
+            alert('No existen puestos para grabar');
+            return false;
+        }
+        
+        var dataPuesto = new Array();
+        var dataNueva = new Array();
+        var validar = '';
+        var contador = 0;
+        var mensaje = '';
+        var mostrarMensaje = 0;
+        
+        $("#tabla tbody tr").each(function () {
+            contador++;
+            var id_puesto = $(this).find("td input").val();
+            //Se muestra cuando si tiene mapa de puesto, agregar condicional
+            var correlativo = $(this).find("td input").eq(1).val(); 
+            var nom_puesto = $(this).find("td input").eq(2).val();
+            var cantidad = $(this).find("td input").eq(3).val();
+            var grupo = $(this).find("td select").eq(0).val();
+            var familia = $(this).find("td select").eq(1).val();
+            var rol = $(this).find("td select").eq(2).val();
+            var unidad = $(this).find("td input").eq(4).val();
+            
+            if ((correlativo == '' || correlativo == 0) || nom_puesto == '' || 
+                    (cantidad == '' || cantidad == 0) || grupo == '' || familia == '' || rol == '') {
+                mensaje += "En la fila " + contador +": Debe completar todos los campos \n";
+                mostrarMensaje = 1;
             }
-
-            //Llenar roles y limpiar rol
-            if (tipo == 'familia') {
-                $.ajax({
-                    url: urls.siteUrl + '/admin/organigrama/obtener-roles',
-                    data: {
-                        familia: valor
-                    },
-                    type: 'post',
-                    dataType: 'json',
-                    success: function (result) {
-                        //Llenar rol
-                        $("#rol_" + num).empty().append("<option value=''>Rol</option>");
-                        $.each(result, function (key, obj) {
-                            $("#rol_" + num).append("<option value='" + obj['codigo_rol_puesto'] + "'>" + obj['descripcion'] + "</option>");
-                        });
-                    }
-                });
+            
+            if (id_puesto == 0) {
+                dataNueva.push(id_puesto + "|" + correlativo + '|' + nom_puesto + '|' + cantidad
+                    + "|" + grupo + "|" + familia + "|" + rol + "|" + unidad); 
+            } else {
+               dataPuesto.push(id_puesto + "|" + correlativo + '|' + nom_puesto + '|' + cantidad
+                    + "|" + grupo + "|" + familia + "|" + rol + "|" + unidad); 
             }
         });
-
-    });
-
-    $("#buscar").click(function () {
-
-        var organo = $("#organo").val();
-        var unidad = $("#unidad").val();
-        var nomunidad = $("#unidad option:selected").text();
-
-        if (organo == '') {
-            alert('Seleccione órgano');
+        
+        //Mostrar mensaje si existen datos por completar
+        if (mostrarMensaje == 1) {
+            alert(mensaje);
             return false;
         }
-
-        if (unidad == '') {
-            alert('Seleccione unidad orgánica');
-            return false;
-        }
-
-        //Buscar y pintar la tabla de los puestos obtenidos
+        
+        //console.log(data);
         $.ajax({
-            url: urls.siteUrl + '/admin/organigrama/obtener-puestos',
+            url: urls.siteUrl + '/admin/organigrama/grabar-puestos',
             data: {
-                unidad: unidad
+                puestos: dataPuesto,
+                nuevo: dataNueva
             },
             type: 'post',
             dataType: 'json',
             success: function (result) {
-
-                var html = '';
-                var contador = 0;
-                
-                 if (result == '' || result == []) {
-                 alert('No existen puestos');
-                 return false;
-                 }
-
-                $('#tabla').DataTable().clear().draw();
-                $.each(result, function (key, obj) {
-                    contador++;
-                    $('#tabla').DataTable().row.add([
-                        obj['organo'],
-                        obj['unidad'],
-                        "<input type=number name=num_cor value='" + obj['numcor'] + "' style='width:50%'>",
-                        "<input type=textarea name=puesto value='" + obj['puesto'] + "'>",
-                        "<input type=number name=cantidad value='" + obj['cantidad'] + "' style='width:50%'>",
-                        obj['grupo'],
-                        obj['familia'],
-                        obj['rpuesto']
-                    ]).draw(false);
-                   
-                   $('#tabla').on('change', 'tr td select', function () {
-
-                    var id = ($(this).attr("id"));
-                    var valor = $(this).val();
-                    var result = id.split('_');
-                    var tipo = result[0];
-                    var num = result[1];
-                    //alert("Tipo:"+tipo +"- Num:"+num );
-                    //Llenar familia y limpiar rol
-                    if (tipo == 'grupo') {
-                        $.ajax({
-                            url: urls.siteUrl + '/admin/organigrama/obtener-familias',
-                            data: {
-                                grupo: valor
-                            },
-                            type: 'post',
-                            dataType: 'json',
-                            success: function (result) {
-                                //Llenar familia
-                                $("#familia_" + num).empty().append("<option value=''>Familia</option>");
-                                $("#rol_" + num).empty().append("<option value=''>Rol</option>");
-                                $.each(result, function (key, obj) {
-                                    $("#familia_" + num).append("<option value='" + obj['codigo_familia'] + "'>" + obj['descripcion'] + "</option>");
-                                });
-                            }
-                        });
-                    }
-
-                    //Llenar roles y limpiar rol
-                    if (tipo == 'familia') {
-                        $.ajax({
-                            url: urls.siteUrl + '/admin/organigrama/obtener-roles',
-                            data: {
-                                familia: valor
-                            },
-                            type: 'post',
-                            dataType: 'json',
-                            success: function (result) {
-                                //Llenar rol
-                                $("#rol_" + num).empty().append("<option value=''>Rol</option>");
-                                $.each(result, function (key, obj) {
-                                    $("#rol_" + num).append("<option value='" + obj['codigo_rol_puesto'] + "'>" + obj['descripcion'] + "</option>");
-                                });
-                            }
-                        });
-                    }
-                });
-                    
-                });
-
-                
-                
-
+                alert(result);
+                location.reload();
             }
         });
-    });
+    };
+    
+    //Actualizar las tablas de los órganos y las unidades orgánicas
+    grabarDatos = function (tipo) {
+
+        var data = new Array();
+        var validar = '';
+        $("#tabla" + tipo + " tbody tr").each(function () {
+            var id = $(this).attr("data-" + tipo);
+            var descripcion = $(this).find("td input").eq(1).val();
+            var idp = $(this).find("td select").eq(0).val();
+            validar = $(this).find("td").eq(0).text();
+            data.push(id + "|" + descripcion + "|" + idp);
+        });
+
+        //if (validar == 'No hay registros' || validar == 'No hay datos en la tabla') {
+        if ($('#tabla'+tipo).DataTable().data().count() == 0) {
+            alert("No hay registros que actualizar");
+            return false;
+        }
+
+        $.ajax({
+            url: urls.siteUrl + '/admin/organigrama/grabar/tipo/' + tipo,
+            data: {
+                datos: data
+            },
+            type: 'post',
+            dataType: 'json',
+            success: function (result) {
+                alert(result);
+                location.reload();
+            }
+        });
+
+    };
 
     $("#organo").change(function () {
 
@@ -222,16 +216,64 @@ $(document).ready(function () {
             //Probar generando el html
             success: function (result) {
                 $("#capa").html(result);
-                $("#buscar").show();
                 $("#nuevoPuesto").show();
                 $("#grabarPuestos").show();
+                
+                $("#unidad").change(function(){
+                    
+                    var organo = $("#organo").val();
+                    var unidad = $("#unidad").val();
+                    var nomunidad = $("#unidad option:selected").text();
+
+                    if (organo == '') {
+                        alert('Seleccione órgano');
+                        $('#tabla').DataTable().clear().draw();
+                        return false;
+                    }
+                    if (unidad == '') {
+                        $('#tabla').DataTable().clear().draw();
+                        return false;
+                    }
+                    //Buscar y pintar la tabla de los puestos obtenidos
+                    $.ajax({
+                        url: urls.siteUrl + '/admin/organigrama/obtener-puestos',
+                        data: {
+                            unidad: unidad
+                        },
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (result) {
+
+                            var html = '';
+                            var contador = 0;
+
+                             if (result == '' || result == []) {
+                             alert('No existen puestos, ingrese Nuevos puestos');
+                             $('#tabla').DataTable().clear().draw();
+                             return false;
+                             }
+
+                            $('#tabla').DataTable().clear().draw();
+                            $.each(result, function (key, obj) {
+                                contador++;
+                                $('#tabla').DataTable().row.add([
+                                    contador,
+                                    "<input type=hidden name=id_puesto value='" + obj['id_puesto'] + "'>" + obj['organo'],
+                                    obj['unidad'],
+                                    "<input type=number name=num_cor value='" + obj['numcor'] + "' style='width:50%'>",
+                                    "<input type=textarea name=puesto class='puesto_validate' value='" + obj['puesto'] + "'>",
+                                    "<input type=number name=cantidad value='" + obj['cantidad'] + "' style='width:50%'>",
+                                    obj['grupo'],
+                                    obj['familia'],
+                                    obj['rpuesto'] + "<input type=hidden name=unidadT value='"+unidad+"'>"
+                                ]).draw(false);
+                            });
+                        }
+                    });
+                });  
             }
         });
-
-
-
-    })
-
+    });
 
     $('#tablaorgano').dataTable({
         "bJQueryUI": true,
@@ -242,15 +284,7 @@ $(document).ready(function () {
                 // "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>"
                 //"sDom": '<""l>t<"F"fp>'
     });
-
-    /*
-     $('#tablaorgano').dataTable({
-     "bJQueryUI": true,
-     "sPaginationType": "full_numbers",
-     // "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>"
-     "sDom": '<""l>t<"F"fp>'
-     });*/
-
+    
     $('#tablaunidad').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers"
@@ -302,14 +336,12 @@ $(document).ready(function () {
                                     }
                                 }
                             })
-
                         },
                         "Cancelar": function () {
                             $(this).dialog("close");
-
                         }
                     },
-                    close: function () {//$("#ventana-modal").remove();
+                    close: function () {
                     }
                 });
             }
@@ -326,37 +358,46 @@ $(document).ready(function () {
     editarRegistro = function (id, tipo) {
         configModal(id, 'edit', 'Editar registro', tipo);
     };
-
-    //Actualizar las tablas de los órganos y las unidades orgánicas
-    grabarDatos = function (tipo) {
-
-        var data = new Array();
-        var validar = '';
-        $("#tabla" + tipo + " tbody tr").each(function () {
-            var id = $(this).attr("data-" + tipo);
-            var descripcion = $(this).find("td input").eq(1).val();
-            var idp = $(this).find("td select").eq(0).val();
-            validar = $(this).find("td").eq(0).text();
-            data.push(id + "|" + descripcion + "|" + idp);
-        });
-
-        if (validar == 'No hay registros' || validar == 'No hay datos en la tabla') {
-            alert("No hay registros que actualizar");
-            return false;
-        }
-
-        $.ajax({
-            url: urls.siteUrl + '/admin/organigrama/grabar/tipo/' + tipo,
-            data: {
-                datos: data
-            },
-            type: 'post',
-            dataType: 'json',
-            success: function (result) {
-                alert(result);
-                location.reload();
-            }
-        });
-
+    
+    eliminaRegistro = function(id, tipo){
+        
+        codigo = id;
+   
+                $('#ventana-modal').empty().html('¿Está seguro que desea eliminar registro?');
+                $('#ventana-modal').dialog({
+                height: 'auto',
+                width: 350, 
+                modal: true,
+                resizable: false,
+                title:'Mensaje del sistema',
+                buttons: {
+                    "Eliminar": function() {
+                    dialog = $(this);
+                    $.ajax({
+                        url: urls.siteUrl + '/admin/organigrama/operacion/ajax/delete',
+                        data:{id:codigo,tipo:tipo},
+                        type: 'post',
+                        dataType: 'json',
+                        success: function(result){
+                            
+                            //Verificar si se actualizó
+                            if (result.code == 0) {
+                                alert(result.msg);
+                                return false;
+                            }
+                            location.reload();
+                        }
+                    });
+                    },
+                     "Cancelar": function() {
+                       $(this).dialog("close"); 
+                    }
+                },
+                close: function() {//$("#ventana-modal").remove();
+                }
+                });
+         
     };
+
+
 })

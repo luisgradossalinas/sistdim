@@ -22,8 +22,8 @@ class Application_Form_Entidad extends Zend_Form
         
         $ruc = new Zend_Form_Element_Text('ruc');
         $ruc->setLabel('Ruc:');
-        $ruc->setAttrib('maxlength',18);
-        $ruc->setRequired();
+        $ruc->setAttrib('maxlength',11);
+        $ruc->setAttrib('class','v_numeric');
         $ruc->addFilter('StripTags');
         $this->addElement($ruc);
         

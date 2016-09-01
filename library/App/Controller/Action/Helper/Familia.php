@@ -6,18 +6,18 @@ class App_Controller_Action_Helper_Familia extends Zend_Controller_Action_Helper
     private $_familia;
 
  
-    public function select($familia, $contador) {
+    public function select($grupo, $familia, $contador) {
         
         $this->_familia = new Application_Model_Familia;
-        $dataFamilia = $this->_familia->combo();
+        $dataFamilia = $this->_familia->obtenerFamilias($grupo);
         $select = '<select style="width:90%" id=familia_'.$contador." name=familia_".$contador.">"
                 . "<option value=''>[Familia]</option>";
         
         foreach ($dataFamilia as $data) {
-            if ($familia == $data['key']) {
-                $select .= "<option value='".$data['key']."' selected>".$data['value']."</option>";
+            if ($familia == $data['codigo_familia']) {
+                $select .= "<option value='".$data['codigo_familia']."' selected>".$data['descripcion']."</option>";
             } else {
-                $select .= "<option value='".$data['key']."'>".$data['value']."</option>";
+                $select .= "<option value='".$data['codigo_familia']."'>".$data['descripcion']."</option>";
             }
         }
         $select .= "</select>";

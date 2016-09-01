@@ -32,12 +32,14 @@ class Application_Form_Organo extends Zend_Form
         $siglas->addFilter('StripTags');
         $this->addElement($siglas);
 
+        /*
         $estado = new Zend_Form_Element_Select('estado');
         $estado->setLabel('Estado:');
         $estado->setRequired();
         $estado->setMultiOptions(array('1' => 'Activo', '0' => 'Inactivo'));
         $estado->addFilter('StripTags');
         $this->addElement($estado);
+         * */
    
     }
 

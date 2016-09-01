@@ -13,25 +13,26 @@
 </select>    
 </div>
 <div id="capa" style="float:left"></div>
-<a id="buscar" role="button" class="btn tip-right" title="Listar puestos" >
-    <li class="icon-check"></li>Listar puestos
-</a>
 <a id="nuevoPuesto" role="button" class="btn tip-right" title="Nuevo puesto" >
     <li class="icon-plus-sign"></li>Nuevo puesto
 </a>
-<a id="grabarPuestos" role="button" class="btn tip-right" title="Grabar puestos" >
+<a  id="btnOpen"  role="button" class="btn tip-right" onclick="grabarPuestos()" title="Grabar puestos" >
     <li class="icon-check"></li>Grabar puestos
 </a>
+<span class="btn btn-small tip-bottom" title="Servidores civiles de Carreras:<br>
+      - Ejecutivo<br>- Experto<br>- Coordinador<br>- Especialista<br>- Analista<br>- Asistente<br><br>
+Servidores de Actividades Complementarias<br>- Jefe de Gabinete<br>- Asesor<br>- Supervisor de Operador<br>- Supervisor de Seguridad<br>- Supervisor de Choferes<br>
+- Supervisor de Mantenimiento<br>- Operador<br>- Secretaria<br>- Auxiliar<br>
+- Apoyo administrativo<br>- Conserje<br>- Mensajero<br>- Notificador"><i class="icon-exclamation-sign"></i></span>
 <table id='tabla' class="table table-condensed table-bordered" style="font-size: 7pt">
     <thead>
-        <tr><th>Órgano</th><th>Unidad Orgánica</th><th width="8%" title="Ingrese el número correlativo del puesto">Núm Corr</th><th width="10%">Puesto</th>
+        <tr><th>#</th><th>Órgano</th><th>Unidad Orgánica</th><th width="8%" title="Ingrese el número correlativo del puesto">Número Corr</th><th width="10%">Puesto</th>
             <th width="8%">Cantidad</th>
         <th width="15%">Grupo</th><th width="15%">Familia</th><th width="15%">Rol</th></tr>
     </thead>
     <tbody>     
     </tbody>
 </table>
- 
 </div>
 </div>
 <?=$this->partial('_partials/modal.phtml',array('model' => $this->model));?>

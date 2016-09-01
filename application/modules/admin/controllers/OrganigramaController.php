@@ -1,7 +1,7 @@
 <?php
 
-class Admin_OrganigramaController extends App_Controller_Action_Admin
-{
+class Admin_OrganigramaController extends App_Controller_Action_Admin {
+
     private $_organoModel;
     private $_organoForm;
     private $_unidadModel;
@@ -9,18 +9,16 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
     private $_puestoModel;
     private $_familiaModel;
     private $_rolPuestoModel;
-    
     private $_grupoModel;
-    
     private $_proyecto;
-    
+    private $_usuario;
+
     const INACTIVO = 0;
     const ACTIVO = 1;
     const ELIMINADO = 2;
-    
-    public function init()
-    {
-        
+
+    public function init() {
+
         $this->_organoModel = new Application_Model_Organo;
         $this->_organoForm = new Application_Form_Organo;
         $this->_unidadModel = new Application_Model_UnidadOrganica;
@@ -29,75 +27,106 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
         $this->_grupoModel = new Application_Model_Grupo;
         $this->_familiaModel = new Application_Model_Familia;
         $this->_rolPuestoModel = new Application_Model_Rolpuesto;
-        
+
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
         $this->_proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
-        
+        $this->_usuario = $sesion_usuario->sesion_usuario['id'];
+
         $this->view->headScript()->appendFile(SITE_URL . '/js/web/organigrama.js');
-        Zend_Layout::getMvcInstance()->assign('show','1'); //No mostrar en el menú la barra horizontal
+        Zend_Layout::getMvcInstance()->assign('show', '1'); //No mostrar en el menú la barra horizontal
         parent::init();
-        
     }
-    
+
     public function indexAction() {
-        
+
         Zend_Layout::getMvcInstance()->assign('active', 'Organigrama');
         Zend_Layout::getMvcInstance()->assign('padre', 3);
         Zend_Layout::getMvcInstance()->assign('link', 'organigrama');
-        
+
         $this->view->organo = $this->_organoModel->obtenerOrgano($this->_proyecto);
         $this->view->unidad = $this->_unidadModel->obtenerUOrganica($this->_proyecto, null);
     }
-    
-    public function operacionAction () 
-    {   
+
+    public function operacionAction() {
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
-        
-        $sesionMvc  = new Zend_Session_Namespace('sesion_mvc');
+
+        $sesionMvc = new Zend_Session_Namespace('sesion_mvc');
         $data = $this->_getAllParams();
-        
+
         //Previene vulnerabilidad XSS (Cross-site scripting)
         $filtro = new Zend_Filter_StripTags();
         foreach ($data as $key => $val) {
             $data[$key] = $filtro->filter(trim($val));
         }
-        
-        if ($data['tipo'] == 'organo') {
+
+        $tipo = $data['tipo'];    
+        if ($tipo == 'organo') {
             $modelo = $this->_organoModel;
             $form = $this->_organoForm;
             $primary = "id_organo";
-        } else if ($data['tipo'] == 'unidad') {
+        } else if ($tipo == 'unidad') {
             $modelo = $this->_unidadModel;
             $form = $this->_unidadForm;
             $primary = "id_uorganica";
         }
-        
+
         if ($this->_getParam('ajax') == 'form') {
             if ($this->_hasParam('id')) {
                 $id = $this->_getParam('id');
                 if ($id != 0) {
-                    $data = $modelo->fetchRow($primary. '= '.$id);
+                    $data = $modelo->fetchRow($primary . '= ' . $id);
                     $form->populate($data->toArray());
                 }
             }
             //$this->_organoForm->getElement('email')->setAttrib('readonly','readonly');   
             //$this->_organoForm->removeElement('unidad_organica');
-            echo $form;         
+            echo $form;
         }
-        
+
         if ($this->_getParam('ajax') == 'validar') {
-                echo $form->processAjax($data);
+            echo $form->processAjax($data);
         }
         if ($this->_getParam('ajax') == 'delete') {
-            $where = $this->getAdapter()->quoteInto('id_organigrama = ?',$data['id']);
-            $modelo->update(array('estado' => self::ELIMINADO),$where);
+            
+            //Validar primero en algunos casos, si tiene órganos activos
+            if ($tipo == Application_Model_Organo::TABLA) {
+                $unidadOrganica = new Application_Model_UnidadOrganica();
+                $dataValida = $unidadOrganica->obtenerUOrganica($this->_proyecto, $data['id']); //Verifica si existen uorganicas activas
+                if (count($dataValida) > 0) {
+                    echo Zend_Json::encode(array('code' => 0, 'msg' => 'No se puede eliminar el órgano,'
+                        . ' tiene unidades orgánicas activas.'));
+                    return;
+                }
+            }
+            
+            //Validar primero en algunos casos, si tiene puestos activos
+            if ($tipo == 'unidad') {
+                $puesto = new Application_Model_Puesto;
+                $dataValida = $puesto->obtenerPuestos($data['id']); //Verifica si existen uorganicas activas
+                if (count($dataValida) > 0) {
+                    echo Zend_Json::encode(array('code' => 0, 'msg' => 'No se puede eliminar la unidad orgánica,'
+                        . ' tiene puestos activos.'));
+                    return;
+                }
+            }
+
+            $where = $this->getAdapter()->quoteInto($primary . ' = ?', $data['id']);
+            $modelo->update(array('estado' => self::ELIMINADO), $where);
             $sesionMvc->messages = 'Registro eliminado';
             $sesionMvc->tipoMessages = self::SUCCESS;
+            
+            echo Zend_Json::encode(array('code' => 1, 'msg' => 'Registro eliminado'));
+            
+            /*
+            $where = $this->getAdapter()->quoteInto($primary.' = ?', $data['id']);
+            $modelo->update(array('estado' => self::ELIMINADO), $where);
+            $sesionMvc->messages = 'Registro eliminado';
+            $sesionMvc->tipoMessages = self::SUCCESS;*/
         }
-        
+
         if ($this->_getParam('ajax') == 'save') {
-      
+
             if ($this->_getParam('scrud') == 'nuevo') {
                 $data['fecha_crea'] = date("Y-m-d H:i:s");
                 $data['usuario_crea'] = Zend_Auth::getInstance()->getIdentity()->id;
@@ -109,12 +138,16 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
                 $data['id_proyecto'] = $this->_proyecto;
                 $sesionMvc->messages = 'Registro actualizado satisfactoriamente';
             }
-            
+
             $sesionMvc->tipoMessages = self::SUCCESS;
             $modelo->guardar($data);
         }
     }
-    
+
+    /*
+      Actualizar registros de órganos y unidades orgánica
+     */
+
     public function grabarAction() {
 
         $this->_helper->layout->disableLayout();
@@ -123,10 +156,7 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
         if (!$this->getRequest()->isXmlHttpRequest())
             exit('Acción solo válida para peticiones ajax');
 
-        $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
-        $usuario = $sesion_usuario->sesion_usuario['id'];
-        
-        $data = $this->_getAllParams();        
+        $data = $this->_getAllParams();
         $datos = $data['datos'];
         $tipo = $data['tipo'];
 
@@ -135,42 +165,40 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
         } else if ($tipo == 'unidad') {
             $modelo = $this->_unidadModel;
         }
-  
+
         if (count($datos) > 0) {
             foreach ($datos as $reg) {
                 $add = explode("|", $reg);
                 if ($tipo == 'organo') {
-                    $where = $this->getAdapter()->quoteInto('id_organo = ?',$add[0]);
-                    $dataNueva = array('organo' => $add[1],'codigo_natuorganica' => $add[2],
-                    'usuario_actu' => $usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                    $where = $this->getAdapter()->quoteInto('id_organo = ?', $add[0]);
+                    $dataNueva = array('organo' => $add[1], 'codigo_natuorganica' => $add[2],
+                        'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
                 } else {
-                    $where = $this->getAdapter()->quoteInto('id_uorganica = ?',$add[0]);
-                    $dataNueva = array('descripcion' => $add[1],'id_organo' => $add[2],
-                    'usuario_actu' => $usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                    $where = $this->getAdapter()->quoteInto('id_uorganica = ?', $add[0]);
+                    $dataNueva = array('descripcion' => $add[1], 'id_organo' => $add[2],
+                        'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
                 }
                 //Registro actualizado
-                $modelo->update($dataNueva,$where);   
+                $modelo->update($dataNueva, $where);
             }
         }
         echo Zend_Json::encode('Registros actualizados');
     }
-    
+
     public function puestoAction() {
-        
+
         Zend_Layout::getMvcInstance()->assign('active', 'Registrar puestos');
         Zend_Layout::getMvcInstance()->assign('padre', 3);
         Zend_Layout::getMvcInstance()->assign('link', 'regpuestos');
         //Listado de órganos registrados del proyecto
         $this->view->organo = $this->_organoModel->obtenerOrgano($this->_proyecto);
     }
-    
+
     public function obtenerUorganicaAction() {
-        
+
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
-
         $data = $this->_getAllParams();
-
         //Previene vulnerabilidad XSS (Cross-site scripting)
         $filtro = new Zend_Filter_StripTags();
         foreach ($data as $key => $val) {
@@ -184,21 +212,21 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
             $organo = $this->_getParam('organo');
             $proyecto = $this->_proyecto;
             $dataUOrganica = $this->_unidadModel->obtenerUOrganica($proyecto, $organo);
-            
+
             //Enviar select con html
             $option = "<select id='unidad' style='width:320px'>";
             $option .= "<option value=''>[Seleccione unidad orgánica]</option>";
             foreach ($dataUOrganica as $value) {
-                $option .= "<option value='".$value['id_uorganica']."'>".$value['descripcion']."</option>";
+                $option .= "<option value='" . $value['id_uorganica'] . "'>" . $value['descripcion'] . "</option>";
             }
             $option.="</select>";
             echo $option;
-           // echo Zend_Json::encode($dataUOrganica);
+            // echo Zend_Json::encode($dataUOrganica);
         }
     }
-    
+
     public function obtenerPuestosAction() {
-        
+
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
 
@@ -212,84 +240,105 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin
 
         if (!$this->getRequest()->isXmlHttpRequest())
             exit('Acción solo válida para peticiones ajax');
-        
+
         $unidad = $data['unidad'];
         $dataPuesto = $this->_puestoModel->obtenerPuestos($unidad);
         $contador = 0;
         foreach ($dataPuesto as $value) {
-            $dataPuesto[$contador]['grupo'] = $this->getHelper('grupo')->select($value['codigo_grupo'],$contador+1);
-            $dataPuesto[$contador]['familia'] = $this->getHelper('familia')->select($value['codigo_familia'],$contador+1);
-            $dataPuesto[$contador]['rpuesto'] = $this->getHelper('rolpuesto')->select($value['codigo_rol_puesto'],$contador+1);
+            $dataPuesto[$contador]['grupo'] = $this->getHelper('grupo')->select($value['codigo_grupo'], $contador + 1);
+            $dataPuesto[$contador]['familia'] = $this->getHelper('familia')->select($value['codigo_grupo'], $value['codigo_familia'], $contador + 1);
+            $dataPuesto[$contador]['rpuesto'] = $this->getHelper('rolpuesto')->select($value['codigo_familia'], $value['codigo_rol_puesto'], $contador + 1);
             $contador++;
         }
-        
+
         echo Zend_Json::encode($dataPuesto);
-        
-        
     }
-    
+
     public function obtenerGruposAction() {
-        
+
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
-
         if (!$this->getRequest()->isXmlHttpRequest())
             exit('Acción solo válida para peticiones ajax');
-        
+
         $dataGrupo = $this->_grupoModel->listado();
         echo Zend_Json::encode($dataGrupo);
-        
     }
-    
+
     public function obtenerFamiliasAction() {
-        
+
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
 
         $data = $this->_getAllParams();
-
         //Previene vulnerabilidad XSS (Cross-site scripting)
         $filtro = new Zend_Filter_StripTags();
         foreach ($data as $key => $val) {
             $data[$key] = $filtro->filter(trim($val));
         }
-        
-        $grupo = $data['grupo'];
-        
         if (!$this->getRequest()->isXmlHttpRequest())
             exit('Acción solo válida para peticiones ajax');
-        
-        $dataFamilia = $this->_familiaModel->obtenerFamilias($grupo);
+
+        $dataFamilia = $this->_familiaModel->obtenerFamilias($data['grupo']);
         echo Zend_Json::encode($dataFamilia);
-        
     }
-    
+
     public function obtenerRolesAction() {
-        
+
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
-
         $data = $this->_getAllParams();
-
         //Previene vulnerabilidad XSS (Cross-site scripting)
         $filtro = new Zend_Filter_StripTags();
         foreach ($data as $key => $val) {
             $data[$key] = $filtro->filter(trim($val));
         }
-        
-        $familia = $data['familia'];
-        
         if (!$this->getRequest()->isXmlHttpRequest())
             exit('Acción solo válida para peticiones ajax');
-        
-        $dataRol = $this->_rolPuestoModel->obtenerRoles($familia);
+
+        $dataRol = $this->_rolPuestoModel->obtenerRoles($data['familia']);
         echo Zend_Json::encode($dataRol);
-        
     }
-    
-    
+
+    public function grabarPuestosAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $data = $this->_getAllParams();
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        $puestos = isset($data['puestos']) ? $data['puestos'] : array();
+        $puestosNuevo = isset($data['nuevo']) ? $data['nuevo'] : array();
+
+        //Actualizando puestos
+        if (count($puestos) > 0) {
+            foreach ($puestos as $reg) {
+                $add = explode("|", $reg);
+                //$where = $this->getAdapter()->quoteInto('id_puesto = ?',$add[0]);
+                $dataNueva = array('id_puesto' => $add[0], 'descripcion' => $add[2], 'id_uorganica' => $add[7],
+                    'num_correlativo' => $add[1], 'cantidad' => $add[3], 'codigo_grupo' => $add[4],
+                    'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6],
+                    'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                //$this->_puestoModel->update($dataNueva,$where);   
+                $this->_puestoModel->guardar($dataNueva);
+            }
+        }
+
+        if (count($puestosNuevo) > 0) {
+            foreach ($puestosNuevo as $reg) {
+                $add = explode("|", $reg);
+                $dataNueva = array('descripcion' => $add[2], 'id_uorganica' => $add[7],
+                    'num_correlativo' => $add[1], 'cantidad' => $add[3], 'codigo_grupo' => $add[4],
+                    'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6], 'estado' => 1,
+                    'usuario_crea' => $this->_usuario, 'fecha_crea' => date("Y-m-d H:i:s"));
+                //$this->_puestoModel->insert($dataNueva);   
+                $this->_puestoModel->guardar($dataNueva);
+            }
+        }
+
+        echo Zend_Json::encode('Puestos actualizados satisfactoriamente.');
+    }
 
 }
-
-
-

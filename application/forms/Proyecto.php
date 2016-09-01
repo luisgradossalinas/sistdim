@@ -31,6 +31,12 @@ class Application_Form_Proyecto extends Zend_Form
         $fin->addFilter('StripTags');
         $this->addElement($fin);
         
+        $tieneMapaPuesto = new Zend_Form_Element_Select('mapa_puesto');
+        $tieneMapaPuesto->setLabel('¿Tiene mapeo de puesto?');
+        $tieneMapaPuesto->setRequired();
+        $tieneMapaPuesto->setMultiOptions(array('1' => 'No', '0' => 'Sí'));
+        $this->addElement($tieneMapaPuesto);
+        
         $estado = new Zend_Form_Element_Select('estado');
         $estado->setLabel('Estado:');
         $estado->setRequired();

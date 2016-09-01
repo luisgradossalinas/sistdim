@@ -53,10 +53,13 @@ class Application_Model_UnidadOrganica extends Zend_Db_Table
         
         $sql = $this->getAdapter()->select()->from(self::TABLA,
                 array('id_uorganica','descripcion','estado','id_proyecto','id_organo','siglas'))
-                ->where('id_proyecto = ?', $proyecto);
+                ->where('id_proyecto = ?', $proyecto)
+                ->where('estado = ?', self::ESTADO_ACTIVO);
         
         if (!is_null($organo)) 
             $sql->where ('id_organo = ?', $organo);
+        
+        $sql->order("descripcion asc");
         
         return $sql->query()->fetchAll();
         

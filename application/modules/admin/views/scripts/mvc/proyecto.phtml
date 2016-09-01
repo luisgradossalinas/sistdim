@@ -6,7 +6,7 @@
 <div class="widget-content nopadding">
     <table id='tabla' class="table table-condensed table-bordered" >
         <thead>
-        <tr><th></th><th>Nombre</th><th>Inicio</th><th>Fin</th><th>Estado</th><th>Entidad</th></tr>
+            <tr><th></th><th>Nombre</th><th>Inicio</th><th>Fin</th><th>Mapeo de puesto</th><th>Estado</th><th>Entidad</th></tr>
         </thead>
         <?php
         echo '<tbody>';
@@ -24,6 +24,10 @@
 	echo "<td>".$value['nombre']."</td>";
 	echo "<td>".$this->FechaMostrar($value['inicio'])."</td>";
 	echo "<td>".$this->FechaMostrar($value['fin'])."</td>";
+        $mp = 'No';
+        if ($value['mapa_puesto'] == 0)
+                $mp = 'Sí';
+        echo "<td><center>".$mp."</center></td>";
 	if ($value['estado'] == Admin_MvcController::INACTIVO)
                 $estado = 'error.png';
             echo '<td width=7%><center><span style=display:none>'.$value['estado'].'</span><img src='.SITE_URL.'/img/'.$estado.' width=15%><center></td>';

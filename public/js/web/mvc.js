@@ -113,7 +113,15 @@ $(document).ready(function(){
                     $.ajax({
                         url: urls.siteUrl + '/admin/mvc/operacion/ajax/delete',
                         data:{id:codigo},
+                        type: 'post',
+                        dataType: 'json',
                         success: function(result){
+                            
+                            //Verificar si se actualizó
+                            if (result.code == 0) {
+                                alert(result.msg);
+                                return false;
+                            }
                             location.reload();
                         }
                     });
@@ -126,7 +134,7 @@ $(document).ready(function(){
                 }
                 });
          
-    }
+    };
     
     verRecursos = function (id) {
         $.ajax({

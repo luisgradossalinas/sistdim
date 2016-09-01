@@ -35,7 +35,7 @@ alert = function (texto) {
     $('#ventana-modal').empty().html(texto);
     $("#ventana-modal").dialog({
         modal: true,
-        width:300,
+        width: 300,
         title: 'Mensaje del sistema',
         resizable: false,
         buttons: {
@@ -47,4 +47,3 @@ alert = function (texto) {
 
 
 };
-

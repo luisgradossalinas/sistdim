@@ -12,8 +12,8 @@ class Application_Model_Puesto extends Zend_Db_Table {
 
     public function guardar($datos) {
         $id = 0;
-        if (!empty($datos["id"])) {
-            $id = (int) $datos["id"];
+        if (!empty($datos["id_puesto"])) {
+            $id = (int) $datos["id_puesto"];
         }
 
         unset($datos["id"]);
@@ -48,6 +48,7 @@ class Application_Model_Puesto extends Zend_Db_Table {
                 ->joinInner(array('rp' => Application_Model_Rolpuesto::TABLA), 'rp.codigo_rol_puesto = p.codigo_rol_puesto',
                         array('codigo_rol_puesto','rpuesto' => 'descripcion'))
                 ->where('p.id_uorganica = ?', $unidad)
+                ->order('p.id_puesto asc')
                 ->query()->fetchAll();
     }
 
