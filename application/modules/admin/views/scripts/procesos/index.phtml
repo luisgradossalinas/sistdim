@@ -4,7 +4,31 @@
         <h5><?=$this->active?></h5>
     </div>
 <div class="widget-content nopadding">
-    
+<div style="float:left">
+<select id="n0" name="n0">
+<option value=''>[Proceso nivel 0]</option>
+<?php foreach ($this->organo as $val){
+   echo "<option value=".$val['id_organo'].">".$val['organo']."</option>"; 
+}?>
+</select>
+<input type="hidden" id="mapaPuesto" name="mapaPuesto" value="<?=$this->mapaPuesto?>">
+</div>
+<div id="capa" style="float:left"></div>
+<a id="nuevoPuesto" role="button" class="btn tip-right" title="Nuevo proceso" >
+    <li class="icon-plus-sign"></li>Nuevo proceso
+</a>
+<a  id="btnOpen"  role="button" class="btn tip-right" onclick="grabarPuestos()" title="Grabar proceso">
+    <li class="icon-check"></li>Grabar proceso
+</a>
+<table id='tabla' class="table table-condensed table-bordered" style="font-size: 7pt">
+    <thead>
+        <tr><th>#</th><th>Órgano</th><th>Unidad Orgánica</th><th width="8%" title="Ingrese el número correlativo del puesto">Número Corr</th><th width="10%">Puesto</th>
+            <th width="8%">Cantidad</th>
+        <th width="15%">Grupo</th><th width="15%">Familia</th><th width="15%">Rol</th></tr>
+    </thead>
+    <tbody>     
+    </tbody>
+</table>
 </div>
 </div>
 <?=$this->partial('_partials/modal.phtml',array('model' => $this->model));?>
