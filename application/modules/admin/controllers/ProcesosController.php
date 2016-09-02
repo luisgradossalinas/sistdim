@@ -9,6 +9,8 @@ class Admin_ProcesosController extends App_Controller_Action_Admin
     private $_proceso3;
     private $_proceso4;
     
+    private $_usuario;
+    private $_proyecto;
     
     public function init()
     {
@@ -18,6 +20,10 @@ class Admin_ProcesosController extends App_Controller_Action_Admin
         $this->_proceso2 = new Application_Model_Proceso2;
         $this->_proceso3 = new Application_Model_Proceso3;
         $this->_proceso4 = new Application_Model_Proceso4;
+        
+        $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
+        $this->_proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
+        $this->_usuario = $sesion_usuario->sesion_usuario['id'];
         
         parent::init();
         Zend_Layout::getMvcInstance()->assign('show', '1'); //No mostrar en el menú la barra horizontal
@@ -31,6 +37,8 @@ class Admin_ProcesosController extends App_Controller_Action_Admin
         Zend_Layout::getMvcInstance()->assign('link', 'inventario');
         
         $this->view->headScript()->appendFile(SITE_URL . '/js/web/inventario.js');
+        
+        $this->view->proceso0 = $this->_proceso0->combo($this->_proyecto);
         
     }
     

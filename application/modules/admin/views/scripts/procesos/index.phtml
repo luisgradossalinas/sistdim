@@ -1,25 +1,40 @@
+<style>
+#n0 {
+    width: 350px;
+    font-size:8pt
+}    
+#nivel {
+    width: 75px;
+}    
+</style>
 <?=$this->partial('_partials/mensajes.phtml',array('messages' => $this->messages,'tipoMessages' => $this->tipoMessages));?>
+<div style="float:left">
+<select id="nivel" name="nivel">
+<option value=''>[Nivel]</option>
+<?php for ($i = 0; $i<=4; $i++){
+   echo "<option value=".$i.">".$i."</option>"; 
+}?>
+</select>
+<select id="n0" name="n0">
+<option value=''>[Proceso nivel 0]</option>
+<?php foreach ($this->proceso0 as $val){
+   echo "<option value=".$val['key'].">".$val['value']."</option>"; 
+}?>
+</select>
+</div>
+<div id="capa" style="float:left"></div>
+<a id="nuevoPuesto" role="button" class="btn tip-right" title="Nuevo registro" >
+    <li class="icon-plus-sign"></li>
+</a>
+<a  id="grabarProceso"  role="button" class="btn tip-right" onclick="grabarProceso()" title="Grabar registros">
+    <li class="icon-file"></li>
+</a>
 <div class="widget-box">
-    <div class="widget-title">	
+    <div class="widget-title">
+
         <h5><?=$this->active?></h5>
     </div>
 <div class="widget-content nopadding">
-<div style="float:left">
-<select id="n0" name="n0">
-<option value=''>[Proceso nivel 0]</option>
-<?php foreach ($this->organo as $val){
-   echo "<option value=".$val['id_organo'].">".$val['organo']."</option>"; 
-}?>
-</select>
-<input type="hidden" id="mapaPuesto" name="mapaPuesto" value="<?=$this->mapaPuesto?>">
-</div>
-<div id="capa" style="float:left"></div>
-<a id="nuevoPuesto" role="button" class="btn tip-right" title="Nuevo proceso" >
-    <li class="icon-plus-sign"></li>Nuevo proceso
-</a>
-<a  id="btnOpen"  role="button" class="btn tip-right" onclick="grabarPuestos()" title="Grabar proceso">
-    <li class="icon-check"></li>Grabar proceso
-</a>
 <table id='tabla' class="table table-condensed table-bordered" style="font-size: 7pt">
     <thead>
         <tr><th>#</th><th>Órgano</th><th>Unidad Orgánica</th><th width="8%" title="Ingrese el número correlativo del puesto">Número Corr</th><th width="10%">Puesto</th>

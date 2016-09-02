@@ -36,10 +36,12 @@ class Application_Model_Proceso0 extends Zend_Db_Table
         return $this->getAdapter()->select()->from($this->_name)->query()->fetchAll();
     }
     
-    public function combo()
+    public function combo($proyecto)
     {
         return $this->getAdapter()->select()->from($this->_name,array('key' => $this->_primary, 'value' => 'descripcion'))
-                ->where('estado = ?',self::ESTADO_ACTIVO)->query()->fetchAll();
+                ->where('estado = ?',self::ESTADO_ACTIVO)
+                ->where('id_proyecto = ?', $proyecto)
+                ->query()->fetchAll();
     }
 
 
