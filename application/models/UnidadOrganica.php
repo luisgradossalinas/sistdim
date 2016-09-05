@@ -57,7 +57,7 @@ class Application_Model_UnidadOrganica extends Zend_Db_Table
                 ->where('estado = ?', self::ESTADO_ACTIVO);
         
         if (!is_null($organo)) 
-            $sql->where ('id_organo = ?', $organo);
+            $sql->where('id_organo = ?', $organo);
         
         $sql->order("descripcion asc");
         

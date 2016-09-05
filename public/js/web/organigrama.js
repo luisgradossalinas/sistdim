@@ -6,10 +6,16 @@ $(document).ready(function () {
     $("#nuevoPuesto").hide();
     $("#grabarPuestos").hide();
     
+    /*
+    $("#unidad").empty().append("<option value=''>[Seleccione unidad]</option>");
+    $("#unidad_chzn .chzn-results").empty().append('<li id="unidad_chzn_o_0" class="active-result" style="">[Seleccione unidad]</li>');
+    $("#unidad_chzn a span").empty().append('[Seleccione unidad]');
+    */
+    
     //Si en el proyecto no se tiene previamente el mapa de puestos, no se debe mostrar 
     //el campo de número correlativo
     if ($("#mapaPuesto").val() == 1) {
-        $("#tabla").DataTable().column(3).visible( false );
+        $("#tabla").DataTable().column(3).visible(false);
     }
     
     $('#tabla').on('change', 'tr td select', function () {
@@ -284,9 +290,23 @@ $(document).ready(function () {
                 organo: organo
             },
             type: 'post',
+            //dataType: 'json',
             //Probar generando el html
             success: function (result) {
                 $("#capa").html(result);
+                
+                /*
+                var contador = 0;
+                $("#unidad").empty().append("<option value=''>[Seleccione unidad]</option>");
+                $("#unidad_chzn .chzn-results").empty().append('<li id="unidad_chzn_o_0" class="active-result result-selected" style="">[Seleccione unidad]</li>');
+                $("#unidad_chzn a span").empty().append('[Seleccione unidad]');
+                $.each(result, function (key, obj) {
+                    contador++;
+                    $("#unidad").append("<option value='" + obj['id_uorganica'] + "'>" + obj['descripcion'] + "</option>");
+                    $("#unidad_chzn .chzn-results").append('<li id="unidad_chzn_o_'+contador+'" class="active-result" style="">'+obj['descripcion']+'</li>');
+                });
+                */
+                
                 $("#nuevoPuesto").show();
                 $("#grabarPuestos").show();
                 

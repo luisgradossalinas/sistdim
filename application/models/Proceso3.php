@@ -36,10 +36,20 @@ class Application_Model_Proceso3 extends Zend_Db_Table
         return $this->getAdapter()->select()->from($this->_name)->query()->fetchAll();
     }
     
-    public function combo()
+    public function combo($proyecto)
     {
         return $this->getAdapter()->select()->from($this->_name,array('key' => $this->_primary, 'value' => 'descripcion'))
-                ->where('estado = ?',self::ESTADO_ACTIVO)->query()->fetchAll();
+                ->where('estado = ?',self::ESTADO_ACTIVO)
+                ->where('id_proyecto = ?', $proyecto)
+                ->query()->fetchAll();
+    }
+    
+    public function obtenerProcesos3($proceso2)
+    {
+        return $this->getAdapter()->select()->from($this->_name)
+                ->where('estado = ?',self::ESTADO_ACTIVO)
+                ->where('id_proceso_n2 = ?', $proceso2)
+                ->query()->fetchAll();
     }
 
 

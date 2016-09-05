@@ -1,32 +1,65 @@
 <style>
-#n0 {
-    width: 350px;
+#n0,#n1,#n2,#n3,#n4,
+#n0_chzn,#n1_chzn,#n2_chzn,#n3_chzn,#n4_chzn
+{
+    width: 205px;
     font-size:8pt
 }    
-#nivel {
-    width: 75px;
+#nivel,#nivel_chzn {
+    width: 68px;
+    font-size:8pt
 }    
 </style>
 <?=$this->partial('_partials/mensajes.phtml',array('messages' => $this->messages,'tipoMessages' => $this->tipoMessages));?>
 <div style="float:left">
+<!--Nivel-->
 <select id="nivel" name="nivel">
 <option value=''>[Nivel]</option>
 <?php for ($i = 0; $i<=4; $i++){
    echo "<option value=".$i.">".$i."</option>"; 
 }?>
 </select>
+<!--Proceso nivel 0-->
 <select id="n0" name="n0">
 <option value=''>[Proceso nivel 0]</option>
 <?php foreach ($this->proceso0 as $val){
    echo "<option value=".$val['key'].">".$val['value']."</option>"; 
 }?>
 </select>
+<!--Proceso nivel 1-->
+<select id="n1" name="n1">
+<option value=''>[Proceso nivel 1]</option>
+<?php foreach ($this->proceso1 as $val){
+   echo "<option value=".$val['key'].">".$val['value']."</option>"; 
+}?>
+</select>
+<!--Proceso nivel 2-->
+<select id="n2" name="n2">
+<option value=''>[Proceso nivel 2]</option>
+<?php foreach ($this->proceso2 as $val){
+   echo "<option value=".$val['key'].">".$val['value']."</option>"; 
+}?>
+</select>
+<!--Proceso nivel 3-->
+<select id="n3" name="n3">
+<option value=''>[Proceso nivel 3]</option>
+<?php foreach ($this->proceso3 as $val){
+   echo "<option value=".$val['key'].">".$val['value']."</option>"; 
+}?>
+</select>
+<!--Proceso nivel 4-->
+<select id="n4" name="n4">
+<option value=''>[Proceso nivel 4]</option>
+<?php foreach ($this->proceso4 as $val){
+   echo "<option value=".$val['key'].">".$val['value']."</option>"; 
+}?>
+</select>
 </div>
 <div id="capa" style="float:left"></div>
-<a id="nuevoPuesto" role="button" class="btn tip-right" title="Nuevo registro" >
+<a id="nuevoProceso" role="button" class="btn tip-left" title="Nuevo registro" >
     <li class="icon-plus-sign"></li>
 </a>
-<a  id="grabarProceso"  role="button" class="btn tip-right" onclick="grabarProceso()" title="Grabar registros">
+<a  id="grabarProceso"  role="button" class="btn tip-left" onclick="grabarProceso()" title="Grabar registros">
     <li class="icon-file"></li>
 </a>
 <div class="widget-box">

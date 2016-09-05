@@ -11,6 +11,14 @@
    echo "<option value=".$val['id_organo'].">".$val['organo']."</option>"; 
 }?>
 </select>
+<!--
+<select id="unidad" name="unidad">
+<option value=''>[Seleccione unidad]</option>
+<?php foreach ($this->unidad as $val){
+   //echo "<option value=".$val['id_uorganica'].">".$val['descripcion']."</option>"; 
+}?>
+</select>
+-->
 <input type="hidden" id="mapaPuesto" name="mapaPuesto" value="<?=$this->mapaPuesto?>">
 </div>
 <div id="capa" style="float:left"></div>
