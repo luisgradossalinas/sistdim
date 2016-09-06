@@ -10,7 +10,7 @@ class Application_Form_Familia extends Zend_Form
         $this->setAttrib('id', 'form');
         
         $descripcion = new Zend_Form_Element_Text('descripcion');
-        $descripcion->setLabel('Descripcion:');
+        $descripcion->setLabel('Familia:');
         $descripcion->setRequired();
         $descripcion->setAttrib('maxlength',400);
         $descripcion->addFilter('StripTags');

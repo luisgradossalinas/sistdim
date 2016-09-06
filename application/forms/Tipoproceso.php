@@ -8,7 +8,7 @@ class Application_Form_Tipoproceso extends Zend_Form
         $this->setAttrib('id', 'form');
         
         $descripcion = new Zend_Form_Element_Text('descripcion');
-        $descripcion->setLabel('Descripcion:');
+        $descripcion->setLabel('Tipo proceso:');
         $descripcion->setRequired();
         $descripcion->setAttrib('maxlength',100);
         $descripcion->addFilter('StripTags');

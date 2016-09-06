@@ -8,7 +8,7 @@ class Application_Form_Entidad extends Zend_Form
         $this->setAttrib('id', 'form');
         
         $nombre = new Zend_Form_Element_Text('nombre');
-        $nombre->setLabel('Nombre:');
+        $nombre->setLabel('Entidad:');
         $nombre->setAttrib('maxlength',100);
         $nombre->setRequired();
         $nombre->addFilter('StripTags');

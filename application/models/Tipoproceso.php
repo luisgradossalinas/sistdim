@@ -37,7 +37,9 @@ class Application_Model_Tipoproceso extends Zend_Db_Table
 
     public function listado()
     {
-        return $this->getAdapter()->select()->from($this->_name)->query()->fetchAll();
+        return $this->getAdapter()->select()->from($this->_name)
+                ->where('estado = ?', self::ESTADO_ACTIVO)
+                ->query()->fetchAll();
     }
 
 

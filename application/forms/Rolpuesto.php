@@ -10,7 +10,7 @@ class Application_Form_Rolpuesto extends Zend_Form
         $this->setAttrib('id', 'form');
         
         $descripcion = new Zend_Form_Element_Text('descripcion');
-        $descripcion->setLabel('Descripcion:');
+        $descripcion->setLabel('Rol:');
         $descripcion->setRequired();
         $descripcion->setAttrib('maxlength',100);
         $descripcion->addFilter('StripTags');

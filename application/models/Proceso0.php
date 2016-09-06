@@ -43,6 +43,14 @@ class Application_Model_Proceso0 extends Zend_Db_Table
                 ->where('id_proyecto = ?', $proyecto)
                 ->query()->fetchAll();
     }
+    
+    public function obtenerProcesos0($proyecto)
+    {
+        return $this->getAdapter()->select()->from($this->_name)
+                ->where('estado = ?',self::ESTADO_ACTIVO)
+                ->where('id_proyecto = ?', $proyecto)
+                ->query()->fetchAll();
+    }
 
 
 }

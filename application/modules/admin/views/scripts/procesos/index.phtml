@@ -1,59 +1,74 @@
 <style>
-#n0,#n1,#n2,#n3,#n4,
-#n0_chzn,#n1_chzn,#n2_chzn,#n3_chzn,#n4_chzn
-{
-    width: 205px;
-    font-size:8pt
-}    
-#nivel,#nivel_chzn {
-    width: 68px;
-    font-size:8pt
-}    
+    #n0,#n1,#n2,#n3,#n4,
+    #n0_chzn,#n1_chzn,#n2_chzn,#n3_chzn,#n4_chzn
+    {
+        width: 250px;
+        font-size:8pt
+    }    
+    #nivel,#nivel_chzn {
+        width: 68px;
+        font-size:8pt
+    }    
 </style>
-<?=$this->partial('_partials/mensajes.phtml',array('messages' => $this->messages,'tipoMessages' => $this->tipoMessages));?>
+<?= $this->partial('_partials/mensajes.phtml', array('messages' => $this->messages, 'tipoMessages' => $this->tipoMessages)); ?>
 <div style="float:left">
-<!--Nivel-->
-<select id="nivel" name="nivel">
-<option value=''>[Nivel]</option>
-<?php for ($i = 0; $i<=4; $i++){
-   echo "<option value=".$i.">".$i."</option>"; 
-}?>
-</select>
-<!--Proceso nivel 0-->
-<select id="n0" name="n0">
-<option value=''>[Proceso nivel 0]</option>
-<?php foreach ($this->proceso0 as $val){
-   echo "<option value=".$val['key'].">".$val['value']."</option>"; 
-}?>
-</select>
-<!--Proceso nivel 1-->
-<select id="n1" name="n1">
-<option value=''>[Proceso nivel 1]</option>
-<?php foreach ($this->proceso1 as $val){
-   echo "<option value=".$val['key'].">".$val['value']."</option>"; 
-}?>
-</select>
-<!--Proceso nivel 2-->
-<select id="n2" name="n2">
-<option value=''>[Proceso nivel 2]</option>
-<?php foreach ($this->proceso2 as $val){
-   echo "<option value=".$val['key'].">".$val['value']."</option>"; 
-}?>
-</select>
-<!--Proceso nivel 3-->
-<select id="n3" name="n3">
-<option value=''>[Proceso nivel 3]</option>
-<?php foreach ($this->proceso3 as $val){
-   echo "<option value=".$val['key'].">".$val['value']."</option>"; 
-}?>
-</select>
-<!--Proceso nivel 4-->
-<select id="n4" name="n4">
-<option value=''>[Proceso nivel 4]</option>
-<?php foreach ($this->proceso4 as $val){
-   echo "<option value=".$val['key'].">".$val['value']."</option>"; 
-}?>
-</select>
+    <!--Nivel-->
+    <select id="nivel" name="nivel">
+        <option value=''>[Nivel]</option>
+        <?php
+        for ($i = 0; $i <= 4; $i++) {
+            echo "<option value=" . $i . ">" . $i . "</option>";
+        }
+        ?>
+    </select>
+    <!--Proceso nivel 0-->
+    <select id="n0" name="n0">
+        <option value=''>[Proceso nivel 0]</option>
+        <?php
+        foreach ($this->proceso0 as $val) {
+            echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
+        }
+        ?>
+    </select>
+    <!--Proceso nivel 1-->
+    <select id="n1" name="n1">
+        <option value=''>[Proceso nivel 1]</option>
+<?php
+foreach ($this->proceso1 as $val) {
+    echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
+}
+?>
+    </select>
+    <!--Proceso nivel 2-->
+    <select id="n2" name="n2">
+        <option value=''>[Proceso nivel 2]</option>
+        <?php
+        foreach ($this->proceso2 as $val) {
+            echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
+        }
+        ?>
+    </select>
+    <!--Proceso nivel 3-->
+    <select id="n3" name="n3">
+        <option value=''>[Proceso nivel 3]</option>
+        <?php
+        foreach ($this->proceso3 as $val) {
+            echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
+        }
+        ?>
+    </select>
+    <!--Proceso nivel 4-->
+
+    <select id="n4" name="n4">
+        <!--
+        <option value=''>[Proceso nivel 4]</option>
+<?php
+//foreach ($this->proceso4 as $val){
+//echo "<option value=".$val['key'].">".$val['value']."</option>"; 
+//}
+?>
+        -->
+    </select>
 </div>
 <div id="capa" style="float:left"></div>
 <a id="nuevoProceso" role="button" class="btn tip-left" title="Nuevo registro" >
@@ -65,18 +80,18 @@
 <div class="widget-box">
     <div class="widget-title">
 
-        <h5><?=$this->active?></h5>
+        <h5><?= $this->active ?></h5>
     </div>
-<div class="widget-content nopadding">
-<table id='tabla' class="table table-condensed table-bordered" style="font-size: 7pt">
-    <thead>
-        <tr><th>#</th><th>Órgano</th><th>Unidad Orgánica</th><th width="8%" title="Ingrese el número correlativo del puesto">Número Corr</th><th width="10%">Puesto</th>
-            <th width="8%">Cantidad</th>
-        <th width="15%">Grupo</th><th width="15%">Familia</th><th width="15%">Rol</th></tr>
-    </thead>
-    <tbody>     
-    </tbody>
-</table>
+    <div class="widget-content nopadding">
+        <table id='tabla' class="table table-condensed table-bordered" style="font-size: 7pt">
+            <thead>
+                <tr><th width="5%">#</th><th>Tipo</th><th>Proceso Nivel 0</th><th>Proceso Nivel 1</th><th>Proceso Nivel 2</th><th>Proceso Nivel 3</th>
+                    <th>Proceso Nivel 4</th>
+                </tr>
+            </thead>
+            <tbody>     
+            </tbody>
+        </table>
+    </div>
 </div>
-</div>
-<?=$this->partial('_partials/modal.phtml',array('model' => $this->model));?>
+<?= $this->partial('_partials/modal.phtml', array('model' => $this->model)); ?>

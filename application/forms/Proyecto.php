@@ -10,7 +10,7 @@ class Application_Form_Proyecto extends Zend_Form
         $this->setAttrib('id', 'form');
         
         $nombre = new Zend_Form_Element_Text('nombre');
-        $nombre->setLabel('Nombre:');
+        $nombre->setLabel('Proyecto:');
         $nombre->setAttrib('maxlength',200);
         $nombre->addFilter('StripTags');
         $this->addElement($nombre);

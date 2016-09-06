@@ -269,7 +269,7 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (result) {
                 alert(result);
-                //location.reload();
+                location.reload();
             }
         });
 
