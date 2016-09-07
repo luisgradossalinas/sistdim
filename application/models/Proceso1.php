@@ -44,11 +44,20 @@ class Application_Model_Proceso1 extends Zend_Db_Table
                 ->query()->fetchAll();
     }
     
+    /*
+SELECT * FROM proceso_n1 n1 INNER JOIN proceso_n0 n0 ON 
+     * n0.codigo_proceso_n0 = n1.id_proceso_n0 JOIN tipoproceso tp
+     *  ON tp.codigo_tipoproceso = n0.codigo_tipoproceso
+    */
     public function obtenerProcesos1($proceso0)
     {
-        return $this->getAdapter()->select()->from($this->_name)
-                ->where('estado = ?',self::ESTADO_ACTIVO)
-                ->where('id_proceso_n0 = ?', $proceso0)
+        return $this->getAdapter()->select()->from(array('n1' => $this->_name))
+                ->joinInner(array('n0' => Application_Model_Proceso0::TABLA), 'n0.id_proceso_n0 = n1.id_proceso_n0',
+                        array('nivel0' => 'descripcion'))
+                ->joinInner(array('tp' => Application_Model_Tipoproceso::TABLA), 'tp.codigo_tipoproceso = n0.codigo_tipoproceso',
+                        array('tipo' => 'descripcion'))
+                ->where('n1.estado = ?',self::ESTADO_ACTIVO)
+                ->where('n1.id_proceso_n0 = ?', $proceso0)
                 ->query()->fetchAll();
     }
 

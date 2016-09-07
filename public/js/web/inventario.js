@@ -27,14 +27,12 @@ $(document).ready(function () {
             $('#tabla').DataTable().row.add([
                 "<center>" + numReg + "</center>",
                 "<select style='width:100%' id=tipoproceso_" + numReg + " name=tipoproceso_" + numReg + "><option value=''>[Tipo]</option></select>",
-                "<input type=hidden name=id_puesto value=0><input type=text name=n0_" + numReg + " id=n0_" + numReg + ">",
+                "<input type=hidden name=id_puesto value=0><input type=text name=n0_" + numReg + " id=n0_" + numReg + " style='width:90%'>",
                 "<input type=hidden name=id_puesto value=0><input type=text name=n1_" + numReg + " id=n2_" + numReg + ">",
                 "<input type=hidden name=id_puesto value=0><input type=text name=n2_" + numReg + " id=n3_" + numReg + ">",
                 "<input type=hidden name=id_puesto value=0><input type=text name=n3_" + numReg + " id=n4_" + numReg + ">",
                 "<input type=hidden name=id_puesto value=0><input type=text name=n4_" + numReg + " id=n5_" + numReg + ">"
             ]).draw(false);
-
-
         }
 
         $.ajax({
@@ -48,12 +46,7 @@ $(document).ready(function () {
                 });
             }
         });
-
-
-
     });
-
-
 
     var ocultarSelect = function () {
         $("#n0_chzn").hide();
@@ -91,6 +84,7 @@ $(document).ready(function () {
             $("#n4_chzn").hide();
             $("#nuevoProceso").show();
             $("#grabarProceso").show();
+            $('#tabla').DataTable().clear();
             $("#tabla").DataTable().column(0).visible(true);
             $("#tabla").DataTable().column(1).visible(true);
             $("#tabla").DataTable().column(2).visible(true);
@@ -98,7 +92,7 @@ $(document).ready(function () {
             $("#tabla").DataTable().column(4).visible(false);
             $("#tabla").DataTable().column(5).visible(false);
             $("#tabla").DataTable().column(6).visible(false);
-            $('#tabla').DataTable().clear();
+
             //Obtener los proceso 0
             $.ajax({
                 url: urls.siteUrl + '/admin/procesos/obtener-procesos0',
@@ -111,18 +105,17 @@ $(document).ready(function () {
                         $('#tabla').DataTable().row.add([
                             "<center>" + contador + "</center>",
                             obj['codigo_tipoproceso'],
-                            "<input type=hidden name=id_puesto value=0><input type=text name=n0_" + contador + " id=n0_" + contador + " value='" + obj['descripcion'] + "'>",
-                            "<input type=hidden name=id_puesto value=0><input type=text name=n1_" + contador + " id=n2_" + contador + ">",
-                            "<input type=hidden name=id_puesto value=0><input type=text name=n2_" + contador + " id=n3_" + contador + ">",
-                            "<input type=hidden name=id_puesto value=0><input type=text name=n3_" + contador + " id=n4_" + contador + ">",
-                            "<input type=hidden name=id_puesto value=0><input type=text name=n4_" + contador + " id=n5_" + contador + ">"
+                            "<input type=hidden name=id_puesto value=0><input type=text name=n0_" + contador + " id=n0_" + contador + " value='" + obj['descripcion'] + "' style='width:90%'>",
+                            '',
+                            '',
+                            '',
+                            ''
                         ]).draw(false);
                     });
+                    $("#th0").css('width', '80%');
                     $("#tabla_wrapper").show();
                 }
             });
-
-
 
         } else if (nivel == 1) {
             $("#n0_chzn").show();
@@ -212,7 +205,6 @@ $(document).ready(function () {
         $("#n4").empty().append("<option value=''>[Proceso nivel 4]</option>");
         $("#n4_chzn .chzn-results").empty().append('<li id="n4_chzn_o_0" class="active-result" style="">[Proceso nivel 4]</li>');
         $("#n4_chzn a span").empty().append('[Proceso nivel 4]');
-
     };
 
     setearListas();
@@ -220,6 +212,7 @@ $(document).ready(function () {
     $("#n0").change(function () {
 
         var n0 = $("#n0").val();
+        var nom_n0 = $("#n0 option:selected").text();
         var nivel = parseInt($("#nivel").val());
         //Si no se ha seleccionado proceso y es nivel 0, 
         if (n0 == '' || nivel == 0) {
@@ -234,6 +227,15 @@ $(document).ready(function () {
                 dataType: 'json',
                 success: function (result) {
                     var contador = 0;
+                    $("#n1").empty().append("<option value=''>[Proceso nivel 1]</option>");
+                    $("#n1_chzn .chzn-results").empty().append('<li id="n1_chzn_o_0" class="active-result result-selected" style="">[Proceso nivel 1]</li>');
+                    $("#n1_chzn a span").empty().append('[Proceso nivel 1]');
+                    $("#n2").empty().append("<option value=''>[Proceso nivel 2]</option>");
+                    $("#n2_chzn .chzn-results").empty().append('<li id="n2_chzn_o_0" class="active-result" style="">[Proceso nivel 2]</li>');
+                    $("#n2_chzn a span").empty().append('[Proceso nivel 2]');
+                    $("#n3").empty().append("<option value=''>[Proceso nivel 3]</option>");
+                    $("#n3_chzn .chzn-results").empty().append('<li id="n3_chzn_o_0" class="active-result" style="">[Proceso nivel 3]</li>');
+                    $("#n3_chzn a span").empty().append('[Proceso nivel 3]');
                     //Primero validar que se obtenga data
                     if (result == '' || result == []) {
                         alert('No existen registros.');
@@ -241,45 +243,44 @@ $(document).ready(function () {
                         return false;
                     }
 
-                    if (nivel == 1) {
+                    $('#tabla').DataTable().clear().draw();
 
+                    if (nivel == 1) {
+                        $("#tabla").DataTable().column(1).visible(false);
+                        $("#th0").css('width', '30%');
+                        $("#th1").css('width', '65%');
                         $.each(result, function (key, obj) {
                             contador++;
                             $('#tabla').DataTable().row.add([
                                 "<center>" + contador + "</center>",
-                                'Tipo',
-                                "<input type=hidden name=id_puesto value=0><input type=text name=n0_" + contador + " id=n0_" + contador + " value='" + obj['descripcion'] + "' readonly>",
-                                "<input type=hidden name=id_puesto value=0><input type=text name=n1_" + contador + " id=n2_" + contador + ">",
-                                "<input type=hidden name=id_puesto value=0><input type=text name=n2_" + contador + " id=n3_" + contador + ">",
-                                "<input type=hidden name=id_puesto value=0><input type=text name=n3_" + contador + " id=n4_" + contador + ">",
-                                "<input type=hidden name=id_puesto value=0><input type=text name=n4_" + contador + " id=n5_" + contador + ">"
+                                '',
+                                nom_n0,
+                                "<input type=hidden name=id_puesto value=0><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>",
+                                '',
+                                '',
+                                ''
                             ]).draw(false);
                         });
                         $("#tabla_wrapper").show();
-
                     }
 
-                    if (nivel == 2) {
-                        $("#n1").empty().append("<option value=''>[Proceso nivel 1]</option>");
-                        $("#n1_chzn .chzn-results").empty().append('<li id="n1_chzn_o_0" class="active-result result-selected" style="">[Proceso nivel 1]</li>');
-                        $("#n1_chzn a span").empty().append('[Proceso nivel 1]');
+                    if (nivel >= 2) {
                         $.each(result, function (key, obj) {
                             contador++;
                             $("#n1").append("<option value='" + obj['id_proceso_n1'] + "'>" + obj['descripcion'] + "</option>");
                             $("#n1_chzn .chzn-results").append('<li id="n1_chzn_o_' + contador + '" class="active-result" style="">' + obj['descripcion'] + '</li>');
                         });
                     }
-
                 }
             });
         }
-
     });
-
 
     $("#n1").change(function () {
 
         var n1 = $("#n1").val();
+        var nom_n0 = $("#n0 option:selected").text();
+        var nom_n1 = $("#n1 option:selected").text();
         var nivel = parseInt($("#nivel").val());
         //Si no se ha seleccionado proceso y es nivel 0, 
         //no ejecutar ajax
@@ -297,11 +298,49 @@ $(document).ready(function () {
                 $("#n2").empty().append("<option value=''>[Proceso nivel 2]</option>");
                 $("#n2_chzn .chzn-results").empty().append('<li id="n2_chzn_o_0" class="active-result" style="">[Proceso nivel 2]</li>');
                 $("#n2_chzn a span").empty().append('[Proceso nivel 2]');
-                $.each(result, function (key, obj) {
-                    contador++;
-                    $("#n2").append("<option value='" + obj['id_proceso_n2'] + "'>" + obj['descripcion'] + "</option>");
-                    $("#n2_chzn .chzn-results").append('<li id="n2_chzn_o_' + contador + '" class="active-result" style="">' + obj['descripcion'] + '</li>');
-                });
+                $("#n3").empty().append("<option value=''>[Proceso nivel 3]</option>");
+                $("#n3_chzn .chzn-results").empty().append('<li id="n3_chzn_o_0" class="active-result" style="">[Proceso nivel 3]</li>');
+                $("#n3_chzn a span").empty().append('[Proceso nivel 3]');
+
+                //Primero validar que se obtenga data
+                if (result == '' || result == []) {
+                    alert('No existen registros.');
+                    $('#tabla').DataTable().clear().draw();
+                    return false;
+                }
+
+                $('#tabla').DataTable().clear().draw();
+
+                if (nivel == 2) {
+                    $("#tabla").DataTable().column(1).visible(false);
+                    $("#tabla").DataTable().column(5).visible(false);
+                    $("#tabla").DataTable().column(6).visible(false);
+                    $("#thp").css('width', '6%');
+                    $("#th0").css('width', '25%');
+                    $("#th1").css('width', '25%');
+                    $("#th2").css('width', '44%');
+                    $.each(result, function (key, obj) {
+                        contador++;
+                        $('#tabla').DataTable().row.add([
+                            "<center>" + contador + "</center>",
+                            '',
+                            nom_n0,
+                            nom_n1,
+                            "<input type=hidden name=id_puesto value=0><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>",
+                            '',
+                            ''
+                        ]).draw(false);
+                    });
+                    $("#tabla_wrapper").show();
+                }
+
+                if (nivel >= 3) {
+                    $.each(result, function (key, obj) {
+                        contador++;
+                        $("#n2").append("<option value='" + obj['id_proceso_n2'] + "'>" + obj['descripcion'] + "</option>");
+                        $("#n2_chzn .chzn-results").append('<li id="n2_chzn_o_' + contador + '" class="active-result" style="">' + obj['descripcion'] + '</li>');
+                    });
+                }
             }
         });
     });
@@ -309,6 +348,9 @@ $(document).ready(function () {
     $("#n2").change(function () {
 
         var n2 = $("#n2").val();
+        var nom_n0 = $("#n0 option:selected").text();
+        var nom_n1 = $("#n1 option:selected").text();
+        var nom_n2 = $("#n2 option:selected").text();
         var nivel = parseInt($("#nivel").val());
         //Si no se ha seleccionado proceso y es nivel 0, 
         //no ejecutar ajax
@@ -322,15 +364,46 @@ $(document).ready(function () {
             type: 'post',
             dataType: 'json',
             success: function (result) {
+
                 var contador = 0;
                 $("#n3").empty().append("<option value=''>[Proceso nivel 3]</option>");
                 $("#n3_chzn .chzn-results").empty().append('<li id="n3_chzn_o_0" class="active-result" style="">[Proceso nivel 3]</li>');
                 $("#n3_chzn a span").empty().append('[Proceso nivel 3]');
-                $.each(result, function (key, obj) {
-                    contador++;
-                    $("#n3").append("<option value='" + obj['id_proceso_n3'] + "'>" + obj['descripcion'] + "</option>");
-                    $("#n3_chzn .chzn-results").append('<li id="n3_chzn_o_' + contador + '" class="active-result" style="">' + obj['descripcion'] + '</li>');
-                });
+                //Primero validar que se obtenga data
+                if (result == '' || result == []) {
+                    alert('No existen registros.');
+                    $('#tabla').DataTable().clear().draw();
+                    return false;
+                }
+                $('#tabla').DataTable().clear().draw();
+
+                if (nivel == 3) {
+                    $("#tabla").DataTable().column(1).visible(false);
+                    $("#tabla").DataTable().column(5).visible(true);
+                    $("#tabla").DataTable().column(6).visible(false);
+                    $("#th3").css('width', '50%');
+                    $.each(result, function (key, obj) {
+                        contador++;
+                        $('#tabla').DataTable().row.add([
+                            "<center>" + contador + "</center>",
+                            '',
+                            nom_n0,
+                            nom_n1,
+                            nom_n2,
+                            "<input type=hidden name=id_puesto value=0><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>",
+                            ''
+                        ]).draw(false);
+                    });
+                    $("#tabla_wrapper").show();
+                }
+
+                if (nivel >= 4) {
+                    $.each(result, function (key, obj) {
+                        contador++;
+                        $("#n3").append("<option value='" + obj['id_proceso_n3'] + "'>" + obj['descripcion'] + "</option>");
+                        $("#n3_chzn .chzn-results").append('<li id="n3_chzn_o_' + contador + '" class="active-result" style="">' + obj['descripcion'] + '</li>');
+                    });
+                }
             }
         });
     });
@@ -338,6 +411,10 @@ $(document).ready(function () {
     $("#n3").change(function () {
 
         var n3 = $("#n3").val();
+        var nom_n0 = $("#n0 option:selected").text();
+        var nom_n1 = $("#n1 option:selected").text();
+        var nom_n2 = $("#n2 option:selected").text();
+        var nom_n3 = $("#n3 option:selected").text();
         var nivel = parseInt($("#nivel").val());
         //Si no se ha seleccionado proceso y es nivel 0, 
         //no ejecutar ajax
@@ -351,18 +428,35 @@ $(document).ready(function () {
             type: 'post',
             dataType: 'json',
             success: function (result) {
+
                 var contador = 0;
-                $("#n4").empty().append("<option value=''>[Proceso nivel 4]</option>");
-                $("#n4_chzn .chzn-results").empty().append('<li id="n4_chzn_o_0" class="active-result" style="">[Proceso nivel 4]</li>');
-                $("#n4_chzn a span").empty().append('[Proceso nivel 4]');
-                $.each(result, function (key, obj) {
-                    contador++;
-                    $("#n4").append("<option value='" + obj['id_proceso_n4'] + "'>" + obj['descripcion'] + "</option>");
-                    $("#n4_chzn .chzn-results").append('<li id="n4_chzn_o_' + contador + '" class="active-result" style="">' + obj['descripcion'] + '</li>');
-                });
+                //Primero validar que se obtenga data
+                if (result == '' || result == []) {
+                    alert('No existen registros.');
+                    $('#tabla').DataTable().clear().draw();
+                    return false;
+                }
+
+                $('#tabla').DataTable().clear().draw();
+
+                if (nivel == 4) {
+                    $("#tabla").DataTable().column(1).visible(false);
+                    $("#th4").css('width', '30%');
+                    $.each(result, function (key, obj) {
+                        contador++;
+                        $('#tabla').DataTable().row.add([
+                            "<center>" + contador + "</center>",
+                            '',
+                            nom_n0,
+                            nom_n1,
+                            nom_n2,
+                            nom_n3,
+                            "<input type=hidden name=id_puesto value=0><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>",
+                        ]).draw(false);
+                    });
+                    $("#tabla_wrapper").show();
+                }
             }
         });
     });
-
-
 });
