@@ -133,7 +133,7 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
                 $data['fecha_crea'] = date("Y-m-d H:i:s");
                 $data['usuario_crea'] = Zend_Auth::getInstance()->getIdentity()->id;
                 $data['id_proyecto'] = $this->_proyecto;
-                $sesionMvc->messages = 'Registro agregado satisfactoriamente';
+                $sesionMvc->messages = 'Registro grabado satisfactoriamente';
             } else {
                 $data['fecha_actu'] = date("Y-m-d H:i:s");
                 $data['usuario_actu'] = Zend_Auth::getInstance()->getIdentity()->id;
@@ -143,6 +143,7 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
 
             $sesionMvc->tipoMessages = self::SUCCESS;
             $modelo->guardar($data);
+            echo Zend_Json::encode($sesionMvc->messages);
         }
     }
 
@@ -172,14 +173,13 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
                 $add = explode("|", $reg);
                 if ($tipo == 'organo') {
                     $where = $this->getAdapter()->quoteInto('id_organo = ?', $add[0]);
-                    $dataNueva = array('organo' => $add[1], 'codigo_natuorganica' => $add[2],
+                    $dataNueva = array('organo' => $add[1], 'codigo_natuorganica' => $add[2],'siglas' => $add[3],
                         'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
                 } else {
                     $where = $this->getAdapter()->quoteInto('id_uorganica = ?', $add[0]);
-                    $dataNueva = array('descripcion' => $add[1], 'id_organo' => $add[2],
+                    $dataNueva = array('descripcion' => $add[1], 'id_organo' => $add[2],'siglas' => $add[3],
                         'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
                 }
-                //Registro actualizado
                 $modelo->update($dataNueva, $where);
             }
         }
@@ -311,27 +311,21 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
             exit('Acción solo válida para peticiones ajax');
 
         $puestos = isset($data['puestos']) ? $data['puestos'] : array();
-        $puestosNuevo = isset($data['nuevo']) ? $data['nuevo'] : array();
-        //Actualizando puestos
         if (count($puestos) > 0) {
             foreach ($puestos as $reg) {
                 $add = explode("|", $reg);
-                $dataNueva = array('id_puesto' => $add[0], 'descripcion' => $add[2], 'id_uorganica' => $add[7],
-                    'num_correlativo' => $add[1], 'cantidad' => $add[3], 'codigo_grupo' => $add[4],
-                    'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6],
-                    'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
-                $this->_puestoModel->guardar($dataNueva);
-            }
-        }
-
-        if (count($puestosNuevo) > 0) {
-            foreach ($puestosNuevo as $reg) {
-                $add = explode("|", $reg);
-                $dataNueva = array('descripcion' => $add[2], 'id_uorganica' => $add[7],
+                if ($add[0] == 0) { //Nuevo
+                    $dataNueva = array('id_puesto' => $add[0], 'descripcion' => $add[2], 'id_uorganica' => $add[7],
                     'num_correlativo' => $add[1], 'cantidad' => $add[3], 'codigo_grupo' => $add[4],
                     'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6],
                     'usuario_crea' => $this->_usuario, 'fecha_crea' => date("Y-m-d H:i:s"));
-                $this->_puestoModel->guardar($dataNueva);
+                } else { //existe
+                    $dataNueva = array('id_puesto' => $add[0], 'descripcion' => $add[2], 'id_uorganica' => $add[7],
+                    'num_correlativo' => $add[1], 'cantidad' => $add[3], 'codigo_grupo' => $add[4],
+                    'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6],
+                    'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                
+                }$this->_puestoModel->guardar($dataNueva);
             }
         }
 

@@ -28,7 +28,7 @@ Unidad orgánica
 <div class="widget-content nopadding">
     <table id='tablaorgano' class="table table-condensed table-bordered" style="">
         <thead>
-            <tr><th></th><th>Naturaleza</th><th>Órgano</th><th>Siglas</th></tr>
+            <tr><th width="20%"></th><th width="15%">Naturaleza</th><th width="60%">Órgano</th><th width="5%">Siglas</th></tr>
         </thead>
         <?php
         echo '<tbody>';
@@ -38,14 +38,12 @@ Unidad orgánica
             $estado = 'checkmark.png';
             echo '<tr data-organo='.$value['id_organo'].'>';
             echo '<td width=5% class="taskOptions">'.'<span style="display:none">'.$value['organo']."</span>";
-            echo '<a data-original-title="Editar" class="tip-top" href="#myModal" data-toggle="modal" onclick="editarRegistro('.$value['id_organo'].','."'"."organo"."')".'">';
-            echo '<i class="icon-pencil"></i></a>&nbsp;&nbsp;';
             echo '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminaRegistro('.$value['id_organo'].','."'"."organo"."')".'">';
             echo '<i class="icon-trash"></i></a>';
             echo '</td>';
-            echo '<td width=20%>'.$this->Naturaleza($value['codigo_natuorganica'],$contador).'</td>';
-            echo '<td><input type=organo value="'.$value['organo'].'" style="width:90%"></td>';
-            echo '<td>'.$value['siglas'].'</td>';
+            echo '<td width=15%>'.$this->Naturaleza($value['codigo_natuorganica'],$contador).'</td>';
+            echo '<td width="60%"><input type=organo value="'.$value['organo'].'" style="width:100%"></td>';
+            echo '<td><input type=organo value="'.$value['siglas'].'" style="width:50%"></td>';
             echo '</tr>';
         }
         echo '</tbody>';
@@ -66,7 +64,7 @@ Unidad orgánica
 <div class="widget-content nopadding">
     <table id='tablaunidad' class="table table-condensed table-bordered" style="">
         <thead>
-            <tr><th></th><th>Órgano</th><th>Unidad Orgánica</th><th>Siglas</th></tr>
+            <tr><th width="20%"></th><th width="15%">Órgano</th><th width="60%">Unidad Orgánica</th><th width="5%">Siglas</th></tr>
         </thead>
         <?php
         echo '<tbody>';
@@ -76,14 +74,12 @@ Unidad orgánica
             $estado = 'checkmark.png';
             echo '<tr data-unidad='.$value['id_uorganica'].'>';
             echo '<td width=5% class="taskOptions">'.'<span style="display:none">'.$value['descripcion']."</span>";;
-            echo '<a data-original-title="Editar" class="tip-top" href="#myModal" data-toggle="modal" onclick="editarRegistro('.$value['id_uorganica'].','."'"."unidad"."')".'">';
-            echo '<i class="icon-pencil"></i></a>&nbsp;&nbsp;';
             echo '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminaRegistro('.$value['id_uorganica'].','."'"."unidad"."')".'">';
             echo '<i class="icon-trash"></i></a>';
             echo '</td>';
-            echo '<td width=25%>'.$this->Organo($value['id_organo'],$value['id_proyecto'],$contador).'</td>';
-            echo '<td><input type=text value="'.$value['descripcion'].'" style="width:90%"></td>';
-            echo '<td>'.$value['siglas'].'</td>';
+            echo '<td width="15%">'.$this->Organo($value['id_organo'],$value['id_proyecto'],$contador).'</td>';
+            echo '<td width="60%"><input type=organo value="'.$value['descripcion'].'" style="width:100%"></td>';
+            echo '<td><input type=organo value="'.$value['siglas'].'" style="width:50%"></td>';
             echo '</tr>';
         }
         echo '</tbody>';
