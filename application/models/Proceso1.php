@@ -14,8 +14,8 @@ class Application_Model_Proceso1 extends Zend_Db_Table
     public function guardar($datos)
     {
         $id = 0;
-        if (!empty($datos["id"])) {
-        	$id = (int) $datos["id"];
+        if (!empty($datos["id_proceso_n1"])) {
+        	$id = (int) $datos["id_proceso_n1"];
         }
         
         unset($datos["id"]);
@@ -41,14 +41,10 @@ class Application_Model_Proceso1 extends Zend_Db_Table
         return $this->getAdapter()->select()->from($this->_name,array('key' => $this->_primary, 'value' => 'descripcion'))
                 ->where('estado = ?',self::ESTADO_ACTIVO)
                 ->where('id_proyecto = ?', $proyecto)
+                ->order('descripcion asc')
                 ->query()->fetchAll();
     }
-    
-    /*
-SELECT * FROM proceso_n1 n1 INNER JOIN proceso_n0 n0 ON 
-     * n0.codigo_proceso_n0 = n1.id_proceso_n0 JOIN tipoproceso tp
-     *  ON tp.codigo_tipoproceso = n0.codigo_tipoproceso
-    */
+
     public function obtenerProcesos1($proceso0)
     {
         return $this->getAdapter()->select()->from(array('n1' => $this->_name))

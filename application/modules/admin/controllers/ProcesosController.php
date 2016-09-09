@@ -40,7 +40,6 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
         $this->view->proceso1 = $this->_proceso1->combo($this->_proyecto);
         $this->view->proceso2 = $this->_proceso2->combo($this->_proyecto);
         $this->view->proceso3 = $this->_proceso3->combo($this->_proyecto);
-        $this->view->proceso4 = $this->_proceso4->combo($this->_proyecto);
     }
 
     public function obtenerProcesos0Action() {
@@ -149,7 +148,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
             echo Zend_Json::encode($dataProceso4);
         }
     }
-    
+
     //obtener-tipo-proceso
     public function obtenerTipoProcesoAction() {
 
@@ -160,6 +159,57 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
 
         $dataTipoProceso = $this->_tipoProceso->listado();
         echo Zend_Json::encode($dataTipoProceso);
+    }
+
+    public function grabarProcesosAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $data = $this->_getAllParams();
+        $nivel = $data['n']; //Identifica que nivel de proceso se va a guardar
+        $modelo = '';
+        if ($nivel == 0) {
+            $modelo = $this->_proceso0;
+        } else if ($nivel == 1) {
+            $modelo = $this->_proceso1;
+        } else if ($nivel == 2) {
+            $modelo = $this->_proceso2;
+        } else if ($nivel == 3) {
+            $modelo = $this->_proceso3;
+        } else if ($nivel == 4) {
+            $modelo = $this->_proceso4;
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        $procesos = isset($data['procesos']) ? $data['procesos'] : array();
+        if (count($procesos) > 0) {
+            foreach ($procesos as $reg) {
+
+                $add = explode("|", $reg);
+                if ($add[0] == 0) { //Nuevo
+                    if ($nivel == 0) {
+                        $dataProceso = array('id_proceso_n0' => $add[0], 'descripcion' => $add[2], 'codigo_tipoproceso' => $add[1],
+                            'id_proyecto' => $this->_proyecto,'usuario_crea' => $this->_usuario, 'fecha_crea' => date("Y-m-d H:i:s"));
+                    } else if ($nivel == 1) {
+                        $dataProceso = array('id_proceso_n1' => $add[0],'id_proceso_n0' => $add[1], 'descripcion' => $add[2],
+                            'id_proyecto' => $this->_proyecto,'usuario_crea' => $this->_usuario, 'fecha_crea' => date("Y-m-d H:i:s"));
+                    }
+                } else {
+                    if ($nivel == 0) {
+                        $dataProceso = array('id_proceso_n0' => $add[0], 'descripcion' => $add[2], 'codigo_tipoproceso' => $add[1],
+                            'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                    } else if ($nivel == 1) {
+                        $dataProceso = array('id_proceso_n1' => $add[0],'id_proceso_n0' => $add[1], 'descripcion' => $add[2], 
+                            'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                    }
+                }
+                $modelo->guardar($dataProceso);
+            }
+        }
+        echo Zend_Json::encode('Procesos actualizados satisfactoriamente.');
     }
 
     public function registroActiAction() {

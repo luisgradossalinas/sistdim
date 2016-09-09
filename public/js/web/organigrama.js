@@ -151,7 +151,6 @@ $(document).ready(function () {
             var rol = $(this).find("td select").eq(2).val();
             var unidad = $(this).find("td input").eq(4 - control).val();
 
-
             if (mapaPuesto == 0) {
                 if ((correlativo == '' || correlativo == 0) || nom_puesto == '' ||
                         (cantidad == '' || cantidad == 0) || grupo == '' || familia == '' || rol == '') {
@@ -382,7 +381,7 @@ $(document).ready(function () {
                             $.each(result, function (key, obj) {
                                 contador++;
                                 $('#tabla').DataTable().row.add([
-                                    "<center>" + contador + "</center>",
+                                    "<center>" + contador + "</center>" + '<span style="display:none">' + obj['organo'] + "</span>" + '<span style="display:none">' + obj['unidad'] + "</span>" + '<span style="display:none">' + obj['puesto'] + "</span>",
                                     "<input type=hidden name=id_puesto value='" + obj['id_puesto'] + "'>" + obj['organo'],
                                     obj['unidad'],
                                     "<input type=number name=num_cor value='" + obj['numcor'] + "' style='width:50%'>",

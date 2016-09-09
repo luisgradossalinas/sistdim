@@ -120,11 +120,6 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
             
             echo Zend_Json::encode(array('code' => 1, 'msg' => 'Registro eliminado'));
             
-            /*
-            $where = $this->getAdapter()->quoteInto($primary.' = ?', $data['id']);
-            $modelo->update(array('estado' => self::ELIMINADO), $where);
-            $sesionMvc->messages = 'Registro eliminado';
-            $sesionMvc->tipoMessages = self::SUCCESS;*/
         }
 
         if ($this->_getParam('ajax') == 'save') {

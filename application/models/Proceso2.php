@@ -14,8 +14,8 @@ class Application_Model_Proceso2 extends Zend_Db_Table
     public function guardar($datos)
     {
         $id = 0;
-        if (!empty($datos["id"])) {
-        	$id = (int) $datos["id"];
+        if (!empty($datos["id_proceso_n2"])) {
+        	$id = (int) $datos["id_proceso_n2"];
         }
         
         unset($datos["id"]);
@@ -41,6 +41,7 @@ class Application_Model_Proceso2 extends Zend_Db_Table
         return $this->getAdapter()->select()->from($this->_name,array('key' => $this->_primary, 'value' => 'descripcion'))
                 ->where('estado = ?',self::ESTADO_ACTIVO)
                 ->where('id_proyecto = ?', $proyecto)
+                ->order('descripcion asc')
                 ->query()->fetchAll();
     }
     

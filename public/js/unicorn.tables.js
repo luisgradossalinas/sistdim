@@ -6,7 +6,6 @@ $(document).ready(function(){
 		"sDom": '<""l>t<"F"fp>'
 	});
         */
-       
         $('#tabla').dataTable({
 		"bJQueryUI": true,
 		"sPaginationType": "full_numbers",
@@ -31,9 +30,4 @@ $(document).ready(function(){
 			}
 		});
 	});	
-	
-	
-	
-	
-	
 });

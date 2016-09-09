@@ -41,6 +41,7 @@ class Application_Model_Proceso4 extends Zend_Db_Table
         return $this->getAdapter()->select()->from($this->_name,array('key' => $this->_primary, 'value' => 'descripcion'))
                 ->where('estado = ?',self::ESTADO_ACTIVO)
                 ->where('id_proyecto = ?', $proyecto)
+                ->order('descripcion asc')
                 ->query()->fetchAll();
     }
     

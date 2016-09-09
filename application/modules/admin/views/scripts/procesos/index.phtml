@@ -13,6 +13,7 @@
 <?= $this->partial('_partials/mensajes.phtml', array('messages' => $this->messages, 'tipoMessages' => $this->tipoMessages)); ?>
 <div style="float:left">
     <!--Nivel-->
+    <div style="float:left">
     <select id="nivel" name="nivel">
         <option value=''>[Nivel]</option>
         <?php
@@ -21,7 +22,9 @@
         }
         ?>
     </select>
+    </div>
     <!--Proceso nivel 0-->
+    <div style="float:left">
     <select id="n0" name="n0">
         <option value=''>[Proceso nivel 0]</option>
         <?php
@@ -30,56 +33,52 @@
         }
         ?>
     </select>
+    </div>
     <!--Proceso nivel 1-->
+    <div style="float:left">
     <select id="n1" name="n1">
         <option value=''>[Proceso nivel 1]</option>
-<?php
-foreach ($this->proceso1 as $val) {
-    echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
-}
-?>
+        <?php
+        //foreach ($this->proceso1 as $val) {
+            //echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
+        //}
+        ?>
     </select>
+    </div>
     <!--Proceso nivel 2-->
+    <div style="float:left">
     <select id="n2" name="n2">
         <option value=''>[Proceso nivel 2]</option>
         <?php
-        foreach ($this->proceso2 as $val) {
-            echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
-        }
+        //foreach ($this->proceso2 as $val) {
+            //echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
+        //}
         ?>
     </select>
+    </div>
     <!--Proceso nivel 3-->
+    <div style="float:left">
     <select id="n3" name="n3">
         <option value=''>[Proceso nivel 3]</option>
         <?php
+        /*
         foreach ($this->proceso3 as $val) {
             echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
         }
+         * */
         ?>
     </select>
-    <!--Proceso nivel 4-->
-
-    <select id="n4" name="n4">
-        <!--
-        <option value=''>[Proceso nivel 4]</option>
-<?php
-//foreach ($this->proceso4 as $val){
-//echo "<option value=".$val['key'].">".$val['value']."</option>"; 
-//}
-?>
-        -->
-    </select>
+    </div>
 </div>
 <div id="capa" style="float:left"></div>
 <a id="nuevoProceso" role="button" class="btn tip-left" title="Nuevo registro" >
     <li class="icon-plus-sign"></li>
 </a>
-<a  id="grabarProceso"  role="button" class="btn tip-left" onclick="grabarProceso()" title="Grabar registros">
-    <li class="icon-file"></li>
+<a  id="grabarProceso"  role="button" class="btn tip-left" title="Grabar registros">
+    <li class="icon-check"></li>
 </a>
 <div class="widget-box">
     <div class="widget-title">
-
         <h5><?= $this->active ?></h5>
     </div>
     <div class="widget-content nopadding">
