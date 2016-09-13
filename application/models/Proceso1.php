@@ -54,6 +54,7 @@ class Application_Model_Proceso1 extends Zend_Db_Table
                         array('tipo' => 'descripcion'))
                 ->where('n1.estado = ?',self::ESTADO_ACTIVO)
                 ->where('n1.id_proceso_n0 = ?', $proceso0)
+                ->order('n1.descripcion asc')
                 ->query()->fetchAll();
     }
 

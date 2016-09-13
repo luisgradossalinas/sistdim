@@ -50,6 +50,7 @@ class Application_Model_Proceso2 extends Zend_Db_Table
         return $this->getAdapter()->select()->from($this->_name)
                 ->where('estado = ?',self::ESTADO_ACTIVO)
                 ->where('id_proceso_n1 = ?', $proceso1)
+                ->order('descripcion asc')
                 ->query()->fetchAll();
     }
 

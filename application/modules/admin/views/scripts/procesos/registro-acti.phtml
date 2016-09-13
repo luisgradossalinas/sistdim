@@ -1,10 +1,110 @@
-<?=$this->partial('_partials/mensajes.phtml',array('messages' => $this->messages,'tipoMessages' => $this->tipoMessages));?>
-<div class="widget-box">
-    <div class="widget-title">	
-        <h5><?=$this->active?></h5>
+<style>
+    #n0,#n1,#n2,#n3,#n4,
+    #n0_chzn,#n1_chzn,#n2_chzn,#n3_chzn,#n4_chzn
+    {
+        width: 250px;
+        font-size:8pt
+    }    
+    #nivel,#nivel_chzn {
+        width: 68px;
+        font-size:8pt
+    }    
+</style>
+<?= $this->partial('_partials/mensajes.phtml', array('messages' => $this->messages, 'tipoMessages' => $this->tipoMessages)); ?>
+<div style="float:left">
+    <!--Nivel-->
+    <div style="float:left">
+        <select id="nivel" name="nivel">
+            <option value=''>[Nivel]</option>
+            <?php
+            for ($i = 1; $i <= 4; $i++) {
+                echo "<option value=" . $i . ">" . $i . "</option>";
+            }
+            ?>
+        </select>
     </div>
-<div class="widget-content nopadding">
-    
+    <!--Proceso nivel 0-->
+    <div style="float:left">
+        <select id="n0" name="n0">
+            <option value=''>[Proceso nivel 0]</option>
+            <?php
+            foreach ($this->proceso0 as $val) {
+                echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
+            }
+            ?>
+        </select>
+    </div>
+    <!--Proceso nivel 1-->
+    <div style="float:left">
+        <select id="n1" name="n1">
+            <option value=''>[Proceso nivel 1]</option>
+            <?php
+            //foreach ($this->proceso1 as $val) {
+            //echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
+            //}
+            ?>
+        </select>
+    </div>
+    <!--Proceso nivel 2-->
+    <div style="float:left">
+        <select id="n2" name="n2">
+            <option value=''>[Proceso nivel 2]</option>
+            <?php
+            //foreach ($this->proceso2 as $val) {
+            //echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
+            //}
+            ?>
+        </select>
+    </div>
+    <!--Proceso nivel 3-->
+    <div style="float:left">
+        <select id="n3" name="n3">
+            <option value=''>[Proceso nivel 3]</option>
+            <?php
+            /*
+              foreach ($this->proceso3 as $val) {
+              echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
+              }
+             * */
+            ?>
+        </select>
+    </div>
+    <div style="float:left">
+        <select id="n4" name="n4">
+            <option value=''>[Proceso nivel 4]</option>
+            <?php
+            /*
+              foreach ($this->proceso3 as $val) {
+              echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
+              }
+             * */
+            ?>
+        </select>
+    </div>
+    <div style="float:left">
+        <a id="nuevoProceso" role="button" class="btn tip-left" title="Nuevo registro" >
+            <li class="icon-plus-sign"></li>
+        </a>
+        <a  id="grabarProceso"  role="button" class="btn tip-left" title="Grabar registros">
+            <li class="icon-check"></li>
+        </a>
+
+    </div>
 </div>
+
+<div class="widget-box">
+    <div class="widget-title">
+        <h5><?= $this->active ?></h5>
+    </div>
+    <div class="widget-content nopadding">
+        <table id='tabla' width="100%" class="table table-condensed table-bordered" style="font-size: 7pt">
+            <thead>
+                <tr><th id="thp" width="7%">#</th><th>Actividad</th><th id="th0">Unidad Orgánica</th><th id="th1">Puesto</th>
+                </tr>
+            </thead>
+            <tbody>     
+            </tbody>
+        </table>
+    </div>
 </div>
-<?=$this->partial('_partials/modal.phtml',array('model' => $this->model));?>
+<?= $this->partial('_partials/modal.phtml', array('model' => $this->model)); ?>
