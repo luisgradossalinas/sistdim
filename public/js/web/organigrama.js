@@ -91,7 +91,7 @@ $(document).ready(function () {
         }
 
         $('#tabla').DataTable().row.add([
-            "<center>" + numReg + "</center>",
+            numReg,
             "<input type=hidden name=id_puesto value=0>" + $("#organo option:selected").text(),
             $("#unidad option:selected").text(),
             "<input type=number name=num_cor title='Ingrese el número correlativo del puesto' style='width:50%'>",
@@ -116,7 +116,7 @@ $(document).ready(function () {
     });
 
     grabarPuestos = function () {
-
+        
         var mapaPuesto = $("#mapaPuesto").val();
         var control = 0;
         if ($('#tabla').DataTable().data().count() == 0) {
@@ -188,6 +188,14 @@ $(document).ready(function () {
 
         });
 
+
+
+        //Mostrar mensaje si existen datos por completar
+        if (mostrarMensaje == 1) {
+            alert(mensaje);
+            return false;
+        }
+
         //Mostrar mensaje de nombres de puestos duplicados
         if (nombre_iguales != '') {
             alert(nombre_iguales + nomRepetidos);
@@ -200,13 +208,8 @@ $(document).ready(function () {
             return false;
         }
 
-        //Mostrar mensaje si existen datos por completar
-        if (mostrarMensaje == 1) {
-            alert(mensaje);
-            return false;
-        }
 
-        //console.log(data);
+        $("#grabarPuestos").attr('onclick','');
         $.ajax({
             url: urls.siteUrl + '/admin/organigrama/grabar-puestos',
             data: {
@@ -216,6 +219,7 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (result) {
                 alert(result);
+                $("#grabarPuestos").attr('onclick','grabarPuestos()');
                 //No refrescar página, sino actualizar con ajac los id
                 var organo = $("#organo").val();
                 var unidad = $("#unidad").val();
@@ -328,6 +332,7 @@ $(document).ready(function () {
             //Probar generando el html
             success: function (result) {
                 $("#capa").html(result);
+                $("#unidad").chosen();
 
                 /*
                  var contador = 0;
@@ -381,8 +386,8 @@ $(document).ready(function () {
                             $.each(result, function (key, obj) {
                                 contador++;
                                 $('#tabla').DataTable().row.add([
-                                    "<center>" + contador + "</center>" + '<span style="display:none">' + obj['organo'] + "</span>" + '<span style="display:none">' + obj['unidad'] + "</span>" + '<span style="display:none">' + obj['puesto'] + "</span>",
-                                    "<input type=hidden name=id_puesto value='" + obj['id_puesto'] + "'>" + obj['organo'],
+                                    contador,
+                                    "<input type=hidden name=id_puesto value='" + obj['id_puesto'] + "'>" + obj['organo'] + '<span style="display:none">' + obj['organo'] + "</span>" + '<span style="display:none">' + obj['unidad'] + "</span>" + '<span style="display:none">' + obj['puesto'] + "</span>",
                                     obj['unidad'],
                                     "<input type=number name=num_cor value='" + obj['numcor'] + "' style='width:50%'>",
                                     "<input type=textarea name=puesto class='puesto_validate' value='" + obj['puesto'] + "'>",
@@ -392,6 +397,7 @@ $(document).ready(function () {
                                     obj['rpuesto'] + "<input type=hidden name=unidadT value='" + unidad + "'>"
                                 ]).draw(false);
                             });
+
                             $("#nuevoPuesto").show();
                             $("#grabarPuestos").show();
                         }
@@ -406,14 +412,16 @@ $(document).ready(function () {
         // searching: false,
         // paging: true,
         // scrollY: 400,
-        "sPaginationType": "full_numbers"
+        "sPaginationType": "full_numbers",
+        "lengthMenu": [[50, -1], [50, "All"]]
                 // "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>"
                 //"sDom": '<""l>t<"F"fp>'
     });
 
     $('#tablaunidad').dataTable({
         "bJQueryUI": true,
-        "sPaginationType": "full_numbers"
+        "sPaginationType": "full_numbers",
+        "lengthMenu": [[50, -1], [50, "All"]]
                 // "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>"
                 //"sDom": '<""l>t<"F"fp>'
     });

@@ -8,6 +8,7 @@ $(document).ready(function () {
     //Grabar proceso
     $("#grabarProceso").click(function () {
 
+        $("#grabarProceso").hide();
         var nivel = $("#nivel").val();
         var numReg = $('#tabla').DataTable().data().count() / 7;
         var dataProceso = new Array();
@@ -34,6 +35,7 @@ $(document).ready(function () {
 
         if ($('#tabla').DataTable().data().count() == 0) {
             alert('No existen procesos para grabar');
+            $("#grabarProceso").show();
             return false;
         }
 
@@ -88,10 +90,12 @@ $(document).ready(function () {
                 }
             }
         });
+        
 
         //Mostrar mensaje si existen datos por completar
         if (mostrarMensaje == 1) {
             alert(mensaje);
+            $("#grabarProceso").show();
             return false;
         }
 
@@ -163,7 +167,6 @@ $(document).ready(function () {
                             $("#n1_chzn a span").empty().append('[Proceso nivel 1]');
                             //Primero validar que se obtenga data
                             if (result == '' || result == []) {
-                                alert('No existen registros.');
                                 $("#tabla_wrapper").show();
                                 return false;
                             }
@@ -185,6 +188,8 @@ $(document).ready(function () {
                                 ]).draw(false);
                             });
                             $("#tabla_wrapper").show();
+                            $("#nuevoProceso").show();
+                            $("#grabarProceso").show();
                         }
                     });
                 }
@@ -223,7 +228,6 @@ $(document).ready(function () {
 
                             //Primero validar que se obtenga data
                             if (result == '' || result == []) {
-                                alert('No existen registros.');
                                 $('#tabla').DataTable().clear().draw();
                                 $("#tabla_wrapper").show();
                                 $("#nuevoProceso").show();
@@ -281,7 +285,6 @@ $(document).ready(function () {
                             $("#n3_chzn a span").empty().append('[Proceso nivel 3]');
                             //Primero validar que se obtenga data
                             if (result == '' || result == []) {
-                                alert('No existen registros.');
                                 $('#tabla').DataTable().clear().draw();
                                 $("#tabla_wrapper").show();
                                 $("#nuevoProceso").show();
@@ -326,7 +329,6 @@ $(document).ready(function () {
                 dataType: 'json',
                 success: function (result) {
                     alert(result);
-                    return false;
                     $.ajax({
                         url: urls.siteUrl + '/admin/procesos/obtener-procesos4',
                         data: {n3: nivel3},
@@ -336,7 +338,6 @@ $(document).ready(function () {
                             var contador = 0;
                             //Primero validar que se obtenga data
                             if (result == '' || result == []) {
-                                alert('No existen registros.');
                                 $('#tabla').DataTable().clear().draw();
                                 $("#tabla_wrapper").show();
                                 $("#nuevoProceso").show();
@@ -352,15 +353,14 @@ $(document).ready(function () {
                                     '',
                                     nivel0_nombre,
                                     nivel1_nombre,
-                                    "<input type=hidden name=id_proceso_n2 value='" + nivel2 + "'>" + nivel2_nombre,
-                                    "<input type=hidden name=id_proceso_n3 value='" + obj['id_proceso_n3'] + "'><input type=text name=n3_" + contador + " id=n3_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>",
-                                    ''
+                                    nivel2_nombre,
+                                    "<input type=hidden name=id_proceso_n3 value='" + nivel3 + "'>" + nivel3_nombre,
+                                    "<input type=hidden name=id_proceso_n4 value='" + obj['id_proceso_n4'] + "'><input type=text name=n4_" + contador + " id=n4_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>",
                                 ]).draw(false);
                             });
                             $("#tabla_wrapper").show();
                             $("#nuevoProceso").show();
                             $("#grabarProceso").show();
-
                         }
                     });
                 }
@@ -393,6 +393,29 @@ $(document).ready(function () {
             $('#tabla').DataTable().clear().draw();
             return false;
         }
+        
+        if (nivel == 1 && n0 == '') {
+            alert("Seleccione proceso nivel 0");
+            return false;
+        }
+        
+        if (nivel == 2 && n1 == '') {
+            alert("Seleccione proceso nivel 1");
+            return false;
+        }
+        
+        if (nivel == 3 && n2 == '') {
+            alert("Seleccione proceso nivel 2");
+            return false;
+        }
+        
+        if (nivel == 4 && n3 == '') {
+            alert("Seleccione proceso nivel 3");
+            return false;
+        }
+        
+        
+        
 
         var nColumnas = 2 + parseInt(nivel);
         var numReg = ($('#tabla').DataTable().data().count() / 7) + 1;
@@ -740,7 +763,6 @@ $(document).ready(function () {
                     $("#n3_chzn a span").empty().append('[Proceso nivel 3]');
                     //Primero validar que se obtenga data
                     if (result == '' || result == []) {
-                        alert('No existen registros.');
                         $('#tabla').DataTable().clear().draw();
                         $("#tabla_wrapper").show();
                         $("#nuevoProceso").show();
@@ -830,7 +852,6 @@ $(document).ready(function () {
 
                 //Primero validar que se obtenga data
                 if (result == '' || result == []) {
-                    alert('No existen registros.');
                     if (nivel == 2) {
                         $('#tabla').DataTable().clear().draw();
                         $("#tabla_wrapper").show();
@@ -908,7 +929,6 @@ $(document).ready(function () {
                 $("#n3_chzn a span").empty().append('[Proceso nivel 3]');
                 //Primero validar que se obtenga data
                 if (result == '' || result == []) {
-                    alert('No existen registros.');
                     if (nivel == 3) {
                         $('#tabla').DataTable().clear().draw();
                         $("#tabla_wrapper").show();
@@ -988,7 +1008,6 @@ $(document).ready(function () {
                 $("#tabla").DataTable().column(6).visible(true);
                 //Primero validar que se obtenga data
                 if (result == '' || result == []) {
-                    alert('No existen registros.');
                     if (nivel == 4) {
                         $('#tabla').DataTable().clear().draw();
                         $("#tabla_wrapper").show();
@@ -1001,7 +1020,7 @@ $(document).ready(function () {
                 $('#tabla').DataTable().clear().draw();
 
                 if (nivel == 4) {
-                    $("#th4").css('width', '30%');
+                    $("#th4").css('width', '50%');
                     $.each(result, function (key, obj) {
                         contador++;
                         $('#tabla').DataTable().row.add([

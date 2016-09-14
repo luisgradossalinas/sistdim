@@ -51,5 +51,17 @@ class Application_Model_Puesto extends Zend_Db_Table {
                 ->order('p.id_puesto asc')
                 ->query()->fetchAll();
     }
+    
+    /*
+    Esta función sirve para listar los puestos en la tabla donde se van a crear actividades.
+     *  */
+    public function puestosActividades($unidad) {
+       
+        return $this->getAdapter()->select()->from($this->_name)
+                ->where('id_uorganica = ?', $unidad)
+                ->where('estado = ?', self::ESTADO_ACTIVO)
+                ->order('descripcion asc')
+                ->query()->fetchAll();
+    }
 
 }

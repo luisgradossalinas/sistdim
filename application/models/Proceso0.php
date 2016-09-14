@@ -10,6 +10,7 @@ class Application_Model_Proceso0 extends Zend_Db_Table
     const ESTADO_ACTIVO = 1;
     const ESTADO_ELIMINADO = 2;
     const TABLA = 'proceso_n0';
+    const TIENE_HIJO = 1;
 
     public function guardar($datos)
     {

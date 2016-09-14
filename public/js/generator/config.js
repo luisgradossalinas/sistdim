@@ -8,7 +8,7 @@ $(document).ready(function(){
  generarCrud = function(){
  
     //alert('Se generarán los CRUD .....');
-    valorSeleccionado = $('#id_tabla_chzn .chzn-single span').text();
+    var valorSeleccionado = $('#id_tabla_chzn .chzn-single span').text();
     
     if (valorSeleccionado == "Seleccione")
     {
@@ -26,11 +26,9 @@ $(document).ready(function(){
             
             $('#logGenerator').empty().html(data);
         }
-      
-        
+
     })
 
- 
  }
 
 });

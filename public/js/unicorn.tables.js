@@ -9,10 +9,14 @@ $(document).ready(function(){
         $('#tabla').dataTable({
 		"bJQueryUI": true,
 		"sPaginationType": "full_numbers",
+                 "lengthMenu": [[50, -1], [50, "All"]]
                // "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>"
-		"sDom": '<""l>t<"F"fp>'
+		//"sDom": '<""l>t<"F"fp>'
 	});
 	
+    
+        
+        
 	$('input[type=checkbox],input[type=radio],input[type=file]').uniform();
 	
 	$('select').chosen();
