@@ -3,13 +3,12 @@
     #n0_chzn,#n1_chzn,#n2_chzn,#n3_chzn,#n4_chzn
     {
         width: 230px;
-        font-size:8pt
+        font-size:7.5pt
     }    
     #nivel,#nivel_chzn {
         width: 68px;
-        font-size:8pt
-    }    
-
+        font-size:7.5pt
+    } 
 </style>
 <?= $this->partial('_partials/mensajes.phtml', array('messages' => $this->messages, 'tipoMessages' => $this->tipoMessages)); ?>
 <div style="float:left">
@@ -100,7 +99,9 @@
     <div class="widget-content nopadding">
         <table id='tabla' width="100%" class="table table-condensed table-bordered" style="font-size: 7pt">
             <thead>
-                <tr><th id="thid" width="4%">#</th><th id="tha" width="50%">Actividad</th><th id="thuo" width="20%">Unidad Orgánica</th><th id="thp" width="20%">Puesto</th>
+                <tr><th id="thid" width="4%">#</th><th id="tha" width="50%">Actividad</th>
+                    <th id="thuo" width="15%">Unidad Orgánica</th><th id="thp" width="15%">Puesto</th>
+                    <th id="tht" width="12%">¿Tarea?</th>
                 </tr>
             </thead>
             <tbody>     

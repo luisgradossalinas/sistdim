@@ -91,11 +91,11 @@ $(document).ready(function () {
                                 obj['puesto']
                             ]).draw(false);
                             $("#unidad_" + contador).chosen();
-                            $("#unidad_" + contador + "_chzn").css('font-size', '8pt');
-                            $("#unidad_" + contador + "_chzn").css('width', '250px');
+                            $("#unidad_" + contador + "_chzn").css('font-size', '7.5pt');
+                            $("#unidad_" + contador + "_chzn").css('width', '230px');
                             $("#puesto_" + contador).chosen();
-                            $("#puesto_" + contador + "_chzn").css('font-size', '8pt');
-                            $("#puesto_" + contador + "_chzn").css('width', '250px');
+                            $("#puesto_" + contador + "_chzn").css('font-size', '7.5pt');
+                            $("#puesto_" + contador + "_chzn").css('width', '230px');
                         });
 
                         $("#nuevaActividad").show();
@@ -144,28 +144,220 @@ $(document).ready(function () {
                     $("#capa_" + num).empty().append(result);
                     //$("#puesto_" + num).empty().append(result);
                     $("#puesto_" + num).chosen();
-                    $("#puesto_" + num + "_chzn").css('font-size', '8pt');
-                    $("#puesto_" + num + "_chzn").css('width', '250px');
+                    $("#puesto_" + num + "_chzn").css('font-size', '7.5pt');
+                    $("#puesto_" + num + "_chzn").css('width', '230px');
                 }
             });
+        } else if (tipo == 'tarea') {
+
+            if (valor == 1) { //Tiene tarea ocultar
+                $("#unidad_" + num + "_chzn").hide();
+                $("#puesto_" + num + "_chzn").hide();
+                $("#capa_tarea_" + num).show();
+            } else {
+                $("#unidad_" + num + "_chzn").show();
+                $("#puesto_" + num + "_chzn").show();
+                $("#capa_tarea_" + num).hide();
+            }
+
+            //alert("tarea");
+
         }
     });
+
+    //Nueva tarea
+    $('#tabla').on('click', 'tr td a', function () {
+        var id = ($(this).attr("id"));
+        var valor = $(this).val();
+        
+        if (id == '' || id == null) {
+            return false;
+        }
+        
+        var result = id.split('_');
+        var tipo = result[0];
+        var num = result[1];
+        var id_actividad = ($(this).attr("id_actividad"));
+        var nom_act = ($(this).attr("nom_act"));
+
+        var nivel = $("#nivel").val();
+        var nom_n0 = $("#n0 option:selected").text();
+        var nom_n1 = $("#n1 option:selected").text();
+        var nom_n2 = $("#n2 option:selected").text();
+        var nom_n3 = $("#n3 option:selected").text();
+        var nom_n4 = $("#n4 option:selected").text();
+
+        //Invocar ajax obteniendo las tareas de la actividad
+        //Abrir popup con las tareas de las actividades
+        $.ajax({
+            url: urls.siteUrl + '/admin/procesos/obtener-tarea',
+            data: {
+                actividad: id_actividad
+            },
+            type: 'post',
+            dataType: 'json',
+            success: function (result) {
+                tablaTareas(result, nivel, id_actividad, nom_act, nom_n0, nom_n1, nom_n2, nom_n3, nom_n4);
+            }
+        });
+
+        return false;
+
+    });
+
+    tablaTareas = function (data, nivel, id_act, nom_act, n0, n1, n2, n3, n4) {
+
+        $('.modal-body').empty();
+        var html = '';
+        html += '<div style="font-size:8pt">';
+        html += '<b>Nivel 0:</b> ' + n0;
+
+        if (nivel == 1) {
+            html += ' | <b>Nivel 1:</b> ' + n1;
+        } else if (nivel == 2) {
+            html += ' | <b>Nivel 1:</b> ' + n1;
+            html += ' | <b>Nivel 2:</b> ' + n2;
+        } else if (nivel == 3) {
+            html += ' | <b>Nivel 1:</b> ' + n1;
+            html += ' | <b>Nivel 2:</b> ' + n2;
+            html += ' | <b>Nivel 3:</b> ' + n3;
+        } else if (nivel == 4) {
+            html += ' | <b>Nivel 1:</b> ' + n1;
+            html += ' | <b>Nivel 2:</b> ' + n2;
+            html += ' | <b>Nivel 3:</b> ' + n3;
+            html += ' | <b>Nivel 4:</b> ' + n4;
+        }
+
+        html += ' | <b>Actividad:</b> ' + nom_act;
+        //Agregar botón para agregar tareas
+        html += ' <a id="nuevaTarea" role="button" class="btn tip-left" title="Nueva tarea" \n\
+        onclick="nuevaTarea()">Nueva tarea<li class="icon-plus-sign"></li></a>';
+        html += '</div>';
+
+        html += '<div class="widget-box">';
+        html += '<div class="widget-title">';
+        html += '<h5>Tareas</h5>';
+        html += '</div>';
+        html += '<div class="widget-content nopadding">';
+        html += '<table id="tablaTarea" class="table table-condensed table-bordered">';
+        html += '<thead>';
+        html += '<tr><th width="5%">#</th><th width="55%">Tarea</th><th width="20%">Unidad Orgánica</th><th width="20%">Puesto</th></tr>';
+        html += '</thead>';
+        html += '<tbody>';
+        html += '</tbody>';
+        html += '</table>';
+        html += '</div>';
+        html += '</div>';
+
+        $('#ventana-modal').empty().html(html);
+        $('#tablaTarea').dataTable({
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "sDom": '<""l>t<"F"fp>'
+        });
+
+        var contador = 0;
+        $.each(data, function (key, obj) {
+            contador++;
+            $('#tablaTarea').DataTable().row.add([
+                contador,
+                "<input type=hidden id='id_tarea' value='" + obj['id_tarea'] + "'><input type=hidden id='id_actividad' value='" + id_act + "'><input type=text name=n1_" + contador + " value='" + obj['descripcion'] + "'  id=n1_" + contador + " style='width:95%;font-size:8pt'>",
+                obj['unidad'],
+                obj['puesto']
+            ]).draw(false);
+        });
+
+        $('#tablaTarea').on('change', 'tr td select', function () {
+
+            var id = ($(this).attr("id"));
+            var valor = $(this).val();
+            var result = id.split('_');
+            var tipo = result[0];
+            var num = result[1];
+
+            if (tipo == 'unidad') {
+                $.ajax({
+                    url: urls.siteUrl + '/admin/procesos/obtener-puestos-actividades',
+                    data: {
+                        unidad: valor,
+                        num: num
+                    },
+                    type: 'post',
+                    success: function (result) {
+                        $("#tablaTarea #puesto_" + num).chosen();
+                        $("#tablaTarea #puesto_" + num + "_chzn").css('font-size', '7.5pt');
+                        $("#tablaTarea #puesto_" + num + "_chzn").css('width', '230px');
+                    }
+                });
+            }
+        });
+
+        $('#ventana-modal').dialog({
+            height: 550,
+            width: 1200,
+            modal: true,
+            resizable: false,
+            title: 'Lista de tareas',
+            buttons: {
+                "Guardar": function () {
+                    dialog = $(this);
+
+                    var selectedItems = new Array();
+                    var recursosAdd = '';
+                    var recursosDelete = '';
+                    var pr = '';
+
+                    $("input[@name='check_recursos[]']:checked").each(function () {
+                        selectedItems.push($(this).val());
+                        recursosAdd += $(this).val() + ',';
+                    });
+
+                    $("input[@name='check_recursos[]']:not(:checked)").each(function () {
+                        if ($(this).val() != '')
+                            recursosDelete += $(this).val() + ',';
+                    });
+
+                    $.ajax({
+                        url: urls.siteUrl + '/admin/recurso/agregar-recursos',
+                        data: {
+                            rec_add: selectedItems,
+                            rec_del: recursosDelete,
+                            rol: rol
+                        },
+                        type: 'post',
+                        success: function (result) {
+                            location.reload();
+                        }
+                    });
+                },
+                "Cancelar": function () {
+                    $(this).dialog("close");
+                }
+            },
+            close: function () {
+            }
+        });
+    };
+
+    nuevaTarea = function () {
+
+        mensaje("ggg");
+
+    };
+
+
 
 
 
     //Nueva actividad
-    //$("#nuevaActividad1").click(function () {
     nuevaActividad = function () {
 
         var nivel = $("#nivel").val();
         var n0 = $("#n0").val();
         var n0_nom = $("#n0 option:selected").text();
         var n1 = $("#n1").val();
-        var n1_nom = $("#n1 option:selected").text();
         var n2 = $("#n2").val();
-        var n2_nom = $("#n2 option:selected").text();
         var n3 = $("#n3").val();
-        var n3_nom = $("#n3 option:selected").text();
         var n4 = $("#n3").val();
         var proceso;
 
@@ -191,9 +383,8 @@ $(document).ready(function () {
             return false;
         }
 
-        var numReg = ($('#tabla').DataTable().data().count() / 4) + 1;
+        var numReg = ($('#tabla').DataTable().data().count() / 5) + 1;
 
-//hiden
         $("#nuevaActividad").attr('onclick', '');
         if (nivel >= 1) {
 
@@ -212,26 +403,39 @@ $(document).ready(function () {
                 data: {num: numReg},
                 type: 'post',
                 success: function (result) {
-                    $("#nuevaActividad").attr('onclick','nuevaActividad()');
+
+                    //aqui select
+                    var select = '<div style="float:left"><select id=tarea_' + numReg + '>';
+                    //Si tiene tarea
+                    select += '<option value=1>Sí</option>';
+                    select += '<option value=0 selected>No</option>';
+                    select += '</select></div>';
+
+                    $("#nuevaActividad").attr('onclick', 'nuevaActividad()');
                     $('#tabla').DataTable().row.add([
                         numReg,
                         "<input type=hidden id='id_actividad' value='0'><input type=hidden id='id_proceso' value='" + proceso + "'><input type=text name=n1_" + numReg + " id=n1_" + numReg + " style='width:95%;font-size:8pt'>",
                         result,
-                        "<div id='capa_" + numReg + "'></div>"
+                        "<div id='capa_" + numReg + "'></div>",
+                        select
                     ]).draw(false);
 
+                    $("#tarea_" + numReg).chosen();
+                    $("#tarea_" + numReg + "_chzn").css('font-size', '7.5pt');
+                    $("#tarea_" + numReg + "_chzn").css('width', '50px');
+                    $("#tarea_" + numReg + "_chzn .chzn-drop .chzn-search input").css('width', '50px');
+
                     $("#unidad_" + numReg).chosen();
-                    $("#unidad_" + numReg + "_chzn").css('font-size', '8pt');
-                    $("#unidad_" + numReg + "_chzn").css('width', '250px');
+                    $("#unidad_" + numReg + "_chzn").css('font-size', '7.5pt');
+                    $("#unidad_" + numReg + "_chzn").css('width', '230px');
                     $("#capa_" + numReg).empty().append("<select id='puesto_" + numReg + "'><option value=''>[Seleccione puesto]</option></select>");
                     $("#puesto_" + numReg).chosen();
-                    $("#puesto_" + numReg + "_chzn").css('font-size', '8pt');
-                    $("#puesto_" + numReg + "_chzn").css('width', '250px');
+                    $("#puesto_" + numReg + "_chzn").css('font-size', '7.5pt');
+                    $("#puesto_" + numReg + "_chzn").css('width', '230px');
                     $("#tabla_wrapper").show();
                     $("#nuevaActividad").show();
                 }
             });
-            
         }
     };
 
@@ -326,8 +530,6 @@ $(document).ready(function () {
             $('#tabla').DataTable().clear().draw();
 
         }
-        //$("#tabla_wrapper").hide();
-        //$("#tabla_wrapper").hide();
     });
 
     var setearListas = function () {
@@ -407,6 +609,8 @@ $(document).ready(function () {
         var n0 = $("#n0").val();
         var n1 = $("#n1").val();
         var nivel = parseInt($("#nivel").val());
+        var select = '';
+        var detalleTarea = '';
         $('#tabla').DataTable().clear().draw();
         $("#tabla_wrapper").hide();
         $("#nuevaActividad").hide();
@@ -483,18 +687,52 @@ $(document).ready(function () {
                     $('#tabla').DataTable().clear().draw();
                     $.each(result, function (key, obj) {
                         contador++;
+
+                        //Evaluar si tiene tarea
+                        select = '<div style="float:left"><select id=tarea_' + contador + '>';
+                        if (obj['tiene_tarea'] == 1) { //Si tiene tarea
+                            select += '<option value=1 selected>Sí</option>';
+                            select += '<option value=0>No</option>';
+
+                        } else {
+                            select += '<option value=1>Sí</option>';
+                            select += '<option value=0 selected>No</option>';
+                        }
+
+                        select += '</select></div>';
+                        detalleTarea = '<div id="capa_tarea_' + contador + '" style="float:left">\n\
+                        <a id="nuevaTarea_' + contador + '" id_actividad=' + obj['id_actividad'] + ' nom_act="' + obj['descripcion'] + '" role="button" class="btn btn-default btn-xs tip-right" title="Ver/Añadir tareas" \n\
+                        ><li class="icon-list"></li></a></div>';
                         $('#tabla').DataTable().row.add([
                             contador,
                             "<input type=hidden id='id_actividad' value='" + obj['id_actividad'] + "'><input type=hidden id='id_proceso' value='" + n1 + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%;font-size:8pt'>",
                             obj['unidad'],
-                            obj['puesto']
+                            obj['puesto'],
+                            select + detalleTarea
                         ]).draw(false);
+                        $("#tarea_" + contador).chosen();
+                        $("#tarea_" + contador + "_chzn").css('font-size', '7.5pt');
+                        $("#tarea_" + contador + "_chzn").css('width', '50px');
+                        $("#tarea_" + contador + "_chzn .chzn-drop .chzn-search input").css('width', '50px');
+
+                        if (obj['tiene_tarea'] == 0) {
+                            $("#capa_tarea_" + contador).hide();
+                        }
+
                         $("#unidad_" + contador).chosen();
-                        $("#unidad_" + contador + "_chzn").css('font-size', '8pt');
-                        $("#unidad_" + contador + "_chzn").css('width', '250px');
+                        $("#unidad_" + contador + "_chzn").css('font-size', '7.5pt');
+                        $("#unidad_" + contador + "_chzn").css('width', '230px');
                         $("#puesto_" + contador).chosen();
-                        $("#puesto_" + contador + "_chzn").css('font-size', '8pt');
-                        $("#puesto_" + contador + "_chzn").css('width', '250px');
+                        $("#puesto_" + contador + "_chzn").css('font-size', '7.5pt');
+                        $("#puesto_" + contador + "_chzn").css('width', '230px');
+
+                        if (obj['tiene_tarea'] == 1) { //Si tiene tarea
+                            select += '<option value=1 selected>Sí</option>';
+                            select += '<option value=0>No</option>';
+                            $("#unidad_" + contador + "_chzn").hide();
+                            $("#puesto_" + contador + "_chzn").hide();
+                        }
+
                     });
 
 
@@ -578,11 +816,11 @@ $(document).ready(function () {
                             obj['puesto']
                         ]).draw(false);
                         $("#unidad_" + contador).chosen();
-                        $("#unidad_" + contador + "_chzn").css('font-size', '8pt');
-                        $("#unidad_" + contador + "_chzn").css('width', '250px');
+                        $("#unidad_" + contador + "_chzn").css('font-size', '7.5pt');
+                        $("#unidad_" + contador + "_chzn").css('width', '230px');
                         $("#puesto_" + contador).chosen();
-                        $("#puesto_" + contador + "_chzn").css('font-size', '8pt');
-                        $("#puesto_" + contador + "_chzn").css('width', '250px');
+                        $("#puesto_" + contador + "_chzn").css('font-size', '7.5pt');
+                        $("#puesto_" + contador + "_chzn").css('width', '230px');
                     });
 
                     $("#nuevaActividad").show();
@@ -670,11 +908,11 @@ $(document).ready(function () {
                             obj['puesto']
                         ]).draw(false);
                         $("#unidad_" + contador).chosen();
-                        $("#unidad_" + contador + "_chzn").css('font-size', '8pt');
-                        $("#unidad_" + contador + "_chzn").css('width', '250px');
+                        $("#unidad_" + contador + "_chzn").css('font-size', '7.5pt');
+                        $("#unidad_" + contador + "_chzn").css('width', '230px');
                         $("#puesto_" + contador).chosen();
-                        $("#puesto_" + contador + "_chzn").css('font-size', '8pt');
-                        $("#puesto_" + contador + "_chzn").css('width', '250px');
+                        $("#puesto_" + contador + "_chzn").css('font-size', '7.5pt');
+                        $("#puesto_" + contador + "_chzn").css('width', '230px');
                     });
 
                     $("#nuevaActividad").show();
@@ -732,16 +970,20 @@ $(document).ready(function () {
                         obj['puesto']
                     ]).draw(false);
                     $("#unidad_" + contador).chosen();
-                    $("#unidad_" + contador + "_chzn").css('font-size', '8pt');
-                    $("#unidad_" + contador + "_chzn").css('width', '250px');
+                    $("#unidad_" + contador + "_chzn").css('font-size', '7.5pt');
+                    $("#unidad_" + contador + "_chzn").css('width', '230px');
                     $("#puesto_" + contador).chosen();
-                    $("#puesto_" + contador + "_chzn").css('font-size', '8pt');
-                    $("#puesto_" + contador + "_chzn").css('width', '250px');
+                    $("#puesto_" + contador + "_chzn").css('font-size', '7.5pt');
+                    $("#puesto_" + contador + "_chzn").css('width', '230px');
                 });
 
                 $("#nuevaActividad").show();
                 $("#grabarActividad").show();
                 $("#tabla_wrapper").show();
+
+                //Programar el select
+
+
             }
         });
     });

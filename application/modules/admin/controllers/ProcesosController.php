@@ -12,6 +12,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
     private $_tipoProceso;
     private $_unidad;
     private $_puesto;
+    private $_tarea;
     private $_proyecto;
 
     public function init() {
@@ -25,6 +26,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
         $this->_tipoProceso = new Application_Model_Tipoproceso;
         $this->_unidad = new Application_Model_UnidadOrganica;
         $this->_puesto = new Application_Model_Puesto;
+        $this->_tarea = new Application_Model_Tarea;
 
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
         $this->_proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
@@ -484,6 +486,36 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
         }
         $option.="</select>";
         echo $option;
+    }
+    
+    //Considerar también el nivel que se envíe por el ajax
+    public function obtenerTareaAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        if ($this->_hasParam('actividad')) {
+            $actividad = $this->_getParam('actividad');
+            $dataTarea = $this->_tarea->obtenerTarea($this->_proyecto, $actividad);
+
+            $contador = 0;
+            foreach ($dataTarea as $value) {
+                $dataTarea[$contador]['unidad'] = $this->getHelper('unidadorganica')->select($this->_proyecto, $value['id_uorganica'], $contador + 1);
+                $dataTarea[$contador]['puesto'] = $this->getHelper('puesto')->select($value['id_uorganica'], $value['id_puesto'], $contador + 1);
+                $contador++;
+            }
+
+            echo Zend_Json::encode($dataTarea);
+        }
     }
 
 }

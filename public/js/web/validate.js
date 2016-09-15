@@ -30,7 +30,6 @@ function validarCampos(json) {
     return false;
 }
 
-
 alert = function (texto) {
     $('#ventana-modal').empty().html(texto);
     $("#ventana-modal").dialog({
@@ -44,6 +43,19 @@ alert = function (texto) {
             }
         }
     });
+};
 
-
+mensaje = function (texto) {
+    $('#ventana-mensaje').empty().html(texto);
+    $("#ventana-mensaje").dialog({
+        modal: true,
+        width: 300,
+        title: 'Mensaje del sistema',
+        resizable: false,
+        buttons: {
+            Cerrar: function () {
+                $(this).dialog("close");
+            }
+        }
+    });
 };
