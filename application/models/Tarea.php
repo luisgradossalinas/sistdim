@@ -41,6 +41,7 @@ class Application_Model_Tarea extends Zend_Db_Table
         return $this->getAdapter()->select()->from($this->_name)
                 ->where('id_proyecto = ?', $proyecto)
                 ->where('id_actividad = ?', $actividad)
+                ->where('estado = ?', self::ESTADO_ACTIVO)
                 ->query()->fetchAll();
     }
 }

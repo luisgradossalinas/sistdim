@@ -30,6 +30,7 @@ function validarCampos(json) {
     return false;
 }
 
+/*
 alert = function (texto) {
     $('#ventana-modal').empty().html(texto);
     $("#ventana-modal").dialog({
@@ -44,8 +45,9 @@ alert = function (texto) {
         }
     });
 };
+*/
 
-mensaje = function (texto) {
+alert = function (texto) {
     $('#ventana-mensaje').empty().html(texto);
     $("#ventana-mensaje").dialog({
         modal: true,

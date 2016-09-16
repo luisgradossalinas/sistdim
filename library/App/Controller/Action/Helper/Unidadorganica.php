@@ -6,11 +6,11 @@ class App_Controller_Action_Helper_Unidadorganica extends Zend_Controller_Action
     private $_unidadOrganica;
 
  
-    public function select($proyecto, $unidad, $contador) {
+    public function select($proyecto, $unidad, $contador, $tarea = '') {
         
         $this->_unidadOrganica = new Application_Model_UnidadOrganica;
         $dataUnidad = $this->_unidadOrganica->obtenerUOrganica($proyecto, null);
-        $select = "<select id='unidad_" . $contador . "'>".
+        $select = "<select id='".$tarea."unidad_" . $contador . "'>".
                 "<option value=''>[Seleccione unidad orgánica]</option>";
         foreach ($dataUnidad as $data) {
             if ($unidad == $data['id_uorganica']) {

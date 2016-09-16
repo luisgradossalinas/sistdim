@@ -292,13 +292,20 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
                 $actividad = $add[0];
                 if ($add[0] == 0) { //Nuevo
                     $dataActividad = array('id_actividad' => $add[0], 'descripcion' => $add[2], 'id_proceso' => $add[1], 'nivel' => $nivel,
-                        'id_uorganica' => $add[3], 'id_puesto' => $add[4],
+                        'id_uorganica' => $add[3], 'id_puesto' => $add[4], 'tiene_tarea' => $add[5],
                         'id_proyecto' => $this->_proyecto, 'usuario_crea' => $this->_usuario, 'fecha_crea' => date("Y-m-d H:i:s"));
                 } else {
                     $dataActividad = array('id_actividad' => $add[0], 'descripcion' => $add[2], 'id_proceso' => $add[1], 'nivel' => $nivel,
-                        'id_uorganica' => $add[3], 'id_puesto' => $add[4],
+                        'id_uorganica' => $add[3], 'id_puesto' => $add[4], 'tiene_tarea' => $add[5],
                         'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
                 }
+
+                if ($add[5] == 0) { //No tiene tarea
+                    //Cambiar de estado a elimnado a las tareas que tuvo la actividad si antes se registraron tareas
+                    $where = $this->getAdapter()->quoteInto('id_actividad = ?', $actividad);
+                    $this->_tarea->update(array('estado' => 0), $where);
+                }
+
                 $this->_actividad->guardar($dataActividad);
             }
 
@@ -310,7 +317,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
                 $flag->update(array('tiene_actividad' => 1), $where);
             }
         }
-        echo Zend_Json::encode('Actividades actualizadas satisfactoriamente.');
+        echo Zend_Json::encode('Actividades grabadas satisfactoriamente.');
     }
 
     //Considerar también el nivel que se envíe por el ajax
@@ -363,6 +370,9 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
             $nivel = $this->_getParam('nivel');
             $dataProceso1 = $this->_proceso1->obtenerProcesos1Actividad($n0, $nivel);
             echo Zend_Json::encode($dataProceso1);
+            
+            
+            
         }
     }
 
@@ -449,9 +459,10 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
         $proyecto = $this->_proyecto;
         $dataUOrganica = $this->_unidad->obtenerUOrganica($proyecto, null);
         $num = $this->_getParam('num');
+        $tarea = $this->_getParam('tarea');
 
         //Enviar select con html
-        $option = "<select id='unidad_" . $num . "'>";
+        $option = "<select id='" . $tarea . "unidad_" . $num . "'>";
         $option .= "<option value=''>[Seleccione unidad orgánica]</option>";
         foreach ($dataUOrganica as $value) {
             $option .= "<option value='" . $value['id_uorganica'] . "'>" . $value['descripcion'] . "</option>";
@@ -476,10 +487,11 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
 
         $unidad = $this->_getParam('unidad');
         $num = $this->_getParam('num');
+        $tarea = $this->_getParam('tarea');
         $dataPuesto = $this->_puesto->puestosActividades($unidad);
 
         //Enviar select con html
-        $option = "<select id='puesto_" . $num . "'>";
+        $option = "<select id='" . $tarea . "puesto_" . $num . "'>";
         $option .= "<option value=''>[Seleccione puesto]</option>";
         foreach ($dataPuesto as $value) {
             $option .= "<option value='" . $value['id_puesto'] . "'>" . $value['descripcion'] . "</option>";
@@ -487,7 +499,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
         $option.="</select>";
         echo $option;
     }
-    
+
     //Considerar también el nivel que se envíe por el ajax
     public function obtenerTareaAction() {
 
@@ -509,13 +521,54 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
 
             $contador = 0;
             foreach ($dataTarea as $value) {
-                $dataTarea[$contador]['unidad'] = $this->getHelper('unidadorganica')->select($this->_proyecto, $value['id_uorganica'], $contador + 1);
-                $dataTarea[$contador]['puesto'] = $this->getHelper('puesto')->select($value['id_uorganica'], $value['id_puesto'], $contador + 1);
+                $dataTarea[$contador]['unidad'] = $this->getHelper('unidadorganica')->select($this->_proyecto, $value['id_uorganica'], $contador + 1, 't');
+                $dataTarea[$contador]['puesto'] = $this->getHelper('puesto')->select($value['id_uorganica'], $value['id_puesto'], $contador + 1, 't');
                 $contador++;
             }
 
             echo Zend_Json::encode($dataTarea);
         }
+    }
+
+    public function grabarTareaAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $data = $this->_getAllParams();
+        $actividad = $data['actividad'];
+
+        //Considerar un flag para validar si tiene hijos el proceso
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        $tarea = isset($data['tarea']) ? $data['tarea'] : array();
+        if (count($tarea) > 0) {
+
+            foreach ($tarea as $reg) {
+
+                $add = explode("|", $reg);
+                //$actividad = $add[0];
+                if ($add[0] == 0) { //Nuevo
+                    $dataTarea = array('id_tarea' => $add[0], 'descripcion' => $add[2], 'id_actividad' => $add[1],
+                        'id_uorganica' => $add[3], 'id_puesto' => $add[4],
+                        'id_proyecto' => $this->_proyecto, 'usuario_crea' => $this->_usuario, 'fecha_crea' => date("Y-m-d H:i:s"));
+                } else {
+                    $dataTarea = array('id_tarea' => $add[0], 'descripcion' => $add[2], 'id_actividad' => $add[1],
+                        'id_uorganica' => $add[3], 'id_puesto' => $add[4],
+                        'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                }
+                $this->_tarea->guardar($dataTarea);
+            }
+
+            //Actualizar flag para indicar que tiene tareas la actividad
+            //Y actualizar campos de unidad orgánica y puesto 
+            $campo = 'id_actividad';
+            $where = $this->getAdapter()->quoteInto($campo . '= ?', $actividad);
+            $this->_actividad->update(array('tiene_tarea' => 1, 'id_uorganica' => '', 'id_puesto' => ''), $where);
+        }
+        echo Zend_Json::encode('Tareas grabadas satisfactoriamente.');
     }
 
 }
