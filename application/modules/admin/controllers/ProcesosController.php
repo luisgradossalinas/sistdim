@@ -290,9 +290,10 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
 
                 $add = explode("|", $reg);
                 $actividad = $add[0];
+                $maxCodigo = $this->_actividad->obtenerMaxPosicion($nivel, $add[1]) + 1;
                 if ($add[0] == 0) { //Nuevo
                     $dataActividad = array('id_actividad' => $add[0], 'descripcion' => $add[2], 'id_proceso' => $add[1], 'nivel' => $nivel,
-                        'id_uorganica' => $add[3], 'id_puesto' => $add[4], 'tiene_tarea' => $add[5],
+                        'id_uorganica' => $add[3], 'id_puesto' => $add[4], 'tiene_tarea' => $add[5], 'codigo_actividad' => $maxCodigo,
                         'id_proyecto' => $this->_proyecto, 'usuario_crea' => $this->_usuario, 'fecha_crea' => date("Y-m-d H:i:s"));
                 } else {
                     $dataActividad = array('id_actividad' => $add[0], 'descripcion' => $add[2], 'id_proceso' => $add[1], 'nivel' => $nivel,
@@ -370,9 +371,6 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
             $nivel = $this->_getParam('nivel');
             $dataProceso1 = $this->_proceso1->obtenerProcesos1Actividad($n0, $nivel);
             echo Zend_Json::encode($dataProceso1);
-            
-            
-            
         }
     }
 
@@ -525,7 +523,6 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
                 $dataTarea[$contador]['puesto'] = $this->getHelper('puesto')->select($value['id_uorganica'], $value['id_puesto'], $contador + 1, 't');
                 $contador++;
             }
-
             echo Zend_Json::encode($dataTarea);
         }
     }
@@ -569,6 +566,29 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
             $this->_actividad->update(array('tiene_tarea' => 1, 'id_uorganica' => '', 'id_puesto' => ''), $where);
         }
         echo Zend_Json::encode('Tareas grabadas satisfactoriamente.');
+    }
+
+    public function cambiarPosicionAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        if ($data['tipo'] == 'actividad') {
+            $dataRpta = $this->_actividad->cambiarPosicion($data['nivel'], $data['proceso'], $data['actividad'], $data['anterior'], $data['nueva']);
+        } else if ($data['tipo'] == 'tarea') {
+            $dataRpta = $this->_tarea->cambiarPosicion($data['actividad'], $data['tarea'], $data['anterior'], $data['nueva']);
+        }
+
+        echo Zend_Json::encode($dataRpta);
     }
 
 }

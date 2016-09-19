@@ -55,13 +55,6 @@
     <div style="float:left" id="div_n4">
         <select id="n4" name="n4">
             <option value=''>[Proceso nivel 4]</option>
-            <?php
-            /*
-              foreach ($this->proceso3 as $val) {
-              echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
-              }
-             * */
-            ?>
         </select>
     </div>
     <div style="float:left">
@@ -82,7 +75,8 @@
     <div class="widget-content nopadding">
         <table id='tabla' width="100%" class="table table-condensed table-bordered" style="font-size: 7pt">
             <thead>
-                <tr><th id="thid" width="4%">#</th><th id="tha" width="50%">Actividad</th>
+                <tr>
+                    <th id="thid" width="6%">#</th><th id="tha" width="50%">Actividad</th>
                     <th id="thuo" width="15%">Unidad Orgánica</th><th id="thp" width="15%">Puesto</th>
                     <th id="tht" width="12%">¿Tarea?</th>
                 </tr>
