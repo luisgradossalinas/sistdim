@@ -94,17 +94,27 @@ class Application_Model_Actividad extends Zend_Db_Table {
         }
 
         return 'Posición actualizada';
-
     }
-    
-    public function obtenerActividadPuesto($puesto) {
-        return $this->getAdapter()->select()->from(array('a' => $this->_name))
-                ->joinInner(array('p' => Application_Model_Puesto::TABLA), 'p.id_puesto = a.id_puesto',
-                        array('id_puesto','puesto' => 'descripcion','codigo_grupo','codigo_familia'))
-                        ->where('a.id_puesto = ?', $puesto)
-                        ->where('a.estado = ?', self::ESTADO_ACTIVO)
-                        //->order('codigo_actividad asc')
-                        ->query()->fetchAll();
+
+    public function obtenerActividadTareaPuesto($puesto) {
+
+        $sqlActividades = $this->getAdapter()->select()->from(array('a' => $this->_name), array('id_actividad', 'codigo_actividad',
+                    'descripcion', 'id_proceso', 'nivel', 'id_tarea' => new Zend_Db_Expr("0"), 'tarea' => new Zend_Db_Expr("0"),
+                    'id_puesto', 'id_nivel_puesto', 'id_categoria_puesto', 'nombre_puesto'))
+                ->joinInner(array('p' => Application_Model_Puesto::TABLA), 'p.id_puesto = a.id_puesto', array('puesto' => 'descripcion', 'codigo_grupo', 'codigo_familia'))
+                ->where('a.id_puesto = ?', $puesto);
+
+        $sqlTarea = $this->getAdapter()->select()->from(array('a' => $this->_name), array('id_actividad', 'codigo_actividad',
+                    'descripcion', 'id_proceso', 'nivel'))
+                ->joinInner(array('t' => Application_Model_Tarea::TABLA), 't.id_actividad = a.id_actividad', array('id_tarea', 'tarea' => 'descripcion', 'id_puesto', 'id_nivel_puesto', 'id_categoria_puesto', 'nombre_puesto'))
+                ->joinInner(array('p' => Application_Model_Puesto::TABLA), 'p.id_puesto = t.id_puesto', array('puesto' => 'descripcion', 'codigo_grupo', 'codigo_familia'))
+                ->where('t.id_puesto = ?', $puesto)
+                ->where('a.estado = ?', self::ESTADO_ACTIVO);
+
+        return $this->getAdapter()->select()
+             ->union(array($sqlActividades, $sqlTarea))
+             ->order(array('nivel asc','id_proceso asc','codigo_actividad asc'))->query()->fetchAll();
+        
     }
 
 }

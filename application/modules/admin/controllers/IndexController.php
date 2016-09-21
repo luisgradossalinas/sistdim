@@ -76,6 +76,7 @@ class Admin_IndexController extends App_Controller_Action_Admin
     public function misDatosAction() {
         
         Zend_Layout::getMvcInstance()->assign('padre', 1);
+        Zend_Layout::getMvcInstance()->assign('active', 'Mis datos');
         Zend_Layout::getMvcInstance()->assign('link', 'misdatos');
 
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');

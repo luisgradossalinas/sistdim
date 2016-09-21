@@ -1,6 +1,6 @@
 <?php
 
-class Admin_PertinenciaController extends App_Controller_Action_Admin {
+class Admin_DotacionController extends App_Controller_Action_Admin {
 
     private $_organoModel;
     private $_actividad;
@@ -18,16 +18,16 @@ class Admin_PertinenciaController extends App_Controller_Action_Admin {
         $this->_proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
         $this->_usuario = $sesion_usuario->sesion_usuario['id'];
 
-        $this->view->headScript()->appendFile(SITE_URL . '/js/web/pertinencia.js');
+        $this->view->headScript()->appendFile(SITE_URL . '/js/web/dotacion.js');
         Zend_Layout::getMvcInstance()->assign('show', '1'); //No mostrar en el menú la barra horizontal
         parent::init();
     }
 
     public function indexAction() {
 
-        Zend_Layout::getMvcInstance()->assign('active', 'Análisis de pertinencia');
-        Zend_Layout::getMvcInstance()->assign('padre', 6);
-        Zend_Layout::getMvcInstance()->assign('link', 'pertinencia');
+        Zend_Layout::getMvcInstance()->assign('active', 'Registrar tiempos y frecuencias');
+        Zend_Layout::getMvcInstance()->assign('padre', 7);
+        Zend_Layout::getMvcInstance()->assign('link', 'dotacion');
 
         $this->view->organo = $this->_organoModel->obtenerOrgano($this->_proyecto);
     }

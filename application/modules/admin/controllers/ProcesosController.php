@@ -293,7 +293,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
                 $maxCodigo = $this->_actividad->obtenerMaxPosicion($nivel, $add[1]) + 1;
                 if ($add[0] == 0) { //Nuevo
                     $dataActividad = array('id_actividad' => $add[0], 'descripcion' => $add[2], 'id_proceso' => $add[1], 'nivel' => $nivel,
-                        'id_uorganica' => $add[3], 'id_puesto' => $add[4], 'tiene_tarea' => $add[5], 'codigo_actividad' => $maxCodigo,
+                        'id_uorganica' => $add[3], 'id_puesto' => $add[4], 'tiene_tarea' => $add[5], 'codigo_actividad' => $maxCodigo, 'nombre_puesto' => '',
                         'id_proyecto' => $this->_proyecto, 'usuario_crea' => $this->_usuario, 'fecha_crea' => date("Y-m-d H:i:s"));
                 } else {
                     $dataActividad = array('id_actividad' => $add[0], 'descripcion' => $add[2], 'id_proceso' => $add[1], 'nivel' => $nivel,
@@ -551,7 +551,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
                 $maxCodigo = $this->_tarea->obtenerMaxPosicion($add[1]) + 1;
                 if ($add[0] == 0) { //Nuevo
                     $dataTarea = array('id_tarea' => $add[0], 'descripcion' => $add[2], 'id_actividad' => $add[1],
-                        'id_uorganica' => $add[3], 'id_puesto' => $add[4], 'codigo_tarea' => $maxCodigo,
+                        'id_uorganica' => $add[3], 'id_puesto' => $add[4], 'codigo_tarea' => $maxCodigo, 'nombre_puesto' => '',
                         'id_proyecto' => $this->_proyecto, 'usuario_crea' => $this->_usuario, 'fecha_crea' => date("Y-m-d H:i:s"));
                 } else {
                     $dataTarea = array('id_tarea' => $add[0], 'descripcion' => $add[2], 'id_actividad' => $add[1],
