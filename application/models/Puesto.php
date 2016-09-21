@@ -48,7 +48,7 @@ class Application_Model_Puesto extends Zend_Db_Table {
                 ->joinInner(array('rp' => Application_Model_Rolpuesto::TABLA), 'rp.codigo_rol_puesto = p.codigo_rol_puesto',
                         array('codigo_rol_puesto','rpuesto' => 'descripcion'))
                 ->where('p.id_uorganica = ?', $unidad)
-                ->order('p.id_puesto asc')
+                ->order('p.descripcion asc')
                 ->query()->fetchAll();
     }
     

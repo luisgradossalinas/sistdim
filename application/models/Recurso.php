@@ -196,7 +196,6 @@ class Application_Model_Recurso extends Zend_Db_Table {
                             ->where("r.servir = ?", self::SERVIR)
                             ->where("r.orden  <> ?", self::PADRE)->query()->fetchAll();
         }
-
         return $this->getAdapter()->select()->from(array("r" => $this->_name), array(
                             'id_recurso' => 'r.id', 'r.nombre', 'estado_permiso' => new Zend_Db_Expr("IFNULL(rr.estado,0)")))
                         ->joinLeft(array("rr" => Application_Model_RolRecurso::TABLA), 'rr.id_recurso = r.id', array())

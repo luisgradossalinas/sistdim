@@ -4,12 +4,12 @@ $(document).ready(function(){
         
     configModal = function(id, ope, titulo,usuario){
 
-        controlador = 'mvc';
+        var controlador = 'mvc';
         if (usuario == "usuario") {//Viene por misdatos
             controlador = 'index';
         }
-        codigo = id;
-        sentencia_crud = ope;
+        var codigo = id;
+        var sentencia_crud = ope;
         $.ajax({
             url: urls.siteUrl + '/admin/'+controlador+'/operacion/ajax/form',
             data:{id:id},
@@ -35,10 +35,7 @@ $(document).ready(function(){
                         success: function(result) {
                             $('#orden').val(result);
                         }
-                        
-                        
                     })
-                    
                })
                    
                 $('#ventana-modal').dialog({

@@ -96,5 +96,15 @@ class Application_Model_Actividad extends Zend_Db_Table {
         return 'Posición actualizada';
 
     }
+    
+    public function obtenerActividadPuesto($puesto) {
+        return $this->getAdapter()->select()->from(array('a' => $this->_name))
+                ->joinInner(array('p' => Application_Model_Puesto::TABLA), 'p.id_puesto = a.id_puesto',
+                        array('id_puesto','puesto' => 'descripcion','codigo_grupo','codigo_familia'))
+                        ->where('a.id_puesto = ?', $puesto)
+                        ->where('a.estado = ?', self::ESTADO_ACTIVO)
+                        //->order('codigo_actividad asc')
+                        ->query()->fetchAll();
+    }
 
 }

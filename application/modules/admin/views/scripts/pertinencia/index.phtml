@@ -1,0 +1,45 @@
+<style>
+    #tabla input, #tabla select {
+        font-size:8pt
+    }    
+</style>
+<?= $this->partial('_partials/mensajes.phtml', array('messages' => $this->messages, 'tipoMessages' => $this->tipoMessages)); ?>
+<div style="float:left">
+    <select id="organo" name="organo">
+        <option value=''>[Seleccione órgano]</option>
+        <?php
+        foreach ($this->organo as $val) {
+            echo "<option value=" . $val['id_organo'] . ">" . $val['organo'] . "</option>";
+        }
+        ?>
+    </select>
+    <input type="hidden" id="mapaPuesto" name="mapaPuesto" value="<?= $this->mapaPuesto ?>">
+</div>
+<div id="capa" style="float:left"></div>
+<div id="capa_puesto" style="float:left"></div>
+<a id="grabarPuestos"  role="button" class="btn tip-right" onclick="grabarPuestos()" title="Grabar">
+    <li class="icon-check"></li>Grabar
+</a>
+<div class="widget-box">
+    <div class="widget-title">	
+        <h5><?= $this->active ?></h5>
+    </div>
+    <div class="widget-content nopadding">
+        <table id='tablaPertinencia' width="100%" class="table table-condensed table-bordered" style="font-size: 7.5pt">
+            <thead>
+                <tr>
+                    <th width="4%">#</th>
+                    <th width="21%">Actividad</th>
+                    <th width="13%">Tarea</th>
+                    <th width="9%">Ejecutor</th>
+                    <th width="18%">Nivel</th>
+                    <th width="22%">Categoría</th>
+                    <th width="14%">Nombre del Puesto</th>
+                </tr>
+            </thead>
+            <tbody>     
+            </tbody>
+        </table>
+    </div>
+</div>
+<?= $this->partial('_partials/modal.phtml', array('model' => $this->model)); ?>

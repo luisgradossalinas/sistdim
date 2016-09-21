@@ -29,7 +29,7 @@ $(document).ready(function () {
             alert('No existen actividades para grabar');
             return false;
         }
-
+        
         //Recorrer toda la tabla
         $("#tabla tbody tr").each(function () {
             contador++;
@@ -37,9 +37,10 @@ $(document).ready(function () {
             id_actividad = $(this).find("td input").eq(0).val();
             proceso = $(this).find("td input").eq(1).val();
             actividad = $(this).find("td input").eq(2).val();
-            unidad = $(this).find("td select").eq(0).val();
-            puesto = $(this).find("td select").eq(1).val();
-            tieneTarea = $(this).find("td select").eq(2).val();
+            
+            unidad = $(this).find("td select").eq(1).val();
+            puesto = $(this).find("td select").eq(2).val();
+            tieneTarea = $(this).find("td select").eq(0).val();
 
             //Validar que cuando se tenga tarea no se obligue seleccionar unidad y puest
             if (tieneTarea == 1) {
@@ -58,12 +59,24 @@ $(document).ready(function () {
             }
             dataActividad.push(id_actividad + "|" + proceso + "|" + actividad + "|" + unidad + "|" + puesto + "|" + tieneTarea);
         });
-
+        
         //Mostrar mensaje si existen datos por completar
         if (mostrarMensaje == 1) {
             alert(mensaje);
             return false;
         }
+        
+        //Validar que se agreguen de 2 a más actividades
+        if ($('#tabla').DataTable().data().count() / 5 == 1) {
+            alert('Debe agregar más de 1 actividad para poder grabar.');
+            return false;
+        }
+
+/*
+        console.log(dataActividad);
+        alert("probando no grabar");
+        return false;
+*/
 
         $.ajax({
             url: urls.siteUrl + '/admin/procesos/grabar-actividad',
@@ -119,9 +132,9 @@ $(document).ready(function () {
                             $('#tabla').DataTable().row.add([
                                 contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + obj['id_proceso'] + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>',
                                 "<input type=hidden id='id_actividad' value='" + obj['id_actividad'] + "'><input type=hidden id='id_proceso' value='" + proceso + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%;font-size:8pt'>",
+                                select + detalleTarea,
                                 obj['unidad'] + '<span style="display:none">' + obj['descripcion'] + "</span>",
-                                obj['puesto'],
-                                select + detalleTarea
+                                obj['puesto']
                             ]).draw(false);
 
                             $("#tarea_" + contador).chosen();
@@ -205,6 +218,7 @@ $(document).ready(function () {
                 $("#puesto_" + num + "_chzn").hide();
                 $("#capa_tarea_" + num).show();
             } else {
+                alert('Si la actividad tiene tareas, se eliminarán.');
                 $("#unidad_" + num + "_chzn").show();
                 $("#puesto_" + num + "_chzn").show();
                 $("#capa_tarea_" + num).hide();
@@ -240,6 +254,7 @@ $(document).ready(function () {
         //Invocar ajax obteniendo las tareas de la actividad
         //Abrir popup con las tareas de las actividades
         if (tipo == 'nuevaTarea') {
+
             $.ajax({
                 url: urls.siteUrl + '/admin/procesos/obtener-tarea',
                 data: {
@@ -332,9 +347,9 @@ $(document).ready(function () {
                                             $('#tabla').DataTable().row.add([
                                                 contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + obj['id_proceso'] + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>',
                                                 "<input type=hidden id='id_actividad' value='" + obj['id_actividad'] + "'><input type=hidden id='id_proceso' value='" + proceso + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%;font-size:8pt'>",
+                                                select + detalleTarea,
                                                 obj['unidad'] + '<span style="display:none">' + obj['descripcion'] + "</span>",
-                                                obj['puesto'],
-                                                select + detalleTarea
+                                                obj['puesto']
                                             ]).draw(false);
 
                                             $("#tarea_" + contador).chosen();
@@ -365,13 +380,8 @@ $(document).ready(function () {
                                         $("#tabla_wrapper").show();
                                     }
                                 });
-
-
-
-
                             }
                         });
-
                     },
                     Cerrar: function () {
                         $(this).dialog("close");
@@ -430,12 +440,12 @@ $(document).ready(function () {
         html += '</div>';
         html += '</div>';
 
-        $('#ventana-modal').empty().html(html);
+        $('#ventana-modal').empty().html(html);       
         $('#tablaTarea').dataTable({
-            "bJQueryUI": true,
-            "sPaginationType": "full_numbers",
-            "sDom": '<""l>t<"F"fp>'
-        });
+		"bJQueryUI": true,
+		"sPaginationType": "full_numbers",
+                 "lengthMenu": [[50, -1], [50, "All"]]
+	});
 
         var contador = 0;
         $.each(data, function (key, obj) {
@@ -512,7 +522,6 @@ $(document).ready(function () {
                                     $('#ventana-modal').dialog("close");
                                     //Actualizar las posiciones con ajax
                                     //ajax obtener actividades
-
                                 }
                             });
 
@@ -522,11 +531,7 @@ $(document).ready(function () {
                         }
                     }
                 });
-
             }
-
-
-
         });
 
         $('#tablaTarea').on('change', 'tr td select', function () {
@@ -604,6 +609,11 @@ $(document).ready(function () {
                     //Mostrar mensaje si existen datos por completar
                     if (mostrarMensaje == 1) {
                         alert(mensajito);
+                        return false;
+                    }
+                    
+                    if ($('#tablaTarea').DataTable().data().count() / 4 == 1) {
+                        alert('Debe agregar más de 1 tarea para poder grabar.');
                         return false;
                     }
 
@@ -732,9 +742,9 @@ $(document).ready(function () {
                     $('#tabla').DataTable().row.add([
                         numReg,
                         "<input type=hidden id='id_actividad' value='0'><input type=hidden id='id_proceso' value='" + proceso + "'><input type=text name=n1_" + numReg + " id=n1_" + numReg + " style='width:95%;font-size:8pt'>",
+                        select,
                         result,
-                        "<div id='capa_" + numReg + "'></div>",
-                        select
+                        "<div id='capa_" + numReg + "'></div>"
                     ]).draw(false);
 
                     $("#tarea_" + numReg).chosen();
@@ -963,7 +973,11 @@ $(document).ready(function () {
 
                                     //Primero validar que se obtenga data
                                     if (result == '' || result == []) {
-                                        return false;
+                                        $("#tabla_wrapper").show();
+                                        $("#nuevaActividad").show();
+                                        $("#grabarActividad").show();
+                                        //alert('Proceso no tiene nivel 2');
+                                        //return false;
                                     }
 
                                     $('#tabla').DataTable().clear().draw();
@@ -1128,9 +1142,9 @@ $(document).ready(function () {
                                                                                         $('#tabla').DataTable().row.add([
                                                                                             contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + n4 + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>',
                                                                                             "<input type=hidden id='id_actividad' value='" + obj['id_actividad'] + "'><input type=hidden id='id_proceso' value='" + n4 + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%;font-size:8pt'>",
+                                                                                            select + detalleTarea,
                                                                                             obj['unidad'] + '<span style="display:none">' + obj['descripcion'] + "</span>",
-                                                                                            obj['puesto'],
-                                                                                            select + detalleTarea
+                                                                                            obj['puesto']
                                                                                         ]).draw(false);
                                                                                         $("#tarea_" + contador).chosen();
                                                                                         $("#tarea_" + contador + "_chzn").css('font-size', '7.5pt');
@@ -1207,9 +1221,9 @@ $(document).ready(function () {
                                                                             $('#tabla').DataTable().row.add([
                                                                                 contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + n3 + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>',
                                                                                 "<input type=hidden id='id_actividad' value='" + obj['id_actividad'] + "'><input type=hidden id='id_proceso' value='" + n3 + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%;font-size:8pt'>",
+                                                                                select + detalleTarea,
                                                                                 obj['unidad'] + '<span style="display:none">' + obj['descripcion'] + "</span>",
-                                                                                obj['puesto'],
-                                                                                select + detalleTarea
+                                                                                obj['puesto']
                                                                             ]).draw(false);
                                                                             $("#tarea_" + contador).chosen();
                                                                             $("#tarea_" + contador + "_chzn").css('font-size', '7.5pt');
@@ -1284,9 +1298,9 @@ $(document).ready(function () {
                                                             $('#tabla').DataTable().row.add([
                                                                 contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + n2 + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>',
                                                                 "<input type=hidden id='id_actividad' value='" + obj['id_actividad'] + "'><input type=hidden id='id_proceso' value='" + n2 + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%;font-size:8pt'>",
+                                                                select + detalleTarea,
                                                                 obj['unidad'] + '<span style="display:none">' + obj['descripcion'] + "</span>",
-                                                                obj['puesto'],
-                                                                select + detalleTarea
+                                                                obj['puesto']
                                                             ]).draw(false);
                                                             $("#tarea_" + contador).chosen();
                                                             $("#tarea_" + contador + "_chzn").css('font-size', '7.5pt');
@@ -1367,9 +1381,9 @@ $(document).ready(function () {
                                         $('#tabla').DataTable().row.add([
                                             contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + n1 + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>',
                                             "<input type=hidden id='id_actividad' value='" + obj['id_actividad'] + "'><input type=hidden id='id_proceso' value='" + n1 + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%;font-size:8pt'>",
+                                            select + detalleTarea,
                                             obj['unidad'] + '<span style="display:none">' + obj['descripcion'] + "</span>",
-                                            obj['puesto'],
-                                            select + detalleTarea
+                                            obj['puesto']
                                         ]).draw(false);
                                         $("#tarea_" + contador).chosen();
                                         $("#tarea_" + contador + "_chzn").css('font-size', '7.5pt');

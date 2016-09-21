@@ -116,7 +116,7 @@ $(document).ready(function () {
     });
 
     grabarPuestos = function () {
-        
+
         var mapaPuesto = $("#mapaPuesto").val();
         var control = 0;
         if ($('#tabla').DataTable().data().count() == 0) {
@@ -209,7 +209,7 @@ $(document).ready(function () {
         }
 
 
-        $("#grabarPuestos").attr('onclick','');
+        $("#grabarPuestos").attr('onclick', '');
         $.ajax({
             url: urls.siteUrl + '/admin/organigrama/grabar-puestos',
             data: {
@@ -219,7 +219,7 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (result) {
                 alert(result);
-                $("#grabarPuestos").attr('onclick','grabarPuestos()');
+                $("#grabarPuestos").attr('onclick', 'grabarPuestos()');
                 //No refrescar página, sino actualizar con ajac los id
                 var organo = $("#organo").val();
                 var unidad = $("#unidad").val();
@@ -379,6 +379,8 @@ $(document).ready(function () {
                             if (result == '' || result == []) {
                                 alert('No existen puestos, ingrese Nuevos puestos');
                                 $('#tabla').DataTable().clear().draw();
+                                $("#nuevoPuesto").show();
+                                $("#grabarPuestos").show();
                                 return false;
                             }
 
@@ -397,7 +399,6 @@ $(document).ready(function () {
                                     obj['rpuesto'] + "<input type=hidden name=unidadT value='" + unidad + "'>"
                                 ]).draw(false);
                             });
-
                             $("#nuevoPuesto").show();
                             $("#grabarPuestos").show();
                         }

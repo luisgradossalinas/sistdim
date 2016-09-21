@@ -546,10 +546,12 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
             foreach ($tarea as $reg) {
 
                 $add = explode("|", $reg);
+                
                 //$actividad = $add[0];
+                $maxCodigo = $this->_tarea->obtenerMaxPosicion($add[1]) + 1;
                 if ($add[0] == 0) { //Nuevo
                     $dataTarea = array('id_tarea' => $add[0], 'descripcion' => $add[2], 'id_actividad' => $add[1],
-                        'id_uorganica' => $add[3], 'id_puesto' => $add[4],
+                        'id_uorganica' => $add[3], 'id_puesto' => $add[4], 'codigo_tarea' => $maxCodigo,
                         'id_proyecto' => $this->_proyecto, 'usuario_crea' => $this->_usuario, 'fecha_crea' => date("Y-m-d H:i:s"));
                 } else {
                     $dataTarea = array('id_tarea' => $add[0], 'descripcion' => $add[2], 'id_actividad' => $add[1],

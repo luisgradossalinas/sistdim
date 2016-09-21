@@ -61,6 +61,8 @@ class Application_Model_Proceso2 extends Zend_Db_Table {
         if ($nivel == 2) {
             $select->where('tiene_hijo <> ?', self::TIENE_HIJO);
         }
+        
+        
         return $select->query()->fetchAll();
     }
 
