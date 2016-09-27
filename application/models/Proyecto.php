@@ -61,6 +61,7 @@ class Application_Model_Proyecto extends Zend_Db_Table {
         return $this->getAdapter()->select()->from(array("a" => $this->_name))
                         ->joinInner(array('b' => Application_Model_Entidad::TABLA), 'b.id_entidad = a.id_entidad', array('entidad' => 'b.nombre'))
                         ->where('a.estado = ?', self::ESTADO_ACTIVO)
+                        ->order('a.nombre asc')
                         ->query()->fetchAll();
     }
 
@@ -70,6 +71,7 @@ class Application_Model_Proyecto extends Zend_Db_Table {
                         ->joinInner(array('rr' => Application_Model_RolRecurso::TABLA), 'rr.id_proyecto = a.id_proyecto', array())
                         ->where('a.estado = ?', self::ESTADO_ACTIVO)
                         ->where('rr.id_usuario = ?', $usuario)
+                        ->order('a.nombre asc')
                         ->query()->fetchAll();
     }
 

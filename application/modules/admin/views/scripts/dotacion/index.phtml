@@ -17,24 +17,32 @@
 </div>
 <div id="capa" style="float:left"></div>
 <div id="capa_puesto" style="float:left"></div>
-<a id="grabarPertinencia"  role="button" class="btn tip-right" onclick="grabarPertinencia()" title="Grabar">
+<a id="grabarDotacion"  role="button" class="btn tip-right" onclick="grabarDotacion()" title="Grabar">
     <li class="icon-check"></li>Grabar
 </a>
 <div class="widget-box">
     <div class="widget-title">	
         <h5><?= $this->active ?></h5>
     </div>
+    <div id="leyendaDotacion" style="font-size: 9pt"><br><b>Periodicidad:</b> Diaria, semanal, mensual | <b>Frecuencia:</b> (2 veces al día), (3 veces a la semana), (4 veces al mes) | 
+        <b>Tiempo:</b> Minutos, horas, días | <b>Duración:</b> (30 minutos por solicitud) , (2 horas por reunión)</div>
+    <br>
     <div class="widget-content nopadding">
-        <table id='tablaPertinencia' width="100%" class="table table-condensed table-bordered" style="font-size: 7.5pt">
+        <table id='tablaDotacion' width="140%" class="table table-condensed table-bordered" style="font-size: 7.5pt;overflow: auto">
             <thead>
                 <tr>
-                    <th width="5%">#</th>
-                    <th width="21%">Actividad</th>
-                    <th width="14%">Tarea</th>
-                    <th width="10%">Ejecutor</th>
-                    <th width="20%">Nivel</th>
-                    <th width="20%">Categoría</th>
-                    <th width="11%">Nombre del Puesto</th>
+                    <th width="4%" style="text-align: center">#</th>
+                    <th width="9%">Nivel 0</th>
+                    <th width="9%">Nivel 1</th>
+                    <th width="9%">Nivel 2</th>
+                    <th width="9%">Nivel 3</th>
+                    <th width="9%">Nivel 4</th>
+                    <th width="9%">Actividad</th>
+                    <th width="7%">Tarea</th>
+                    <th width="9%">Periodicidad</th>
+                    <th width="8%">Frecuencia</th>
+                    <th width="9%">Unidad</th>
+                    <th width="8%">Duración</th>
                 </tr>
             </thead>
             <tbody>     

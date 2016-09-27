@@ -69,11 +69,6 @@ $(document).ready(function () {
             success: function (result) {
                 alert(result);
                 $("#grabarPertinencia").attr('onclick', 'grabarPertinencia()');
-                
-                //Actualizar tabla de pertinencia
-                
-                
-                
             }
         });
     };

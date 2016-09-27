@@ -112,9 +112,65 @@ class Application_Model_Actividad extends Zend_Db_Table {
                 ->where('a.estado = ?', self::ESTADO_ACTIVO);
 
         return $this->getAdapter()->select()
-             ->union(array($sqlActividades, $sqlTarea))
-             ->order(array('nivel asc','id_proceso asc','codigo_actividad asc'))->query()->fetchAll();
-        
+                        ->union(array($sqlActividades, $sqlTarea))
+                        ->order(array('nivel asc', 'id_proceso asc', 'codigo_actividad asc'))->query()->fetchAll();
+    }
+
+    public function obtenerActividadTareaDotacion($puesto) {
+
+        $sqlActividades = $this->getAdapter()->select()->from(array('a' => $this->_name), array('id_actividad', 'codigo_actividad',
+                    'descripcion', 'id_proceso', 'nivel', 'id_tarea' => new Zend_Db_Expr("0"), 'tarea' => new Zend_Db_Expr("0"), 'id_periodicidad', 'frecuencia', 'id_tiempo', 'duracion'))
+                ->where('a.id_puesto = ?', $puesto);
+
+        $sqlTarea = $this->getAdapter()->select()->from(array('a' => $this->_name), array('id_actividad', 'codigo_actividad',
+                    'descripcion', 'id_proceso', 'nivel'))
+                ->joinInner(array('t' => Application_Model_Tarea::TABLA), 't.id_actividad = a.id_actividad', array('id_tarea', 'tarea' => 'descripcion', 'id_periodicidad', 'frecuencia', 'id_tiempo', 'duracion'))
+                ->where('t.id_puesto = ?', $puesto)
+                ->where('a.estado = ?', self::ESTADO_ACTIVO);
+
+        return $this->getAdapter()->select()
+                        ->union(array($sqlActividades, $sqlTarea))->order(array('nivel asc', 'id_proceso asc', 'codigo_actividad asc'))->query()->fetchAll();
+    }
+
+    /* Esta función es para obtener todos los nombres de los niveles de procesos y 
+      mostrarlas en el registro de tiempos y frecuencias
+     */
+    public function obtenerNombreNiveles($nivel, $proceso) {
+
+        if ($nivel == 1) { //Buscar nombre nivel0,nivel1
+            $data = $this->getAdapter()->select()->from(array('n0' => Application_Model_Proceso0::TABLA), array('nivel0' => 'descripcion'))
+                            ->joinInner(array('n1' => Application_Model_Proceso1::TABLA), 'n1.id_proceso_n0 = n0.id_proceso_n0', array('nivel1' => 'descripcion'))
+                            ->where('n1.id_proceso_n1 = ?', $proceso)->query()->fetch();
+
+            $data['nivel2'] = '';
+            $data['nivel3'] = '';
+            $data['nivel4'] = '';
+        } else if ($nivel == 2) { //Buscar nombre nivel0,nivel1,nivel2
+            $data = $this->getAdapter()->select()->from(array('n0' => Application_Model_Proceso0::TABLA), array('nivel0' => 'descripcion'))
+                            ->joinInner(array('n1' => Application_Model_Proceso1::TABLA), 'n1.id_proceso_n0 = n0.id_proceso_n0', array('nivel1' => 'descripcion'))
+                            ->joinInner(array('n2' => Application_Model_Proceso2::TABLA), 'n2.id_proceso_n1 = n1.id_proceso_n1', array('nivel2' => 'descripcion'))
+                            ->where('n2.id_proceso_n2 = ?', $proceso)->query()->fetch();
+
+            $data['nivel3'] = '';
+            $data['nivel4'] = '';
+        } else if ($nivel == 3) { //Buscar nombre nivel0,nivel1,nivel2,nivel3
+            $data = $this->getAdapter()->select()->from(array('n0' => Application_Model_Proceso0::TABLA), array('nivel0' => 'descripcion'))
+                            ->joinInner(array('n1' => Application_Model_Proceso1::TABLA), 'n1.id_proceso_n0 = n0.id_proceso_n0', array('nivel1' => 'descripcion'))
+                            ->joinInner(array('n2' => Application_Model_Proceso2::TABLA), 'n2.id_proceso_n1 = n1.id_proceso_n1', array('nivel2' => 'descripcion'))
+                            ->joinInner(array('n3' => Application_Model_Proceso3::TABLA), 'n3.id_proceso_n2 = n2.id_proceso_n2', array('nivel3' => 'descripcion'))
+                            ->where('n3.id_proceso_n3 = ?', $proceso)->query()->fetch();
+
+            $data['nivel4'] = '';
+        } else if ($nivel == 4) { //Buscar todos los niveles
+            $data = $this->getAdapter()->select()->from(array('n0' => Application_Model_Proceso0::TABLA), array('nivel0' => 'descripcion'))
+                            ->joinInner(array('n1' => Application_Model_Proceso1::TABLA), 'n1.id_proceso_n0 = n0.id_proceso_n0', array('nivel1' => 'descripcion'))
+                            ->joinInner(array('n2' => Application_Model_Proceso2::TABLA), 'n2.id_proceso_n1 = n1.id_proceso_n1', array('nivel2' => 'descripcion'))
+                            ->joinInner(array('n3' => Application_Model_Proceso3::TABLA), 'n3.id_proceso_n2 = n2.id_proceso_n2', array('nivel3' => 'descripcion'))
+                            ->joinInner(array('n4' => Application_Model_Proceso4::TABLA), 'n4.id_proceso_n3 = n3.id_proceso_n3', array('nivel4' => 'descripcion'))
+                            ->where('n4.id_proceso_n4 = ?', $proceso)->query()->fetch();
+        }
+
+        return $data;
     }
 
 }

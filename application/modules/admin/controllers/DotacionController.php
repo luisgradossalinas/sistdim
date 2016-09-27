@@ -32,7 +32,7 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
         $this->view->organo = $this->_organoModel->obtenerOrgano($this->_proyecto);
     }
 
-    public function obtenerActividadPuestoAction() {
+    public function obtenerDotacionAction() {
 
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
@@ -48,17 +48,38 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
 
         if ($this->_hasParam('puesto')) {
             $puesto = $this->_getParam('puesto');
-            $dataAct = $this->_actividad->obtenerActividadTareaPuesto($puesto); //Incluye tareas
+            $dataAct = $this->_actividad->obtenerActividadTareaDotacion($puesto); //Incluye tareas
             $contador = 0;
 
-            //Obtener nivel y caegoria del puesto
             foreach ($dataAct as $value) {
+                
+                $niveles = $this->_actividad->obtenerNombreNiveles($value['nivel'],$value['id_proceso']);
+                
                 //Si es actividad asignarle tarea vacía
-                $dataAct[$contador]['nivel_puesto'] = $this->getHelper('nivelpuesto')->select($value['codigo_grupo'], $value['id_nivel_puesto'], $contador + 1);
-                $dataAct[$contador]['categoria_puesto'] = $this->getHelper('categoriapuesto')->select($value['codigo_familia'], $value['id_categoria_puesto'], $contador + 1);
+                $dataAct[$contador]['periodicidad'] = $this->getHelper('periodicidad')->select($value['id_periodicidad'], $contador + 1);
+                $dataAct[$contador]['tiempo'] = $this->getHelper('tiempo')->select($value['id_tiempo'], $contador + 1);
                 if ($dataAct[$contador]['tarea'] == "0") {
                     $dataAct[$contador]['tarea'] = '';
                 }
+                if ($dataAct[$contador]['periodicidad'] == "0") {
+                    $dataAct[$contador]['periodicidad'] = '';
+                }
+                if ($dataAct[$contador]['tiempo'] == "0") {
+                    $dataAct[$contador]['tiempo'] = '';
+                }
+                if ($dataAct[$contador]['frecuencia'] == "0.00") {
+                    $dataAct[$contador]['frecuencia'] = '';
+                }
+                if ($dataAct[$contador]['duracion'] == "0.00") {
+                    $dataAct[$contador]['duracion'] = '';
+                }
+                
+                $dataAct[$contador]['nivel0'] = $niveles['nivel0'];
+                $dataAct[$contador]['nivel1'] = $niveles['nivel1'];
+                $dataAct[$contador]['nivel2'] = $niveles['nivel2'];
+                $dataAct[$contador]['nivel3'] = $niveles['nivel3'];
+                $dataAct[$contador]['nivel4'] = $niveles['nivel4'];
+
                 $contador++;
             }
 
@@ -66,7 +87,7 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
         }
     }
 
-    public function grabarPertinenciaAction() {
+    public function grabarDotacionAction() {
 
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
@@ -76,10 +97,10 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
         if (!$this->getRequest()->isXmlHttpRequest())
             exit('Acción solo válida para peticiones ajax');
 
-        $pertinencia = isset($data['pertinencia']) ? $data['pertinencia'] : array();
+        $dotacion = isset($data['dotacion']) ? $data['dotacion'] : array();
 
-        if (count($pertinencia) > 0) {
-            foreach ($pertinencia as $reg) {
+        if (count($dotacion) > 0) {
+            foreach ($dotacion as $reg) {
                 //Validar si es tarea o actividad -- Todo es actualizar (nivel_puesto,categoria_puesto y 
 
                 $add = explode("|", $reg);
@@ -87,17 +108,17 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
                 $idTarea = $add[1];
 
                 if ($idTarea == 0) { //Es actividad
-                    $dataActividad = array('id_actividad' => $idAct, 'id_nivel_puesto' => $add[3],
-                        'id_categoria_puesto' => $add[4],'nombre_puesto' => $add[5],'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                    $dataActividad = array('id_actividad' => $idAct, 'id_periodicidad' => $add[2],'frecuencia' => $add[3],
+                        'id_tiempo' => $add[4],'duracion' => $add[5],'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
                     $this->_actividad->guardar($dataActividad);
                 } else { // Es tarea
-                    $dataTarea = array('id_tarea' => $idTarea, 'id_nivel_puesto' => $add[3],
-                        'id_categoria_puesto' => $add[4],'nombre_puesto' => $add[5],'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                    $dataTarea = array('id_tarea' => $idTarea, 'id_periodicidad' => $add[2],'frecuencia' => $add[3],
+                        'id_tiempo' => $add[4],'duracion' => $add[5],'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
                     $this->_tarea->guardar($dataTarea);
                 }
             }
         }
-        echo Zend_Json::encode('Pertinencia grabada satisfactoriamente.');
+        echo Zend_Json::encode('Dotación grabada satisfactoriamente.');
     }
 
 }

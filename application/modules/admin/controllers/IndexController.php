@@ -18,7 +18,7 @@ class Admin_IndexController extends App_Controller_Action_Admin
 
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
 
-        $this->view->active = 'Recursos para el usuario 
+        $this->view->active = 'Bienvenido(a) al Sistema de Dimensionamiento (SISTDIM) - Usuario : 
             ' . $sesion_usuario->sesion_usuario['nombre_completo'].
                 " (".$sesion_usuario->sesion_usuario['nombre_rol'].")";
 

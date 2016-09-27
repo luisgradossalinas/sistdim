@@ -27,8 +27,8 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (result) {
 
-                html = '';
-                contador = 0;
+                var html = '';
+                var contador = 0;
                 $.each(result, function (key, obj) {
                     contador++;
                     html += "<tr>";
@@ -77,12 +77,12 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (result) {
 
-                html = '';
-                contador = 0;
+                var html = '';
+                var contador = 0;
                 $.each(result, function (key, obj) {
                     contador++;
                     html += "<tr>";
-                    html += "<td>" + contador + "</td>";
+                    html += "<td><center>" + contador + "</center></td>";
                     html += "<td>" + obj['nombre'] + "</td>";
 
                     if (obj['estado_permiso'] == 1) {
@@ -143,13 +143,7 @@ $(document).ready(function () {
         });
        
        alert("Permisos grabados");
-        
-        
+          
     });
-
-
-
-
-
 
 })

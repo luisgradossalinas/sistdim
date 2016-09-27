@@ -1,3 +1,15 @@
+<style>
+    #usuario,#usuario_chzn
+    {
+        width: 250px;
+        font-size:10pt
+    }  
+    #proyecto,#proyecto_chzn
+    {
+        width: 440px;
+        font-size:10pt
+    }       
+</style>
 <?=$this->partial('_partials/mensajes.phtml',array('messages' => $this->messages,'tipoMessages' => $this->tipoMessages));?>
 <div class="widget-box">
     <div class="widget-title">	
@@ -17,7 +29,6 @@
 }?>
 </select>
 <input type="submit" id="grabarPermisos" class="btn btn-inverse" value="Grabar permisos" style="margin-top:-23px" />
-
 <table id='' class="table table-condensed table-bordered" style="width: 60%">
     <thead>
         <tr><th>#</th><th>Nombre</th><th>Estado</th></tr>
@@ -27,6 +38,4 @@
 </table>
 <input type="hidden" id="controla" name="controla" value="0">
 </div>
-
-
 <?=$this->partial('_partials/modal.phtml',array('model' => $this->model));?>

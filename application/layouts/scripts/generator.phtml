@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Admin Test</title>
+		<title><?=TITLE?></title>
 		<meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <link rel="stylesheet" href=<?=SITE_URL."/css/bootstrap.min.css"?> />
@@ -42,7 +42,6 @@
                 <script src="<?=SITE_URL?>/js/web/main.js"></script>
                 <script src=<?=SITE_URL."/js/web/mvc.js"?> ></script>
                 
-
                 <?=$this->headScript() ?>
 	</head>
 	<body>
@@ -71,7 +70,11 @@
 			<a href="#" class="visible-phone"><i class="icon icon-home"></i>Dashboard</a>
 			<ul>
                             <!-- Sería un menú dinámico -->
-				<?=$this->partial('menu.phtml',array('padre' => $this->layout()->padre, 'active' => $this->layout()->link));?>
+                            <?=$this->partial('menu.phtml',array('padre' => $this->layout()->padre,
+                                    'active' => $this->layout()->link, 'rol' => $this->layout()->id_rol, 
+                                    'proyecto' => $this->layout()->id_proyecto,
+                                    'usuario' => $this->layout()->id_usuario
+                                    ));?>
 			</ul>
 		</div>
 		
