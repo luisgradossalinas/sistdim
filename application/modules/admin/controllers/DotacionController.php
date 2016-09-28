@@ -5,6 +5,7 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
     private $_organoModel;
     private $_actividad;
     private $_tarea;
+    private $_puesto;
     
     private $_usuario;
 
@@ -13,12 +14,12 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
         $this->_organoModel = new Application_Model_Organo;
         $this->_actividad = new Application_Model_Actividad;
         $this->_tarea = new Application_Model_Tarea;
+        $this->_puesto = new Application_Model_Puesto;
 
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
         $this->_proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
         $this->_usuario = $sesion_usuario->sesion_usuario['id'];
-
-        $this->view->headScript()->appendFile(SITE_URL . '/js/web/dotacion.js');
+        
         Zend_Layout::getMvcInstance()->assign('show', '1'); //No mostrar en el menú la barra horizontal
         parent::init();
     }
@@ -28,6 +29,7 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
         Zend_Layout::getMvcInstance()->assign('active', 'Registrar tiempos y frecuencias');
         Zend_Layout::getMvcInstance()->assign('padre', 7);
         Zend_Layout::getMvcInstance()->assign('link', 'dotacion');
+        $this->view->headScript()->appendFile(SITE_URL . '/js/web/dotacion.js');
 
         $this->view->organo = $this->_organoModel->obtenerOrgano($this->_proyecto);
     }
@@ -79,6 +81,9 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
                 $dataAct[$contador]['nivel2'] = $niveles['nivel2'];
                 $dataAct[$contador]['nivel3'] = $niveles['nivel3'];
                 $dataAct[$contador]['nivel4'] = $niveles['nivel4'];
+                
+                $dataPuesto = $this->_puesto->fetchRow('id_puesto = '.$puesto)->toArray();
+                $dataAct[$contador]['total_dotacion'] = $dataPuesto['total_dotacion'];
 
                 $contador++;
             }
@@ -109,16 +114,35 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
 
                 if ($idTarea == 0) { //Es actividad
                     $dataActividad = array('id_actividad' => $idAct, 'id_periodicidad' => $add[2],'frecuencia' => $add[3],
-                        'id_tiempo' => $add[4],'duracion' => $add[5],'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                        'id_tiempo' => $add[4],'duracion' => $add[5],'usuario_actu_dotacion' => $this->_usuario, 'fecha_actu_dotacion' => date("Y-m-d H:i:s"));
                     $this->_actividad->guardar($dataActividad);
                 } else { // Es tarea
                     $dataTarea = array('id_tarea' => $idTarea, 'id_periodicidad' => $add[2],'frecuencia' => $add[3],
-                        'id_tiempo' => $add[4],'duracion' => $add[5],'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                        'id_tiempo' => $add[4],'duracion' => $add[5],'usuario_actu_dotacion' => $this->_usuario, 'fecha_actu_dotacion' => date("Y-m-d H:i:s"));
                     $this->_tarea->guardar($dataTarea);
                 }
             }
+            $totalDotacion = $this->_getParam('totalDotacion');
+            $puesto = $this->_getParam('puesto');
+            //Actualizar dotación del puesto
+            $dataPuesto = array('id_puesto' => $puesto, 'total_dotacion' => $totalDotacion, 
+                'usuario_actu_dotacion' => $this->_usuario, 'fecha_actu_dotacion' => date("Y-m-d H:i:s"));
+            $this->_puesto->guardar($dataPuesto);
         }
         echo Zend_Json::encode('Dotación grabada satisfactoriamente.');
+    }
+    
+    public function avanceAction() {
+        
+        Zend_Layout::getMvcInstance()->assign('active', 'Avance de dotación');
+        Zend_Layout::getMvcInstance()->assign('padre', 7);
+        Zend_Layout::getMvcInstance()->assign('link', 'avance');
+        
+        $this->view->headScript()->appendFile(SITE_URL . '/js/web/avance.js');
+        
+        $this->view->organo = $this->_organoModel->obtenerOrgano($this->_proyecto);
+        
+        
     }
 
 }

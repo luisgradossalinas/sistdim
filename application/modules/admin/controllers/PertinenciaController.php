@@ -7,6 +7,7 @@ class Admin_PertinenciaController extends App_Controller_Action_Admin {
     private $_tarea;
     
     private $_usuario;
+    private $_proyecto;
 
     public function init() {
 
@@ -61,7 +62,6 @@ class Admin_PertinenciaController extends App_Controller_Action_Admin {
                 }
                 $contador++;
             }
-
             echo Zend_Json::encode($dataAct);
         }
     }
@@ -85,14 +85,14 @@ class Admin_PertinenciaController extends App_Controller_Action_Admin {
                 $add = explode("|", $reg);
                 $idAct = $add[0];
                 $idTarea = $add[1];
-
+                
                 if ($idTarea == 0) { //Es actividad
                     $dataActividad = array('id_actividad' => $idAct, 'id_nivel_puesto' => $add[3],
-                        'id_categoria_puesto' => $add[4],'nombre_puesto' => $add[5],'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                        'id_categoria_puesto' => $add[4],'nombre_puesto' => $add[5],'usuario_actu_pertinencia' => $this->_usuario, 'fecha_actu_pertinencia' => date("Y-m-d H:i:s"));
                     $this->_actividad->guardar($dataActividad);
                 } else { // Es tarea
                     $dataTarea = array('id_tarea' => $idTarea, 'id_nivel_puesto' => $add[3],
-                        'id_categoria_puesto' => $add[4],'nombre_puesto' => $add[5],'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                        'id_categoria_puesto' => $add[4],'nombre_puesto' => $add[5],'usuario_actu_pertinencia' => $this->_usuario, 'fecha_actu_pertinencia' => date("Y-m-d H:i:s"));
                     $this->_tarea->guardar($dataTarea);
                 }
             }

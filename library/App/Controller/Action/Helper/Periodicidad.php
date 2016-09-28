@@ -13,9 +13,9 @@ class App_Controller_Action_Helper_Periodicidad extends Zend_Controller_Action_H
                 "<option value=''>[Seleccione]</option>";
         foreach ($dataPerio as $data) {
             if ($periodicidad == $data['id_periodicidad']) {
-                $select .= "<option value='".$data['id_periodicidad']."' selected>".$data['descripcion']."</option>";
+                $select .= "<option value='".$data['id_periodicidad'].'|'.$data['valor']."' selected>".$data['descripcion']."</option>";
             } else {
-                $select .= "<option value='".$data['id_periodicidad']."'>".$data['descripcion']."</option>";
+                $select .= "<option value='".$data['id_periodicidad'].'|'.$data['valor']."'>".$data['descripcion']."</option>";
             }
         }
         $select .= "</select>";

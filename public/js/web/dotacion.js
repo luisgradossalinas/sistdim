@@ -4,6 +4,7 @@ $(document).ready(function () {
 
     //Ocultar el botón listar puestos y nuevo puesto;
     $("#grabarDotacion").hide();
+    $("#tablaResumen").hide();
 
     $('#tablaDotacion').dataTable({
         "bJQueryUI": true,
@@ -19,6 +20,80 @@ $(document).ready(function () {
     $("#unidad_chzn").css('width', '300px');
     $("#unidad_chzn .chzn-drop").css('width', '290px');
     $("#unidad_chzn .chzn-drop .chzn-search input").css('width', '240px');
+
+    calcularDotacion = function () {
+
+        if ($('#tablaDotacion').DataTable().data().count() == 0) {
+            alert('No existen registros');
+            return false;
+        }
+
+        var contador = 0;
+        var dotacion = 0;
+        var resultP = '';
+        var periodicidad = '';
+        var resultT = '';
+        var tiempo = '';
+
+        $("#tablaDotacion tbody tr").each(function () {
+            contador++;
+
+            if ($(this).find("td select").eq(0).val() != '') {
+                resultP = $(this).find("td select").eq(0).val().split('|');
+                periodicidad = resultP[1];
+            } else {
+                periodicidad = '';
+            }
+            
+            var frecuencia = $(this).find("td input").eq(3).val();
+            
+            if ($(this).find("td select").eq(1).val() != '') {
+                resultT = $(this).find("td select").eq(1).val().split('|');
+                tiempo = resultT[1];
+            } else {
+                tiempo = '';
+            } 
+            var duracion = $(this).find("td input").eq(5).val();
+
+            //No considerarlo en la suma
+            if (frecuencia == '' || (periodicidad == '' || periodicidad == 0) || (tiempo == '' || tiempo == 0)
+                    || duracion == '') {
+
+            } else {
+                //Realizar suma
+                dotacion += ((periodicidad * frecuencia * tiempo * duracion) * 1.1) / 176;
+            }
+        });
+
+        $("#dotacionPuesto").empty().append(dotacion.toFixed(2));
+
+    };
+
+    //Sumar al cambiar select de la tabla
+    $('#tablaDotacion').on('change', 'tr td select', function () {
+        
+        /*
+        var id = $(this).attr('id');
+        var result = id.split('_');
+        var reg = result[1];
+        var menor = reg - 1;
+        if ($("#"+id+" option:selected").text() == 'Diaria') {
+            //Ocultar días
+            $("#tiempo_"+reg+" option[value=Días]").hide();
+            $("#tiempo_"+reg+"_chzn_o_"+menor).hide();
+            
+        } else {
+            $("#tiempo_"+reg+" option[value=Días]").show();
+            $("#tiempo_"+reg+"_chzn_o_"+menor).hide();
+        }
+        */
+        calcularDotacion();
+    });
+
+    //Sumar al cambiar valor en frecuencia y tiempo
+    $('#tablaDotacion').on('keyup', 'tr td input', function () {
+        calcularDotacion();
+    });
 
     grabarDotacion = function () {
 
@@ -37,10 +112,15 @@ $(document).ready(function () {
             //Se muestra cuando si tiene mapa de puesto, agregar condicional
             var id_act = $(this).find("td input").eq(0).val();
             var id_tarea = $(this).find("td input").eq(1).val();
-            
-            var periodicidad = $(this).find("td select").eq(0).val();
+
+            var resultP = $(this).find("td select").eq(0).val().split('|');
+            var periodicidad = resultP[0];
+
             var frecuencia = $(this).find("td input").eq(3).val();
-            var tiempo = $(this).find("td select").eq(1).val();
+
+            var resultT = $(this).find("td select").eq(1).val().split('|');
+            var tiempo = resultT[0];
+
             var duracion = $(this).find("td input").eq(5).val();
 
             if (frecuencia == '' || (periodicidad == '' || periodicidad == 0) || (tiempo == '' || tiempo == 0)
@@ -53,8 +133,8 @@ $(document).ready(function () {
                     + "|" + tiempo + "|" + duracion);
 
         });
-       
-        
+
+
         //Mostrar mensaje si existen datos por completar
         if (mostrarMensaje == 1) {
             alert(mensaje);
@@ -65,7 +145,9 @@ $(document).ready(function () {
         $.ajax({
             url: urls.siteUrl + '/admin/dotacion/grabar-dotacion',
             data: {
-                dotacion: dataDotacion
+                dotacion: dataDotacion,
+                totalDotacion: $("#dotacionPuesto").text(),
+                puesto: $("#puesto").val()
             },
             type: 'post',
             dataType: 'json',
@@ -78,6 +160,7 @@ $(document).ready(function () {
 
     $("#organo").change(function () {
 
+        $("#tablaResumen").hide();
         var organo = $("#organo").val();
         if (organo == '') {
             $('#tablaDotacion').DataTable().clear().draw();
@@ -109,6 +192,7 @@ $(document).ready(function () {
 
                 $("#unidad").change(function () {
 
+                    $("#tablaResumen").hide();
                     var organo = $("#organo").val();
                     var unidad = $("#unidad").val();
                     var nomunidad = $("#unidad option:selected").text();
@@ -121,6 +205,11 @@ $(document).ready(function () {
                     if (unidad == '') {
                         $('#tablaDotacion').DataTable().clear().draw();
                         $("#grabarDotacion").hide();
+                        $("#capa_puesto").empty().append('<select id="puesto" name="puesto" style="width:320px"><option value="">[Seleccione Puesto]</option>');
+                        $("#capa_puesto").append("</select>");
+                        $("#puesto").chosen();
+
+
                         return false;
                     }
                     //Buscar y pintar la tablaDotacion de los puestos obtenidos
@@ -166,17 +255,20 @@ $(document).ready(function () {
                                     success: function (result) {
 
                                         var contador = 0;
+                                        var totalDotacion = 0;
 
                                         if (result == '' || result == []) {
                                             alert('No existen actividades o tareas asignadas a: <b>' + nombre_puesto + "</b>");
                                             $('#tablaDotacion').DataTable().clear().draw();
                                             $("#grabarDotacion").hide();
+                                            $("#tablaResumen").hide();
                                             return false;
                                         }
 
                                         $('#tablaDotacion').DataTable().clear().draw();
                                         $.each(result, function (key, obj) {
                                             contador++;
+                                            totalDotacion = parseFloat(obj['total_dotacion']);
                                             $('#tablaDotacion').DataTable().row.add([
                                                 '<center>' + contador + "</center>",
                                                 "<input type=hidden name=id_actividad value='" + obj['id_actividad'] + "'>" + "<input type=hidden name=id_tarea value='" + obj['id_tarea'] + "'>" + obj['nivel0'],
@@ -187,23 +279,28 @@ $(document).ready(function () {
                                                 obj['descripcion'],
                                                 obj['tarea'],
                                                 obj['periodicidad'],
-                                                '<center><input type=text id=frecuencia_'+contador+' value="' + obj['frecuencia'] + '" style="font-size: 8pt;width:70%;text-align:center" maxlength="6"></center>',
+                                                '<center><input type=text id=frecuencia_' + contador + ' value="' + obj['frecuencia'] + '" style="font-size: 8pt;width:70%;text-align:center" maxlength="6"></center>',
                                                 obj['tiempo'],
-                                                '<center><input type=text id=duracion_'+contador+' value="' + obj['duracion'] + '" style="font-size: 8pt;width:70%;text-align:center" maxlength="6"></center>',
+                                                '<center><input type=text id=duracion_' + contador + ' value="' + obj['duracion'] + '" style="font-size: 8pt;width:70%;text-align:center" maxlength="6"></center>',
                                                 ''
                                             ]).draw(false);
                                             $("#frecuencia_" + contador).numeric();
                                             $("#duracion_" + contador).numeric();
-                                            
+
                                             $("#periodicidad_" + contador).chosen();
                                             $("#periodicidad_" + contador + "_chzn").css('font-size', '7.5pt');
                                             $("#periodicidad_" + contador + "_chzn").css('width', '94%');
-                                            
+
                                             $("#tiempo_" + contador).chosen();
                                             $("#tiempo_" + contador + "_chzn").css('font-size', '7.5pt');
                                             $("#tiempo_" + contador + "_chzn").css('width', '94%');
+                                            
                                         });
                                         $("#grabarDotacion").show();
+                                        $("#tablaResumen").show();
+                                        $("#textoPuesto").empty().append(nombre_puesto);
+                                        $("#dotacionPuesto").empty().append(totalDotacion.toFixed(2));
+                                        
                                     }
                                 });
                             });

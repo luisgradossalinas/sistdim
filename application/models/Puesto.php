@@ -36,7 +36,7 @@ class Application_Model_Puesto extends Zend_Db_Table {
     public function obtenerPuestos($unidad) {
 
         return $this->getAdapter()->select()->from(array('p' => self::TABLA),array('id_puesto','puesto' => 'descripcion',
-            'numcor' => 'num_correlativo','cantidad'))
+            'numcor' => 'num_correlativo','cantidad','total_dotacion','nombre_trabajador'))
                 ->joinInner(array('uo' => Application_Model_UnidadOrganica::TABLA), 'uo.id_uorganica = p.id_uorganica',
                         array('id_uorganica','unidad' => 'descripcion'))
                 ->joinInner(array('o' => Application_Model_Organo::TABLA), 'o.id_organo = uo.id_organo',

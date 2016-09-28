@@ -8,13 +8,13 @@ class Application_Model_Rol extends Zend_Db_Table
     const ADMINISTRADOR = 1;
     const CLIENTE_WEB = 2;
     const SUPER = 3;
-    //const OTRO_ROL = 4;
-
     const NOMADMIN = "Administrador";
+    
+    const INVITADO = 'Invitado';
     
     const ESTADO_INACTIVO = 0;
     const ESTADO_ACTIVO = 1;
-    CONST ESTADO_ELIMINADO = 2;
+    const ESTADO_ELIMINADO = 2;
     
     const TABLA = 'rol';
     

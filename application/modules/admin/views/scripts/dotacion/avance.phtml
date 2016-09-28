@@ -1,0 +1,39 @@
+<style>
+    #tabla input, #tabla select {
+        font-size:8pt
+    }    
+</style>
+<?= $this->partial('_partials/mensajes.phtml', array('messages' => $this->messages, 'tipoMessages' => $this->tipoMessages)); ?>
+<div style="float:left">
+    <select id="organo" name="organo">
+        <option value=''>[Seleccione órgano]</option>
+        <?php
+        foreach ($this->organo as $val) {
+            echo "<option value=" . $val['id_organo'] . ">" . $val['organo'] . "</option>";
+        }
+        ?>
+    </select>
+</div>
+<div id="capa" style="float:left"></div>
+<div class="widget-box">
+    <div class="widget-title">	
+        <h5><?= $this->active ?></h5>
+    </div>
+    <div class="widget-content nopadding">
+        <table id='tablaAvance' width="70%" class="table table-condensed table-bordered">
+            <thead>
+                <tr>
+                    <th width="5%" style="text-align: center">#</th>
+                    <th width="30%">Puesto</th>
+                    <th width="12%" style="text-align:center">Servidores Públicos</th>
+                    <th width="20%" style="text-align:center">Entrevistado</th>
+                </tr>
+            </thead>
+            <tbody>     
+            </tbody>
+        </table>
+        <br>
+        <br>
+    </div>
+</div>
+<?= $this->partial('_partials/modal.phtml', array('model' => $this->model)); ?>
