@@ -20,11 +20,12 @@
 <a id="grabarDotacion"  role="button" class="btn tip-right" onclick="grabarDotacion()" title="Grabar">
     <li class="icon-check"></li>Grabar
 </a>
+<input type="hidden" value="<?=$this->rol?>" id="rol">
 <div class="widget-box">
     <div class="widget-title">	
         <h5><?= $this->active ?></h5>
     </div>
-    <div id="leyendaDotacion" style="font-size: 9pt"><br><b>Periodicidad:</b> Diaria, semanal, mensual | <b>Frecuencia:</b> (2 veces al día), (3 veces a la semana), (4 veces al mes) | 
+    <div id="leyendaDotacion" style="font-size: 8.5pt"><br><b>Periodicidad:</b> Diaria, semanal, mensual | <b>Frecuencia:</b> (2 veces al día), (3 veces a la semana), (4 veces al mes) | 
         <b>Tiempo:</b> Minutos, horas, días | <b>Duración:</b> (30 minutos por solicitud) , (2 horas por reunión)</div>
     <br>
     <div class="widget-content nopadding">
@@ -53,6 +54,7 @@
             <tr><th>Puesto</th><th>Servidores Públicos</th></tr>
             <tr align="center"><td id="textoPuesto"></td><td id="dotacionPuesto">0</td></tr>
         </table>
+        <div id="capa_nombre">Nombres: <input type="text" id="nombre_trabajador"></div>
         <br>
     </div>
 </div>

@@ -11,11 +11,6 @@
     }       
 </style>
 <?=$this->partial('_partials/mensajes.phtml',array('messages' => $this->messages,'tipoMessages' => $this->tipoMessages));?>
-<div class="widget-box">
-    <div class="widget-title">	
-        <h5><?=$this->active?></h5>
-    </div>
-<div class="widget-content nopadding" style="height:360px">
 <select id="usuario" name="usuario">
 <option value=''>[Seleccione usuario]</option>
 <?php foreach ($this->usuarios as $val){
@@ -29,6 +24,11 @@
 }?>
 </select>
 <input type="submit" id="grabarPermisos" class="btn btn-inverse" value="Grabar permisos" style="margin-top:-23px" />
+<div class="widget-box">
+    <div class="widget-title">	
+        <h5><?=$this->active?></h5>
+    </div>
+<div class="widget-content nopadding">
 <table id='' class="table table-condensed table-bordered" style="width: 60%">
     <thead>
         <tr><th>#</th><th>Nombre</th><th>Estado</th></tr>
@@ -37,5 +37,6 @@
     </tbody>
 </table>
 <input type="hidden" id="controla" name="controla" value="0">
+</div>
 </div>
 <?=$this->partial('_partials/modal.phtml',array('model' => $this->model));?>

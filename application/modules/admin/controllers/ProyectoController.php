@@ -12,6 +12,8 @@ class Admin_ProyectoController extends App_Controller_Action_Admin {
         $this->_usuarioModel = new Application_Model_Usuario;
         $this->_recursoModel = new Application_Model_Recurso;
         $this->_proyectoModel = new Application_Model_Proyecto;
+        
+        Zend_Layout::getMvcInstance()->assign('show', '1'); //No mostrar en el menú la barra horizontal
     }
 
     public function proyectoUsuarioAction() {

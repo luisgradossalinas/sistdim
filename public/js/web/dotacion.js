@@ -1,6 +1,7 @@
-var codigo = 0;
-var sentencia_crud = '';
 $(document).ready(function () {
+
+
+    $("#capa_nombre").hide();
 
     //Ocultar el botón listar puestos y nuevo puesto;
     $("#grabarDotacion").hide();
@@ -44,15 +45,15 @@ $(document).ready(function () {
             } else {
                 periodicidad = '';
             }
-            
+
             var frecuencia = $(this).find("td input").eq(3).val();
-            
+
             if ($(this).find("td select").eq(1).val() != '') {
                 resultT = $(this).find("td select").eq(1).val().split('|');
                 tiempo = resultT[1];
             } else {
                 tiempo = '';
-            } 
+            }
             var duracion = $(this).find("td input").eq(5).val();
 
             //No considerarlo en la suma
@@ -71,22 +72,6 @@ $(document).ready(function () {
 
     //Sumar al cambiar select de la tabla
     $('#tablaDotacion').on('change', 'tr td select', function () {
-        
-        /*
-        var id = $(this).attr('id');
-        var result = id.split('_');
-        var reg = result[1];
-        var menor = reg - 1;
-        if ($("#"+id+" option:selected").text() == 'Diaria') {
-            //Ocultar días
-            $("#tiempo_"+reg+" option[value=Días]").hide();
-            $("#tiempo_"+reg+"_chzn_o_"+menor).hide();
-            
-        } else {
-            $("#tiempo_"+reg+" option[value=Días]").show();
-            $("#tiempo_"+reg+"_chzn_o_"+menor).hide();
-        }
-        */
         calcularDotacion();
     });
 
@@ -97,9 +82,20 @@ $(document).ready(function () {
 
     grabarDotacion = function () {
 
+        var nombre_trabajador = '';
+
         if ($('#tablaDotacion').DataTable().data().count() == 0) {
             alert('No existen registros para grabar');
             return false;
+        }
+
+        if ($("#rol").val() == 3) { //Invitado
+            if ($("#nombre_trabajador").val() == '') {
+                alert("Ingrese nombre");
+                return false;
+                
+            }
+            nombre_trabajador = $("#nombre_trabajador").val();
         }
 
         var dataDotacion = new Array();
@@ -112,15 +108,11 @@ $(document).ready(function () {
             //Se muestra cuando si tiene mapa de puesto, agregar condicional
             var id_act = $(this).find("td input").eq(0).val();
             var id_tarea = $(this).find("td input").eq(1).val();
-
             var resultP = $(this).find("td select").eq(0).val().split('|');
             var periodicidad = resultP[0];
-
             var frecuencia = $(this).find("td input").eq(3).val();
-
             var resultT = $(this).find("td select").eq(1).val().split('|');
             var tiempo = resultT[0];
-
             var duracion = $(this).find("td input").eq(5).val();
 
             if (frecuencia == '' || (periodicidad == '' || periodicidad == 0) || (tiempo == '' || tiempo == 0)
@@ -147,7 +139,8 @@ $(document).ready(function () {
             data: {
                 dotacion: dataDotacion,
                 totalDotacion: $("#dotacionPuesto").text(),
-                puesto: $("#puesto").val()
+                puesto: $("#puesto").val(),
+                nombre_trabajador: nombre_trabajador
             },
             type: 'post',
             dataType: 'json',
@@ -294,13 +287,16 @@ $(document).ready(function () {
                                             $("#tiempo_" + contador).chosen();
                                             $("#tiempo_" + contador + "_chzn").css('font-size', '7.5pt');
                                             $("#tiempo_" + contador + "_chzn").css('width', '94%');
-                                            
+
                                         });
                                         $("#grabarDotacion").show();
                                         $("#tablaResumen").show();
+                                        if ($("#rol").val() == 3) { //Invitado
+                                            $("#capa_nombre").show();
+                                        }
                                         $("#textoPuesto").empty().append(nombre_puesto);
                                         $("#dotacionPuesto").empty().append(totalDotacion.toFixed(2));
-                                        
+
                                     }
                                 });
                             });

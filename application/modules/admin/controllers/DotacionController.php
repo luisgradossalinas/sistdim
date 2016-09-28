@@ -8,6 +8,7 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
     private $_puesto;
     
     private $_usuario;
+    private $_rol;
 
     public function init() {
 
@@ -19,6 +20,8 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
         $this->_proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
         $this->_usuario = $sesion_usuario->sesion_usuario['id'];
+        $this->_rol = $sesion_usuario->sesion_usuario['id_rol'];
+        
         
         Zend_Layout::getMvcInstance()->assign('show', '1'); //No mostrar en el menú la barra horizontal
         parent::init();
@@ -32,6 +35,8 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
         $this->view->headScript()->appendFile(SITE_URL . '/js/web/dotacion.js');
 
         $this->view->organo = $this->_organoModel->obtenerOrgano($this->_proyecto);
+        $this->view->rol = $this->_rol;
+        
     }
 
     public function obtenerDotacionAction() {
@@ -107,7 +112,6 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
         if (count($dotacion) > 0) {
             foreach ($dotacion as $reg) {
                 //Validar si es tarea o actividad -- Todo es actualizar (nivel_puesto,categoria_puesto y 
-
                 $add = explode("|", $reg);
                 $idAct = $add[0];
                 $idTarea = $add[1];
@@ -124,8 +128,9 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
             }
             $totalDotacion = $this->_getParam('totalDotacion');
             $puesto = $this->_getParam('puesto');
+            $nomTrabajador = $this->_getParam('nombre_trabajador');
             //Actualizar dotación del puesto
-            $dataPuesto = array('id_puesto' => $puesto, 'total_dotacion' => $totalDotacion, 
+            $dataPuesto = array('id_puesto' => $puesto, 'total_dotacion' => $totalDotacion, 'nombre_trabajador' => $nomTrabajador,
                 'usuario_actu_dotacion' => $this->_usuario, 'fecha_actu_dotacion' => date("Y-m-d H:i:s"));
             $this->_puesto->guardar($dataPuesto);
         }

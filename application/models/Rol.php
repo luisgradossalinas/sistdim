@@ -6,23 +6,17 @@ class Application_Model_Rol extends Zend_Db_Table
     protected $_primary = 'id';
     
     const ADMINISTRADOR = 1;
-    const CLIENTE_WEB = 2;
-    const SUPER = 3;
-    const NOMADMIN = "Administrador";
+    const CONSULTOR = 2;
+    const INVITADO = 3;
+    const COORDINADOR = 4;
     
-    const INVITADO = 'Invitado';
+    const NOMADMIN = "Administrador";
     
     const ESTADO_INACTIVO = 0;
     const ESTADO_ACTIVO = 1;
     const ESTADO_ELIMINADO = 2;
     
     const TABLA = 'rol';
-    
-    public function combo()
-    {
-        return $this->getAdapter()->select()->from($this->_name,array('key' => 'id', 'value' => 'nombre'))
-                ->where('estado = ?',self::ESTADO_ACTIVO)->query()->fetchAll();
-    }
     
     public function guardar($datos)
     {         
@@ -42,7 +36,14 @@ class Application_Model_Rol extends Zend_Db_Table
         }
         return $id;
     }
-
+    
+    public function combo()
+    {
+        return $this->getAdapter()->select()->from($this->_name,array('key' => 'id', 'value' => 'nombre'))
+                ->where('estado = ?',self::ESTADO_ACTIVO)
+                ->order('nombre asc')
+                ->query()->fetchAll();
+    }
 
 }
 
