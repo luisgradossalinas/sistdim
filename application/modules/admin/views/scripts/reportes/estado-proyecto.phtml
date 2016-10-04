@@ -1,0 +1,39 @@
+<?= $this->partial('_partials/mensajes.phtml', array('messages' => $this->messages, 'tipoMessages' => $this->tipoMessages)); ?>
+<a id="generarWord"  role="button" class="btn tip-right" onclick="generarWord()" title="Exportar a Word">
+    <li class="icon-check"></li>Exportar a Word
+</a>
+<div class="widget-box">
+    <div class="widget-title">	
+        <h5><?= $this->active ?></h5>
+    </div>
+    <div class="widget-content nopadding">
+        <table id='tablaEstadoProyecto' width="100%" class="table table-condensed table-bordered">
+            <thead>
+                <tr>
+                    <th width="5%" style="text-align: center">#</th>
+                    <th width="30%">Órgano</th>
+                    <th width="30%">Unidad Orgánica</th>
+                    <th width="10%">Edtado</th>
+                </tr>
+            </thead>
+            <?php
+            echo '<tbody>';
+            $contador = 0;
+            foreach ($this->organoUnidad as $value) {
+                $contador++;
+                echo "<td style='text-align:center'>" . $contador . "</td>";
+                echo "<td>" . $value['organo'] . "</td>";
+                echo "<td>" . $value['descripcion'] . "</td>";
+                echo "<td>" . '' . "</td>";
+                echo "</tr>";
+                ?>
+                <?php
+            }
+            echo '</tbody>';
+            ?>
+        </table>
+        <br>
+        <br>
+    </div>
+</div>
+<?= $this->partial('_partials/modal.phtml', array('model' => $this->model)); ?>

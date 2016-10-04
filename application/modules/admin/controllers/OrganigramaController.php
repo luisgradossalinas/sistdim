@@ -242,6 +242,10 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
         $dataPuesto = $this->_puestoModel->obtenerPuestos($unidad);
         $contador = 0;
         foreach ($dataPuesto as $value) {
+            $dataPuesto[$contador]['ngrupo'] = $dataPuesto[$contador]['grupo'];
+            $dataPuesto[$contador]['nfamilia'] = $dataPuesto[$contador]['familia'];
+            $dataPuesto[$contador]['npuesto'] = $dataPuesto[$contador]['rpuesto'];
+            
             $dataPuesto[$contador]['grupo'] = $this->getHelper('grupo')->select($value['codigo_grupo'], $contador + 1);
             $dataPuesto[$contador]['familia'] = $this->getHelper('familia')->select($value['codigo_grupo'], $value['codigo_familia'], $contador + 1);
             $dataPuesto[$contador]['rpuesto'] = $this->getHelper('rolpuesto')->select($value['codigo_familia'], $value['codigo_rol_puesto'], $contador + 1);

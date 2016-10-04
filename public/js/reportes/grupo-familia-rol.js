@@ -102,6 +102,9 @@ $(document).ready(function () {
                                 
                                 $('#tablaOrgaUnidad').DataTable().row.add([
                                     '<center>' + contador + "</center>",
+                                    obj['ngrupo'],
+                                    obj['nfamilia'],
+                                    obj['npuesto'],
                                     obj['puesto'],
                                     "<center>" + obj['cantidad'] + "</center>",
                                     "<center>" + tdota + "</center>",
@@ -115,6 +118,9 @@ $(document).ready(function () {
                             tqueda = tdotacion - tcant;
                             $('#tablaOrgaUnidad').DataTable().row.add([
                                 '<center><div style="display:none">' + contador + "</div></center>",
+                                '',
+                                '',
+                                '',
                                 '<b>Total</b>',
                                 "<center><b>" + tcant + "</b></center>",
                                 "<center><b>" + tdotacion + "</b></center>",

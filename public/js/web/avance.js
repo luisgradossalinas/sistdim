@@ -95,7 +95,7 @@ $(document).ready(function () {
                             $('#tablaAvance').DataTable().row.add([
                                 '<center><div style="display:none">' + contador + "</div></center>",
                                 '<b>Total</b>',
-                                "<center><b>" + totalDotacion + "</b></center>",
+                                "<center><b>" + totalDotacion.toFixed(2) + "</b></center>",
                                 '',
                                 ''
                             ]).draw(false);
