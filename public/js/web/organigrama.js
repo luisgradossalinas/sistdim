@@ -76,7 +76,7 @@ $(document).ready(function () {
 
     $("#nuevoPuesto").click(function () {
 
-        var numReg = ($('#tabla').DataTable().data().count() / 9) + 1;
+        var numReg = ($('#tabla').DataTable().data().count() / 10) + 1;
         var organo = $("#organo").val();
         var unidad = $("#unidad").val();
 
@@ -95,11 +95,12 @@ $(document).ready(function () {
             "<input type=hidden name=id_puesto value=0>" + $("#organo option:selected").text(),
             $("#unidad option:selected").text(),
             "<input type=number name=num_cor title='Ingrese el número correlativo del puesto' style='width:50%'>",
-            "<input type=textarea name=puesto>",
+            "<input type=text name=puesto>",
             "<input type=number name=cantidad style='width:50%'>",
             "<select style='width:90%' id=grupo_" + numReg + " name=grupo_" + numReg + "><option value=''>[Grupo]</option></select>",
             "<select style='width:90%' id=familia_" + numReg + " name=familia><option value=''>[Familia]</option></select>",
-            "<select style='width:90%' id=rol_" + numReg + " name=rol><option value=''>[Rol]</option></select><input type=hidden name=unidadT value='" + unidad + "'>"
+            "<select style='width:90%' id=rol_" + numReg + " name=rol><option value=''>[Rol]</option></select><input type=hidden name=unidadT value='" + unidad + "'>",
+            "<input type=text name=nombre_personal style='width:80%'>"
         ]).draw(false);
 
         $.ajax({
@@ -150,6 +151,7 @@ $(document).ready(function () {
             var familia = $(this).find("td select").eq(1).val();
             var rol = $(this).find("td select").eq(2).val();
             var unidad = $(this).find("td input").eq(4 - control).val();
+            var nombre_personal = $(this).find("td input").eq(5 - control).val();
 
             if (mapaPuesto == 0) {
                 if ((correlativo == '' || correlativo == 0) || nom_puesto == '' ||
@@ -165,7 +167,7 @@ $(document).ready(function () {
                 correlativo = '';
             }
             dataPuesto.push(id_puesto + "|" + correlativo + '|' + nom_puesto + '|' + cantidad
-                    + "|" + grupo + "|" + familia + "|" + rol + "|" + unidad);
+                    + "|" + grupo + "|" + familia + "|" + rol + "|" + unidad + "|" + nombre_personal);
 
 
             $.each(nombrePuesto, function (index, value) {
@@ -261,11 +263,12 @@ $(document).ready(function () {
                                 "<input type=hidden name=id_puesto value='" + obj['id_puesto'] + "'>" + obj['organo'],
                                 obj['unidad'],
                                 "<input type=number name=num_cor value='" + obj['numcor'] + "' style='width:50%'>",
-                                "<input type=textarea name=puesto class='puesto_validate' value='" + obj['puesto'] + "'>",
+                                "<input type=text name=puesto value='" + obj['puesto'] + "'>",
                                 "<input type=number name=cantidad value='" + obj['cantidad'] + "' style='width:50%'>",
                                 obj['grupo'],
                                 obj['familia'],
-                                obj['rpuesto'] + "<input type=hidden name=unidadT value='" + unidad + "'>"
+                                obj['rpuesto'] + "<input type=hidden name=unidadT value='" + unidad + "'>",
+                                "<input type=text name=nom_personal value='" + obj['nombre_personal'] + "' style='width:80%'>"
                             ]).draw(false);
                         });
                     }
@@ -392,11 +395,12 @@ $(document).ready(function () {
                                     "<input type=hidden name=id_puesto value='" + obj['id_puesto'] + "'>" + obj['organo'] + '<span style="display:none">' + obj['organo'] + "</span>" + '<span style="display:none">' + obj['unidad'] + "</span>" + '<span style="display:none">' + obj['puesto'] + "</span>",
                                     obj['unidad'],
                                     "<input type=number name=num_cor value='" + obj['numcor'] + "' style='width:50%'>",
-                                    "<input type=textarea name=puesto class='puesto_validate' value='" + obj['puesto'] + "'>",
+                                    "<input type=text name=puesto value='" + obj['puesto'] + "'>",
                                     "<input type=number name=cantidad value='" + obj['cantidad'] + "' style='width:50%'>",
                                     obj['grupo'],
                                     obj['familia'],
-                                    obj['rpuesto'] + "<input type=hidden name=unidadT value='" + unidad + "'>"
+                                    obj['rpuesto'] + "<input type=hidden name=unidadT value='" + unidad + "'>",
+                                    "<input type=text name=nom_personal value='" + obj['nombre_personal'] + "' style='width:80%'>"
                                 ]).draw(false);
                             });
                             $("#nuevoPuesto").show();

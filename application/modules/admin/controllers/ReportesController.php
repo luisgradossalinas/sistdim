@@ -10,7 +10,6 @@ class Admin_ReportesController extends App_Controller_Action_Admin
     private $_usuario;
     private $_rol;
     private $_proyecto;
-    
 
     public function init()
     {
@@ -26,11 +25,6 @@ class Admin_ReportesController extends App_Controller_Action_Admin
         Zend_Layout::getMvcInstance()->assign('show', '1'); //No mostrar en el menú la barra horizontal
         parent::init();
     }
-
-    public function indexAction()
-    {
-        // action body
-    }
     
     public function organoUnidadAction()
     {
@@ -39,10 +33,21 @@ class Admin_ReportesController extends App_Controller_Action_Admin
         Zend_Layout::getMvcInstance()->assign('link', 'reporteorganounidad');
         
         $this->view->headScript()->appendFile(SITE_URL . '/js/reportes/organo-unidad.js');
-
         $this->view->organo = $this->_organo->obtenerOrgano($this->_proyecto);
+    }
+    
+    public function exportWordOrganoUnidadAction() {
+        
+        
+        echo "hola";
+        
+        
+        
         
     }
+    
+    
+    
     
     public function grupoFamiliaRolAction()
     {
@@ -63,8 +68,16 @@ class Admin_ReportesController extends App_Controller_Action_Admin
         
         $this->view->headScript()->appendFile(SITE_URL . '/js/reportes/estado-proyecto.js');
         $this->view->organoUnidad = $this->_unidadOrganica->obtenerOrganoUOrganica($this->_proyecto);
+    }
+    
+    public function analisisPertinenciaAction()
+    {
+        Zend_Layout::getMvcInstance()->assign('active', 'Reporte análisis de pertinencia');
+        Zend_Layout::getMvcInstance()->assign('padre', 8);
+        Zend_Layout::getMvcInstance()->assign('link', 'analpert');
         
-        
+        $this->view->headScript()->appendFile(SITE_URL . '/js/reportes/analisis-pertinencia.js');
+        $this->view->organo = $this->_organo->obtenerOrgano($this->_proyecto);
     }
     
     public function dimensionamientoAction()
@@ -73,15 +86,6 @@ class Admin_ReportesController extends App_Controller_Action_Admin
         Zend_Layout::getMvcInstance()->assign('padre', 8);
         Zend_Layout::getMvcInstance()->assign('link', 'dimensionamiento');
     }
-    
-    public function analisisPertinenciaAction()
-    {
-        Zend_Layout::getMvcInstance()->assign('active', 'Reporte análisis de pertinencia');
-        Zend_Layout::getMvcInstance()->assign('padre', 8);
-        Zend_Layout::getMvcInstance()->assign('link', 'analpert');
-    }
-
-
 
 }
 

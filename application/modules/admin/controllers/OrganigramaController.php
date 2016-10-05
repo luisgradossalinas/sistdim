@@ -316,12 +316,12 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
                 if ($add[0] == 0) { //Nuevo
                     $dataNueva = array('id_puesto' => $add[0], 'descripcion' => $add[2], 'id_uorganica' => $add[7],
                     'num_correlativo' => $add[1], 'cantidad' => $add[3], 'codigo_grupo' => $add[4],
-                    'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6],'nombre_trabajador' => '',
+                    'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6],'nombre_trabajador' => '','nombre_personal' => $add[8],
                     'usuario_crea' => $this->_usuario, 'fecha_crea' => date("Y-m-d H:i:s"));
                 } else { //existe
                     $dataNueva = array('id_puesto' => $add[0], 'descripcion' => $add[2], 'id_uorganica' => $add[7],
                     'num_correlativo' => $add[1], 'cantidad' => $add[3], 'codigo_grupo' => $add[4],
-                    'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6],
+                    'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6],'nombre_personal' => $add[8],
                     'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
                 
                 }$this->_puestoModel->guardar($dataNueva);

@@ -22,7 +22,6 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
         $this->_usuario = $sesion_usuario->sesion_usuario['id'];
         $this->_rol = $sesion_usuario->sesion_usuario['id_rol'];
         
-        
         Zend_Layout::getMvcInstance()->assign('show', '1'); //No mostrar en el menú la barra horizontal
         parent::init();
     }
@@ -86,10 +85,8 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
                 $dataAct[$contador]['nivel2'] = $niveles['nivel2'];
                 $dataAct[$contador]['nivel3'] = $niveles['nivel3'];
                 $dataAct[$contador]['nivel4'] = $niveles['nivel4'];
-                
                 $dataPuesto = $this->_puesto->fetchRow('id_puesto = '.$puesto)->toArray();
                 $dataAct[$contador]['total_dotacion'] = $dataPuesto['total_dotacion'];
-
                 $contador++;
             }
 
@@ -144,10 +141,7 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
         Zend_Layout::getMvcInstance()->assign('link', 'avance');
         
         $this->view->headScript()->appendFile(SITE_URL . '/js/web/avance.js');
-        
         $this->view->organo = $this->_organoModel->obtenerOrgano($this->_proyecto);
         
-        
     }
-
 }

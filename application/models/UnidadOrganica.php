@@ -58,9 +58,6 @@ class Application_Model_UnidadOrganica extends Zend_Db_Table {
     }
 
     //Obtener los órganos y unidades orgánicas de un proyecto
-    //SELECT o.`organo`,uo.`descripcion` FROM organo o INNER JOIN unidad_organica uo
-    // ON o.`id_organo` = uo.`id_organo` WHERE uo.`id_proyecto` = 1
-    //AND uo.`estado` = 1 ORDER BY o.`organo` ASC, uo.`descripcion` ASC;
     function obtenerOrganoUOrganica($proyecto) {
 
         $sql = $this->getAdapter()->select()->from(array('o' => Application_Model_Organo::TABLA), array('organo'))
