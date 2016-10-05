@@ -1,12 +1,13 @@
 $(document).ready(function () {
 
+    $("#generarWord").hide();
 
     $('#tablaOrgaUnidad').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "lengthMenu": [[-1], ["All"]]
     });
-    
+
     //Personalizar el listado de órganos
     $("#organo_chzn").css('width', '420px');
     $("#organo_chzn .chzn-drop").css('width', '410px');
@@ -16,9 +17,34 @@ $(document).ready(function () {
     $("#unidad_chzn .chzn-drop").css('width', '290px');
     $("#unidad_chzn .chzn-drop .chzn-search input").css('width', '240px');
 
+    generarWord = function () {
+
+        var organo = $("#organo").val();
+        var unidad = $("#unidad").val();
+
+        if (organo == '' || unidad == '') {
+            alert("Debe seleccionar Órgano o Unidad Orgánica");
+            return false;
+        }
+
+        //Invocar ajax para generar el word
+        $.ajax({
+            url: urls.siteUrl + '/admin/reportes/export-word-organo-unidad',
+            data: {
+                unidad: unidad
+            },
+            type: 'post',
+            success: function (result) {
+
+            }
+        });
+    };
+
+
     $("#organo").change(function () {
 
         var organo = $("#organo").val();
+        $("#generarWord").hide();
         if (organo == '') {
             $('#tablaOrgaUnidad').DataTable().clear().draw();
             $("#capa").html("<select id='unidad' style='width:320px'><option>[Selecione unidad orgánica]</option></select>");
@@ -56,6 +82,7 @@ $(document).ready(function () {
                     }
                     if (unidad == '') {
                         $('#tablaOrgaUnidad').DataTable().clear().draw();
+                        $("#generarWord").hide();
                         return false;
                     }
                     //Buscar y pintar la tablaOrgaUnidad de los puestos obtenidos
@@ -71,13 +98,13 @@ $(document).ready(function () {
                             //Llenar tabla con los puestos
                             var contador = 0;
                             var totalQueda = 0;
-                            
+
                             var tcant = 0;
                             var tdotacion = 0;
                             var tqueda = 0;
-                            
+
                             var tdota = 0;
-                            
+
                             if (result == '' || result == []) {
                                 alert('Unidad orgánica, no tiene puestos registrados.');
                                 $('#tablaOrgaUnidad').DataTable().clear().draw();
@@ -87,19 +114,19 @@ $(document).ready(function () {
                             //0.56 es una persona
                             $.each(result, function (key, obj) {
                                 contador++;
-                                
+
                                 tdota = parseFloat(obj['total_dotacion']).toFixed(2).split(".");
                                 if (parseInt(tdota[1]) >= 56) {
                                     tdota = parseInt(tdota[0]) + 1;
                                 } else {
                                     tdota = parseInt(tdota[0]);
                                 }
-                                
+
                                 tdotacion += tdota;
-                                tcant += parseInt(obj['cantidad']); 
-                                
+                                tcant += parseInt(obj['cantidad']);
+
                                 totalQueda = tdota - parseInt(obj['cantidad']);
-                                
+
                                 $('#tablaOrgaUnidad').DataTable().row.add([
                                     '<center>' + contador + "</center>",
                                     obj['puesto'],
@@ -107,7 +134,7 @@ $(document).ready(function () {
                                     "<center>" + tdota + "</center>",
                                     "<center>" + totalQueda + "</center>"
                                 ]).draw(false);
-
+                                $("#generarWord").show();
                             });
 
                             //Agregando el total
