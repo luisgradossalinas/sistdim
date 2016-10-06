@@ -21,6 +21,9 @@ $(document).ready(function () {
 
         var organo = $("#organo").val();
         var unidad = $("#unidad").val();
+        
+        var nomorgano = $("#organo option:selected").text();
+        var nomunidad = $("#unidad option:selected").text();
 
         if (organo == '' || unidad == '') {
             alert("Debe seleccionar Órgano o Unidad Orgánica");
@@ -31,9 +34,12 @@ $(document).ready(function () {
         $.ajax({
             url: urls.siteUrl + '/admin/reportes/export-word-organo-unidad',
             data: {
-                unidad: unidad
+                unidad: unidad,
+                nomorgano : nomorgano,
+                nomunidad : nomunidad
             },
             type: 'post',
+            dataType: 'html',
             success: function (result) {
 
             }
@@ -116,7 +122,7 @@ $(document).ready(function () {
                                 contador++;
 
                                 tdota = parseFloat(obj['total_dotacion']).toFixed(2).split(".");
-                                if (parseInt(tdota[1]) >= 56) {
+                                if (parseInt(tdota[1]) >= urls.redondeo) {
                                     tdota = parseInt(tdota[0]) + 1;
                                 } else {
                                     tdota = parseInt(tdota[0]);

@@ -25,8 +25,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $js = sprintf(
             "var urls = {
                 siteUrl : '%s',
+                redondeo : %s
             }", 
-            $config->app->siteUrl
+            $config->app->siteUrl,$config->valor->redondeo
         );
 
         $view->headScript()->appendScript($js);
@@ -50,15 +51,24 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         
     }
     
+    protected function _initServir() {
+        date_default_timezone_set('America/Lima');
+        Zend_Locale::setDefault('es');
+    }
+    
+    public function _initLibrerias()
+    {
+        require_once( APPLICATION_PATH . "/../library/Word/PHPWord.php");
+
+    }
+    
     
     //Configuración de SEO
     protected function _initRoutes() 
     {
         $routeConfig = new Zend_Config_Ini(APPLICATION_PATH . '/configs/routes.ini');
-        
         $router = new Zend_Controller_Router_Rewrite();
         $router->addConfig($routeConfig);
-        
         $this->getResource('frontController')->setRouter($router);
     }
     
