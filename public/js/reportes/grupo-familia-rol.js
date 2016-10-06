@@ -17,6 +17,35 @@ $(document).ready(function () {
     $("#unidad_chzn .chzn-drop").css('width', '290px');
     $("#unidad_chzn .chzn-drop .chzn-search input").css('width', '240px');
 
+    generarWord = function () {
+
+        var organo = $("#organo").val();
+        var unidad = $("#unidad").val();
+
+        var nomorgano = $("#organo option:selected").text();
+        var nomunidad = $("#unidad option:selected").text();
+
+        if (organo == '' || unidad == '') {
+            alert("Debe seleccionar Órgano o Unidad Orgánica");
+            return false;
+        }
+
+        //Invocar ajax para generar el word
+        $.ajax({
+            url: urls.siteUrl + '/admin/reportes/export-word-grupo-familia-rol',
+            data: {
+                unidad: unidad,
+                nomorgano: nomorgano,
+                nomunidad: nomunidad
+            },
+            type: 'post',
+            dataType: 'html',
+            success: function (result) {
+
+            }
+        });
+    };
+
     $("#organo").change(function () {
 
         var organo = $("#organo").val();

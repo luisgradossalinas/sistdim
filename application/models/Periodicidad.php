@@ -1,9 +1,9 @@
 <?php
 
-class Application_Model_Periocidad extends Zend_Db_Table
+class Application_Model_Periodicidad extends Zend_Db_Table
 {
 
-    protected $_name = 'periocidad';
+    protected $_name = 'periodicidad';
     protected $_primary = 'id_periodicidad';
 
     const ESTADO_INACTIVO = 0;

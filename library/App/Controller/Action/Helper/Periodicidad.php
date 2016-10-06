@@ -7,7 +7,7 @@ class App_Controller_Action_Helper_Periodicidad extends Zend_Controller_Action_H
 
     public function select($periodicidad, $contador) {
         
-        $this->_periodicidad = new Application_Model_Periocidad;
+        $this->_periodicidad = new Application_Model_Periodicidad;
         $dataPerio = $this->_periodicidad->listado();
         $select = "<select id='periodicidad_" . $contador . "'>".
                 "<option value=''>[Seleccione]</option>";

@@ -189,7 +189,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
 
                 $dataWord[$contador]['grupo'] = $value['grupo'];
                 $dataWord[$contador]['familia'] = $value['familia'];
-                $dataWord[$contador]['rol'] = $value['rol'];
+                $dataWord[$contador]['rpuesto'] = $value['rpuesto'];
                 $dataWord[$contador]['puesto'] = $value['puesto'];
                 $dataWord[$contador]['cantidad'] = $value['cantidad'];
 
@@ -210,7 +210,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
             
             $dataWord[$contador]['grupo'] = '';
             $dataWord[$contador]['familia'] = '';
-            $dataWord[$contador]['rol'] = '';
+            $dataWord[$contador]['rpuesto'] = '';
             $dataWord[$contador]['puesto'] = 'Total';
             $dataWord[$contador]['cantidad'] = $tcant;
             $dataWord[$contador]['tdota'] = $tdota;
@@ -269,7 +269,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
             }
             $table->addCell(3000)->addText(utf8_decode($value['grupo'])); //Grupo
             $table->addCell(3000)->addText(utf8_decode($value['familia'])); //Familia
-            $table->addCell(3000)->addText(utf8_decode($value['rol'])); //Rol
+            $table->addCell(3000)->addText(utf8_decode($value['rpuesto'])); //Rol
             $table->addCell(3000)->addText(utf8_decode($value['puesto'])); //Ejecutor
             $table->addCell(2000, $styleCell)->addText($value['cantidad'], $textoCenter); //Suma dotación atual X
             $table->addCell(2000, $styleCell)->addText($value['tdota'], $textoCenter); //Suma carga de trabajo Y

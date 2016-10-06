@@ -125,7 +125,7 @@ $(document).ready(function () {
                     + "|" + tiempo + "|" + duracion);
 
         });
-
+        
 
         //Mostrar mensaje si existen datos por completar
         if (mostrarMensaje == 1) {
