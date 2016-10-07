@@ -60,11 +60,15 @@ class Application_Model_UnidadOrganica extends Zend_Db_Table {
     //Obtener los órganos y unidades orgánicas de un proyecto
     function obtenerOrganoUOrganica($proyecto) {
 
-        $sql = $this->getAdapter()->select()->from(array('o' => Application_Model_Organo::TABLA), array('organo'))
-                ->joinInner(array('uo' => self::TABLA), 'uo.id_organo = o.id_organo', array('descripcion'))
+        $sql = $this->getAdapter()->select()->from(array('o' => Application_Model_Organo::TABLA), array('o.organo'))
+                ->joinInner(array('uo' => self::TABLA), 'uo.id_organo = o.id_organo', array('uo.descripcion'))
+                ->joinInner(array('p' => Application_Model_Puesto::TABLA), 'p.id_uorganica = uo.id_uorganica', array('total_puestos' => 'count(p.id_puesto)',
+                    'puestos' => new Zend_Db_Expr('group_concat(if(p.total_dotacion=0.00000,concat(p.descripcion,"(",round(p.`total_dotacion`,2),")"),null) separator "<br>")')))
                 ->where('uo.id_proyecto = ?', $proyecto)
                 ->where('uo.estado = ?', self::ESTADO_ACTIVO)
-                ->order(array("o.organo asc", "uo.descripcion asc"));
+                ->where('p.estado = ?', self::ESTADO_ACTIVO)
+                ->group(array("o.organo", "uo.descripcion"))
+                ->order(array('o.organo asc','uo.descripcion asc','p.descripcion asc'));
 
         return $sql->query()->fetchAll();
     }

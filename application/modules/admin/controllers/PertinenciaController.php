@@ -5,6 +5,7 @@ class Admin_PertinenciaController extends App_Controller_Action_Admin {
     private $_organoModel;
     private $_actividad;
     private $_tarea;
+    private $_puesto;
     
     private $_usuario;
     private $_proyecto;
@@ -14,6 +15,7 @@ class Admin_PertinenciaController extends App_Controller_Action_Admin {
         $this->_organoModel = new Application_Model_Organo;
         $this->_actividad = new Application_Model_Actividad;
         $this->_tarea = new Application_Model_Tarea;
+        $this->_puesto = new Application_Model_Puesto;
 
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
         $this->_proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
@@ -98,6 +100,26 @@ class Admin_PertinenciaController extends App_Controller_Action_Admin {
             }
         }
         echo Zend_Json::encode('Pertinencia grabada satisfactoriamente.');
+    }
+    
+    public function obtenerPuestosAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        $unidad = $data['unidad'];
+        $dataPuesto = $this->_puesto->obtenerPuestoPertinencia($unidad);
+        echo Zend_Json::encode($dataPuesto);
     }
 
 }
