@@ -61,9 +61,9 @@ class Application_Model_UnidadOrganica extends Zend_Db_Table {
     function obtenerOrganoUOrganica($proyecto) {
 
         $sql = $this->getAdapter()->select()->from(array('o' => Application_Model_Organo::TABLA), array('o.organo'))
-                ->joinInner(array('uo' => self::TABLA), 'uo.id_organo = o.id_organo', array('uo.descripcion'))
+                ->joinInner(array('uo' => self::TABLA), 'uo.id_organo = o.id_organo', array('id_uorganica','uo.descripcion'))
                 ->joinInner(array('p' => Application_Model_Puesto::TABLA), 'p.id_uorganica = uo.id_uorganica', array('total_puestos' => 'count(p.id_puesto)',
-                    'puestos' => new Zend_Db_Expr('group_concat(if(p.total_dotacion=0.00000,concat(p.descripcion,"(",round(p.`total_dotacion`,2),")"),null) separator "<br>")')))
+                    'puestos' => new Zend_Db_Expr('group_concat(if(p.total_dotacion=0.00000,concat(p.descripcion,"(",round(p.`total_dotacion`,2),")"),null) order by p.descripcion asc separator "<br>")')))
                 ->where('uo.id_proyecto = ?', $proyecto)
                 ->where('uo.estado = ?', self::ESTADO_ACTIVO)
                 ->where('p.estado = ?', self::ESTADO_ACTIVO)

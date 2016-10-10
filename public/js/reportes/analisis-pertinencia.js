@@ -1,11 +1,42 @@
 $(document).ready(function () {
 
+    $("#generarWord").hide();
+
     $('#tablaAnaPertinencia').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "lengthMenu": [[-1], ["All"]]
     });
     
+    generarWord = function () {
+
+        var organo = $("#organo").val();
+        var unidad = $("#unidad").val();
+
+        var nomorgano = $("#organo option:selected").text();
+        var nomunidad = $("#unidad option:selected").text();
+
+        if (organo == '' || unidad == '') {
+            alert("Debe seleccionar Órgano o Unidad Orgánica");
+            return false;
+        }
+
+        //Invocar ajax para generar el word
+        $.ajax({
+            url: urls.siteUrl + '/admin/reportes/export-word-pertinencia',
+            data: {
+                unidad: unidad,
+                nomorgano: nomorgano,
+                nomunidad: nomunidad
+            },
+            type: 'post',
+            dataType: 'html',
+            success: function (result) {
+
+            }
+        });
+    };
+
     //Personalizar el listado de órganos
     $("#organo_chzn").css('width', '420px');
     $("#organo_chzn .chzn-drop").css('width', '410px');
@@ -18,6 +49,7 @@ $(document).ready(function () {
     $("#organo").change(function () {
 
         var organo = $("#organo").val();
+        $("#generarWord").hide();
         if (organo == '') {
             $('#tablaAnaPertinencia').DataTable().clear().draw();
             $("#capa").html("<select id='unidad' style='width:320px'><option>[Selecione unidad orgánica]</option></select>");
@@ -55,6 +87,7 @@ $(document).ready(function () {
                     }
                     if (unidad == '') {
                         $('#tablaAnaPertinencia').DataTable().clear().draw();
+                        $("#generarWord").hide();
                         return false;
                     }
                     //Buscar y pintar la tablaAnaPertinencia de los puestos obtenidos
@@ -66,9 +99,9 @@ $(document).ready(function () {
                         type: 'post',
                         dataType: 'json',
                         success: function (result) {
-                            
+
                             var contador = 0;
-                            
+
                             if (result == '' || result == []) {
                                 alert('Falta grabar la pertinencia en los puestos');
                                 $('#tablaAnaPertinencia').DataTable().clear().draw();
@@ -78,11 +111,11 @@ $(document).ready(function () {
                             //0.56 es una persona
                             $.each(result, function (key, obj) {
                                 contador++;
-                                
+
                                 if (obj['dotacion'] == null) {
                                     obj['dotacion'] = "0.00";
                                 }
-                                
+
 
                                 $('#tablaAnaPertinencia').DataTable().row.add([
                                     '<center>' + contador + "</center>",
@@ -91,7 +124,7 @@ $(document).ready(function () {
                                     obj['nombre_puesto'],
                                     "<center>" + obj['dotacion'] + "</center>"
                                 ]).draw(false);
-
+                                $("#generarWord").show();
                             });
                         }
                     });

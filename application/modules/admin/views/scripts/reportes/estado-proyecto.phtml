@@ -8,11 +8,11 @@
             <thead>
                 <tr>
                     <th width="4%" style="text-align: center">#</th>
-                    <th width="18%">Órgano</th>
-                    <th width="18%">Unidad Orgánica</th>
+                    <th width="20%">Órgano</th>
+                    <th width="20%">Unidad Orgánica</th>
                     <th width="10%">Total Puestos</th>
-                    <th width="25%">Puestos sin dotación</th>
-                    <th width="25%">Faltantes Pertinencia</th>
+                    <th width="23%">Puestos con Dotación faltante</th>
+                    <th width="23%">Puestos con Pertinencia faltante</th>
                 </tr>
             </thead>
             <?php
@@ -24,8 +24,8 @@
                 echo "<td>" . $value['organo'] . "</td>";
                 echo "<td>" . $value['descripcion'] . "</td>";
                 echo "<td><center>" . $value['total_puestos'] . "</center></td>";
-                echo "<td>" . $value['puestos'] . "</td>";
-                echo "<td>" . "" . "</td>";
+                echo "<td>" . $value['dotacion'] . "</td>";
+                echo "<td>" . $value['pertinencia'] . "</td>";
                 echo "</tr>";
             }
             echo '</tbody>';
