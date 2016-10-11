@@ -35,7 +35,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
     public function exportWordOrganoUnidadAction() {
 
         $this->_helper->layout->disableLayout();
-        //$this->_helper->viewRenderer->setNoRender(true);
+        $this->_helper->viewRenderer->setNoRender(true);
         $data = $this->_getAllParams();
         //Previene vulnerabilidad XSS (Cross-site scripting)
         $filtro = new Zend_Filter_StripTags();
@@ -81,15 +81,9 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
 
             $nomorgano = $this->_getParam('nomorgano');
             $nomunidad = $this->_getParam('nomunidad');
-
-            //Exportar word text
-            //$this->getHelper('word')->repOrganoUnidad($dataWord, $nomorgano, $nomunidad);
-
             $PHPWord = new PHPWord();
             $section = $PHPWord->createSection();
 
-            //Template-Organo-Unidad.docx
-            //$section = $PHPWord->loadTemplate('Template-Organo-Unidad.docx');
             $styleTable = array('borderSize' => 6, 'borderColor' => '000000', 'cellMargin' => 80);
             $styleFirstRow = array('borderBottomSize' => 18, 'borderBottomColor' => '000000', 'bgColor' => 'BFD7FA');
 
@@ -137,20 +131,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
             $objWriter = PHPWord_IOFactory::createWriter($PHPWord, 'Word2007');
             $objWriter->save($filename);
 
-            $filename = 'Organo-Unidad.docx';
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="Organo-Unidad.docx"');
-            header('Content-Transfer-Encoding: binary');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-            header('Pragma: public');
-            //header('Content-Length: ' . filesize($h2d_file_uri));
-            ob_clean();
-            flush();
-            //readfile($h2d_file_uri);
-            //unlink($h2d_file_uri);
-            //exit;
+            echo Zend_Json::encode(array("success" => 1));
         }
     }
 
@@ -166,7 +147,8 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
     public function exportWordGrupoFamiliaRolAction() {
 
         $this->_helper->layout->disableLayout();
-        //$this->_helper->viewRenderer->setNoRender(true);
+        $this->_helper->viewRenderer->setNoRender(true);
+
         $data = $this->_getAllParams();
         //Previene vulnerabilidad XSS (Cross-site scripting)
         $filtro = new Zend_Filter_StripTags();
@@ -219,14 +201,9 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
             $nomorgano = $this->_getParam('nomorgano');
             $nomunidad = $this->_getParam('nomunidad');
 
-            //Exportar word text
-            //$this->getHelper('word')->repOrganoUnidad($dataWord, $nomorgano, $nomunidad);
-
             $PHPWord = new PHPWord();
             $section = $PHPWord->createSection();
 
-            //Template-Organo-Unidad.docx
-            //$section = $PHPWord->loadTemplate('Template-Organo-Unidad.docx');
             $styleTable = array('borderSize' => 6, 'borderColor' => '000000', 'cellMargin' => 80);
             $styleFirstRow = array('borderBottomSize' => 18, 'borderBottomColor' => '000000', 'bgColor' => 'BFD7FA');
 
@@ -280,20 +257,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
             $objWriter = PHPWord_IOFactory::createWriter($PHPWord, 'Word2007');
             $objWriter->save($filename);
 
-            $filename = 'GrupoFamiliaRol.docx';
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="GrupoFamiliaRol.docx"');
-            header('Content-Transfer-Encoding: binary');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-            header('Pragma: public');
-            //header('Content-Length: ' . filesize($h2d_file_uri));
-            ob_clean();
-            flush();
-            //readfile($h2d_file_uri);
-            //unlink($h2d_file_uri);
-            //exit;
+            echo Zend_Json::encode(array("success" => 1));
         }
     }
 
@@ -327,8 +291,6 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
 
     public function exportWordPertinenciaAction() {
 
-        $this->_helper->layout->disableLayout();
-        //$this->_helper->viewRenderer->setNoRender(true);
         $data = $this->_getAllParams();
         //Previene vulnerabilidad XSS (Cross-site scripting)
         $filtro = new Zend_Filter_StripTags();
@@ -336,10 +298,9 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
             $data[$key] = $filtro->filter(trim($val));
         }
 
-        /*
-          if (!$this->getRequest()->isXmlHttpRequest())
-          exit('Acción solo válida para peticiones ajax');
-         * */
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
 
         if ($this->_hasParam('unidad')) {
             $unidad = $this->_getParam('unidad');
@@ -351,8 +312,6 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
             $PHPWord = new PHPWord();
             $section = $PHPWord->createSection();
 
-            //Template-Organo-Unidad.docx
-            //$section = $PHPWord->loadTemplate('Template-Organo-Unidad.docx');
             $styleTable = array('borderSize' => 6, 'borderColor' => '000000', 'cellMargin' => 80);
             $styleFirstRow = array('borderBottomSize' => 18, 'borderBottomColor' => '000000', 'bgColor' => 'BFD7FA');
 
@@ -366,11 +325,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
             //$section->addTextBreak(1); // Enter
             // Add table style
             $PHPWord->addTableStyle('myOwnTableStyle', $styleTable, $styleFirstRow);
-
-            // Add table
             $table = $section->addTable('myOwnTableStyle');
-
-            $textoCenter = array('align' => 'center');
             $table->addRow(900);
 
             // Add cells
@@ -397,35 +352,8 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
 
             $this->_helper->layout->disableLayout();
             $this->_helper->viewRenderer->setNoRender();
-            
-            //$filename = APPLICATION_PATH . "/../public/Pertinencia.docx";          
-            
-            $this->getResponse()->setRawHeader("Content-Type: application/octet-stream")
-                    ->setRawHeader("Content-Description: File Transfer")
-                    ->setRawHeader('Content-Disposition: attachment; filename="'.$filename.'"')
-                    ->setRawHeader("Content-Transfer-Encoding: binary")
-                    ->setRawHeader("Expires: 0")
-                    ->setRawHeader("Cache-Control: must-revalidate, post-check=0, pre-check=0")
-                    ->setRawHeader("Pragma: public")
-                    ->setRawHeader("Content-Length: " . filesize($filename))
-                    ->sendResponse();
 
-
-            /*
-              header('Content-Description: File Transfer');
-              header('Content-Type: application/octet-stream');
-              header('Content-Disposition: attachment; filename="Pertinencia.docx"');
-              header('Content-Transfer-Encoding: binary');
-              header('Expires: 0');
-              header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-              header('Pragma: public');
-              //header('Content-Length: ' . filesize($h2d_file_uri));
-              ob_clean();
-              flush();
-              //readfile($h2d_file_uri);
-              //unlink($h2d_file_uri);
-              exit;
-             * */
+            echo Zend_Json::encode(array("success" => 1));
         }
     }
 
@@ -438,53 +366,80 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
 
     public function mapeoPuestoAction() {
 
-        set_time_limit(0);
+        $objPHPExcel = new PHPExcel();
+
+        $objPHPExcel->getProperties()->setCreator('Xperta Gestión Empresarial')
+                ->setTitle('PHPExcel Test Document')
+                ->setSubject('PHPExcel Test Document')
+                ->setDescription('Mapeo de puestos')
+                ->setKeywords('office PHPExcel php')
+                ->setCategory('Test result file');
+        $objPHPExcel->getActiveSheet()->setTitle('MapeoPuestos');
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        //$objPHPExcel->getActiveSheet()->getRowDimension('7')->setRowHeight(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(12);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(15); //->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(25);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(25);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(22);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth(25);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth(25);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('I')->setWidth(25);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setWidth(15);
+
+        $objPHPExcel->getActiveSheet()->setCellValue('A1', 'Núm Correlativo')
+                ->setCellValue('B1', 'Naturaleza del Órgano')
+                ->setCellValue('C1', 'Órgano')
+                ->setCellValue('D1', 'Unidad Orgánica')
+                ->setCellValue('E1', 'Nombre del Puesto')
+                ->setCellValue('F1', 'Cantidad de ocupados')
+                ->setCellValue('G1', 'Grupo')
+                ->setCellValue('H1', 'Familia')
+                ->setCellValue('I1', 'Rol')
+                ->setCellValue('J1', 'Nombres');
+
         $data = $this->_puesto->obtenerMapeoPuesto($this->_proyecto);
-        $filename = APPLICATION_PATH . "/../public/excel-" . date("m-d-Y") . ".xls";
-        $realPath = realpath($filename);
-        if (false === $realPath) {
-            touch($filename);
-            chmod($filename, 0777);
-        }
-        $filename = realpath($filename);
-        $handle = fopen($filename, "w");
         $finalData = array();
         foreach ($data AS $row) {
             $finalData[] = array(
-                utf8_decode($row["num_correlativo"]),
-                utf8_decode($row["naturaleza"]),
-                utf8_decode($row["organo"]),
-                utf8_decode($row["unidad"]),
-                utf8_decode($row["puesto"]),
-                utf8_decode($row["cantidad"]),
-                utf8_decode($row["grupo"]),
-                utf8_decode($row["familia"]),
-                utf8_decode($row["rpuesto"]),
-                utf8_decode($row["nombre_personal"])
+                ($row["num_correlativo"]),
+                ($row["naturaleza"]),
+                ($row["organo"]),
+                ($row["unidad"]),
+                ($row["puesto"]),
+                ($row["cantidad"]),
+                ($row["grupo"]),
+                ($row["familia"]),
+                ($row["rpuesto"]),
+                ($row["nombre_personal"])
             );
         }
 
-        $cabecera = array(utf8_decode('Núm Correlativo'), utf8_decode('Naturaleza del Órgano'), utf8_decode('Órgano'),
-            utf8_decode('Unidad Orgánica'), 'Nombre del Puesto', 'Cantidad de ocupados',
-            'Grupo', 'Familia', 'Rol', 'Nombres');
-        fputcsv($handle, $cabecera, "\t");
-        foreach ($finalData AS $finalRow) {
-            fputcsv($handle, $finalRow, "\t");
-        }
-        fclose($handle);
-        $this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender();
-        $this->getResponse()->setRawHeader("Content-Type: application/vnd.ms-excel; charset=UTF-8")
-                ->setRawHeader("Content-Disposition: attachment; filename=MapeoPuestos.xls")
-                ->setRawHeader("Content-Transfer-Encoding: binary")
-                ->setRawHeader("Expires: 0")
-                ->setRawHeader("Cache-Control: must-revalidate, post-check=0, pre-check=0")
-                ->setRawHeader("Pragma: public")
-                ->setRawHeader("Content-Length: " . filesize($filename))
-                ->sendResponse();
-        readfile($filename);
-        unlink($filename);
-        exit();
+        $styleArray = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array('argb' => 'FF000000'),
+                )
+            ),
+        );
+
+        $objPHPExcel->getActiveSheet()->fromArray($finalData, NULL, 'A2');
+        $nReg = count($finalData) + 1;
+
+        $objPHPExcel->getActiveSheet()->getStyle('A1:J' . $nReg)->applyFromArray($styleArray);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:J1')->getFont()->setBold(true);
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="MapeoPuestos.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+        exit;
     }
 
 }

@@ -39,9 +39,11 @@ $(document).ready(function () {
                 nomunidad: nomunidad
             },
             type: 'post',
-            dataType: 'html',
+            dataType: 'json',
             success: function (result) {
-
+                if (result.success == 1) {
+                    location.href = "/GrupoFamiliaRol.docx";
+                }
             }
         });
     };

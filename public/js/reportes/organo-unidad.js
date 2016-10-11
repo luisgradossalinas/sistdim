@@ -21,7 +21,7 @@ $(document).ready(function () {
 
         var organo = $("#organo").val();
         var unidad = $("#unidad").val();
-        
+
         var nomorgano = $("#organo option:selected").text();
         var nomunidad = $("#unidad option:selected").text();
 
@@ -35,13 +35,15 @@ $(document).ready(function () {
             url: urls.siteUrl + '/admin/reportes/export-word-organo-unidad',
             data: {
                 unidad: unidad,
-                nomorgano : nomorgano,
-                nomunidad : nomunidad
+                nomorgano: nomorgano,
+                nomunidad: nomunidad
             },
             type: 'post',
-            dataType: 'html',
+            dataType: 'json',
             success: function (result) {
-
+                if (result.success == 1) {
+                    location.href = "/Organo-Unidad.docx";
+                }
             }
         });
     };

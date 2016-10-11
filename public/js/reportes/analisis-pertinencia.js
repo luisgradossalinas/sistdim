@@ -1,21 +1,17 @@
 $(document).ready(function () {
 
     $("#generarWord").hide();
-
     $('#tablaAnaPertinencia').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "lengthMenu": [[-1], ["All"]]
     });
-    
     generarWord = function () {
 
         var organo = $("#organo").val();
         var unidad = $("#unidad").val();
-
         var nomorgano = $("#organo option:selected").text();
         var nomunidad = $("#unidad option:selected").text();
-
         if (organo == '' || unidad == '') {
             alert("Debe seleccionar Órgano o Unidad Orgánica");
             return false;
@@ -30,22 +26,22 @@ $(document).ready(function () {
                 nomunidad: nomunidad
             },
             type: 'post',
-            dataType: 'html',
+            dataType: 'json',
             success: function (result) {
-
+                //Si se llegó a generar el word
+                if (result.success == 1) {
+                    location.href = "/Pertinencia.docx";
+                }
             }
         });
     };
-
     //Personalizar el listado de órganos
     $("#organo_chzn").css('width', '420px');
     $("#organo_chzn .chzn-drop").css('width', '410px');
     $("#organo_chzn .chzn-drop .chzn-search input").css('width', '360px');
-
     $("#unidad_chzn").css('width', '300px');
     $("#unidad_chzn .chzn-drop").css('width', '290px');
     $("#unidad_chzn .chzn-drop .chzn-search input").css('width', '240px');
-
     $("#organo").change(function () {
 
         var organo = $("#organo").val();
@@ -68,7 +64,6 @@ $(document).ready(function () {
             success: function (result) {
                 $("#capa").html(result);
                 $("#unidad").chosen();
-
                 if ($("#unidad option").size() == 1) {
                     alert('Órgano, no tiene Unidades Orgánicas registradas.');
                     return false;
@@ -79,7 +74,6 @@ $(document).ready(function () {
                     var unidad = $("#unidad").val();
                     var nomunidad = $("#unidad option:selected").text();
                     $('#tablaAnaPertinencia').DataTable().clear().draw();
-
                     if (organo == '') {
                         alert('Seleccione órgano');
                         $('#tablaAnaPertinencia').DataTable().clear().draw();
@@ -101,7 +95,6 @@ $(document).ready(function () {
                         success: function (result) {
 
                             var contador = 0;
-
                             if (result == '' || result == []) {
                                 alert('Falta grabar la pertinencia en los puestos');
                                 $('#tablaAnaPertinencia').DataTable().clear().draw();
@@ -111,7 +104,6 @@ $(document).ready(function () {
                             //0.56 es una persona
                             $.each(result, function (key, obj) {
                                 contador++;
-
                                 if (obj['dotacion'] == null) {
                                     obj['dotacion'] = "0.00";
                                 }

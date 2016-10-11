@@ -50,7 +50,6 @@ class Application_Model_Puesto extends Zend_Db_Table {
     /*
       Esta función sirve para listar los puestos en la tabla donde se van a crear actividades.
      *  */
-
     public function puestosActividades($unidad) {
 
         return $this->getAdapter()->select()->from($this->_name)
@@ -64,7 +63,7 @@ class Application_Model_Puesto extends Zend_Db_Table {
 
         return $this->getAdapter()->query('SELECT puesto,descripcion,nombre_puesto,SUM(dotacion) AS dotacion
             FROM
-            (SELECT p.`descripcion` AS puesto,np.`descripcion`,a.`nombre_puesto`,ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2)
+            (SELECT p.`descripcion` AS puesto,np.`descripcion`,a.`nombre_puesto`,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2),0.00)
                         AS dotacion
                         FROM puesto p INNER JOIN actividad a ON p.`id_puesto` = a.`id_puesto` 
                        LEFT JOIN nivel_puesto np ON np.`id_nivel_puesto` = a.`id_nivel_puesto` 
@@ -73,7 +72,7 @@ class Application_Model_Puesto extends Zend_Db_Table {
                        WHERE  np.`id_nivel_puesto` IN (1,2,3,4) AND a.`tiene_tarea` = 0 AND a.`id_uorganica` = ' . $unidad . ' 
                        GROUP BY p.`descripcion`,np.`descripcion`,a.`nombre_puesto`
                        UNION ALL
-                       SELECT p.`descripcion` AS puesto,np.`descripcion`,a.`nombre_puesto`,ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2) AS dotacion
+                       SELECT p.`descripcion` AS puesto,np.`descripcion`,a.`nombre_puesto`,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2),0.00) AS dotacion
                         FROM puesto p INNER JOIN tarea a ON p.`id_puesto` = a.`id_puesto` 
                        LEFT JOIN nivel_puesto np ON np.`id_nivel_puesto` = a.`id_nivel_puesto` 
                        LEFT JOIN tiempo t ON t.`id_tiempo` = a.`id_tiempo` 
@@ -135,21 +134,9 @@ class Application_Model_Puesto extends Zend_Db_Table {
                         ->query()->fetchColumn();
     }
 
-    /*
-      select p.`num_correlativo`,nat.`descripcion`,o.`organo`,uo.`descripcion`,p.`descripcion`,p.`cantidad`
-      ,g.`descripcion`,f.`descripcion`,p.`nombre_personal` from puesto p
-      inner join unidad_organica uo on uo.`id_uorganica` = p.`id_uorganica`
-      inner join organo o on o.`id_organo` = uo.`id_organo` inner join natuorganica nat on nat.`codigo_natuorganica` = o.`codigo_natuorganica`
-      inner join grupo g on g.`codigo_grupo` = p.`codigo_grupo`
-      inner join familia f on f.`codigo_familia` = p.`codigo_familia`
-      inner join rolpuesto rp on rp.`codigo_rol_puesto` = p.`codigo_rol_puesto`
-      where o.`id_proyecto` = 1 and p.`estado` = 1
-      order by nat.`descripcion` asc,o.`organo` asc,uo.`descripcion` asc,p.`descripcion` asc;
-     *      */
-
     public function obtenerMapeoPuesto($proyecto) {
 
-        $sql = $this->getAdapter()->select()->from(array('p' => self::TABLA), array('num_correlativo', 'puesto' => 'descripcion',
+        return $this->getAdapter()->select()->from(array('p' => self::TABLA), array('num_correlativo', 'puesto' => 'descripcion',
                     'cantidad', 'nombre_personal'))
                 ->joinInner(array('uo' => Application_Model_UnidadOrganica::TABLA), 'uo.id_uorganica = p.id_uorganica', array('unidad' => 'descripcion'))
                 ->joinInner(array('o' => Application_Model_Organo::TABLA), 'o.id_organo = uo.id_organo', array('organo'))
@@ -159,10 +146,9 @@ class Application_Model_Puesto extends Zend_Db_Table {
                 ->joinInner(array('rp' => Application_Model_Rolpuesto::TABLA), 'rp.codigo_rol_puesto = p.codigo_rol_puesto', array('rpuesto' => 'descripcion'))
                 ->where('o.id_proyecto = ?', $proyecto)
                 ->where('p.estado = ?', self::ESTADO_ACTIVO)
-                ->order(array('nat.descripcion asc', 'o.organo asc', 'uo.descripcion asc', 'p.descripcion asc'));
+                ->order(array('nat.descripcion asc', 'o.organo asc', 'uo.descripcion asc', 'p.descripcion asc'))
+                ->query()->fetchAll();
 
-
-        return $sql->query()->fetchAll();
     }
 
 }

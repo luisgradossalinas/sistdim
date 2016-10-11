@@ -7,6 +7,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     {
         $config = new Zend_Config($this->getOptions(), true);
         $config->merge(new Zend_Config_Ini(APPLICATION_PATH.'/configs/servir.ini'));
+        $config->merge(new Zend_Config_Ini(APPLICATION_PATH.'/configs/security.ini'));
         //$config->setReadOnly();
         Zend_Registry::set('config', $config);
     }
@@ -59,6 +60,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     public function _initLibrerias()
     {
         require_once( APPLICATION_PATH . "/../library/Word/PHPWord.php");
+        require_once( APPLICATION_PATH . "/../library/Excel/PHPExcel.php");
 
     }
     
