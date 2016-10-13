@@ -24,15 +24,15 @@ class App_Controller_Action_Admin extends App_Controller_Action
         $rol = $sesion_usuario->sesion_usuario['id_rol'];
         $url = substr($_SERVER['REQUEST_URI'],1);
         
-        /*
+        
         $valUrl = explode("/",$url);
         $valUrl = $valUrl[0]."/".$valUrl[1]."/".$valUrl[2];
         $dataUrl = $this->getConfig()->accesos->url->toArray();
-        */
+        
          
         
-        //if (!$this->getRequest()->isXmlHttpRequest() && !in_array($valUrl,$dataUrl)) {
-        if (!$this->getRequest()->isXmlHttpRequest()) {
+        if (!$this->getRequest()->isXmlHttpRequest() && !in_array($valUrl,$dataUrl)) {
+        //if (!$this->getRequest()->isXmlHttpRequest()) {
             if ($url != self::MODULO_ADMIN) {
                 $recursoModelo = new Application_Model_Recurso;
                 $acceso = ($recursoModelo->validaAcceso($rol, $url));
