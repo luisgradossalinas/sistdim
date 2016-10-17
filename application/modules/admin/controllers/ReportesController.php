@@ -402,6 +402,9 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
                 ->setCellValue('I1', 'Rol')
                 ->setCellValue('J1', 'Nombres');
 
+        $objPHPExcel->getActiveSheet()->getStyle('A1:J1')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:J1')->getFill()->getStartColor()->setARGB('FF808080');
+
         $data = $this->_puesto->obtenerMapeoPuesto($this->_proyecto);
         $finalData = array();
         foreach ($data AS $row) {
@@ -459,13 +462,13 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
 
         //$objPHPExcel->getActiveSheet()->getRowDimension('7')->setRowHeight(20);
         $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(12);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(10); //->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(8); //->setAutoSize(true);
         $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(50);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(8);
         $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(50);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(8);
         $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth(50);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth(8);
         $objPHPExcel->getActiveSheet()->getColumnDimension('I')->setWidth(50);
         $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setWidth(10);
         $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setWidth(50);
@@ -482,6 +485,9 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
                 ->setCellValue('J1', 'Cod 4')
                 ->setCellValue('K1', 'Nivel 4');
 
+        $objPHPExcel->getActiveSheet()->getStyle('A1:K1')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:K1')->getFill()->getStartColor()->setARGB('FF808080');
+
         $data = $this->_proceson0->obtenerInventarioProcesos($this->_proyecto);
 
         //Generar nuevo array
@@ -489,12 +495,16 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         $contadorNombre = 1;
         $nivel1 = 1;
         $nivel2 = 1;
+        $nivel3 = 1;
+        $nivel4 = 1;
         $arrayNombreN0 = array();
         $arrayNombreN1 = array();
+        $arrayNombreN2 = array();
+        $arrayNombreN3 = array();
+        $arrayNombreN4 = array();
         foreach ($data as $value) {
 
-
-            if ($contador == 0) {
+            if ($contador == 0) { //La primera vez
                 $data[$contador]['cod0'] = $contadorNombre;
                 $arrayNombreN0[] = $value['nivel0'];
                 $contadorNombre++;
@@ -505,8 +515,72 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
                     $data[$contador]['cod0'] = $contadorNombre;
                     $arrayNombreN0[] = $value['nivel0'];
                     $contadorNombre++;
+                    $nivel1 = 1;
+                    $arrayNombreN1[] = array();
                 } else { //Si existe
                     $data[$contador]['cod0'] = $indice + 1;
+                }
+            }
+
+            if (empty($value['nivel1'])) {
+                $data[$contador]['cod1'] = '';
+            } else {
+                $indice1 = array_search($value['nivel1'], $arrayNombreN1);
+                if (empty($indice1)) { //Se agrega nuevo
+                    $arrayNombreN1[] = $value['nivel1'];
+                    $data[$contador]['cod1'] = $data[$contador]['cod0'] . "." . $nivel1;
+                    $nivel1++;
+                    $arrayNombreN2[] = array();
+                    $nivel2 = 1;
+                } else {
+                    $n = $nivel1 - 1;
+                    $data[$contador]['cod1'] = $data[$contador]['cod0'] . "." . $n;
+                }
+            }
+
+            if (empty($value['nivel2'])) {
+                $data[$contador]['cod2'] = '';
+            } else {
+                $indice2 = array_search($value['nivel2'], $arrayNombreN2);
+                if (empty($indice2)) { //Se agrega nuevo
+                    $arrayNombreN2[] = $value['nivel2'];
+                    $data[$contador]['cod2'] = $data[$contador]['cod1'] . "." . $nivel2;
+                    $nivel2++;
+                    $arrayNombreN3[] = array();
+                    $nivel3 = 1;
+                } else {
+                    $n = $nivel2 - 1;
+                    $data[$contador]['cod2'] = $data[$contador]['cod1'] . "." . $n;
+                }
+            }
+
+            if (empty($value['nivel3'])) {
+                $data[$contador]['cod3'] = '';
+            } else {
+                $indice3 = array_search($value['nivel3'], $arrayNombreN3);
+                if (empty($indice3)) { //Se agrega nuevo
+                    $arrayNombreN3[] = $value['nivel3'];
+                    $data[$contador]['cod3'] = $data[$contador]['cod2'] . "." . $nivel3;
+                    $nivel3++;
+                    $arrayNombreN4[] = array();
+                    $nivel4 = 1;
+                } else {
+                    $n = $nivel3 - 1;
+                    $data[$contador]['cod3'] = $data[$contador]['cod2'] . "." . $n;
+                }
+            }
+
+            if (empty($value['nivel4'])) {
+                $data[$contador]['cod4'] = '';
+            } else {
+                $indice4 = array_search($value['nivel4'], $arrayNombreN4);
+                if (empty($indice4)) { //Se agrega nuevo
+                    $arrayNombreN4[] = $value['nivel4'];
+                    $data[$contador]['cod4'] = $data[$contador]['cod3'] . "." . $nivel4;
+                    $nivel4++;
+                } else {
+                    $n = $nivel4 - 1;
+                    $data[$contador]['cod4'] = $data[$contador]['cod3'] . "." . $n;
                 }
             }
 
@@ -519,13 +593,13 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
                 $row["tipoproceso"],
                 $row['cod0'],
                 $row["nivel0"],
-                $row['cod0'],
+                $row['cod1'],
                 $row["nivel1"],
-                '',
+                $row['cod2'],
                 $row["nivel2"],
-                '',
+                $row['cod3'],
                 $row["nivel3"],
-                '',
+                $row['cod4'],
                 $row["nivel4"]
             );
         }
@@ -548,6 +622,256 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="Inventario-Procesos.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+        exit;
+    }
+
+    public function matrizDotacionAction() {
+
+        $objPHPExcel = new PHPExcel();
+
+        $objPHPExcel->getProperties()->setCreator('Xperta Gestión Empresarial')
+                ->setTitle('PHPExcel Test Document')
+                ->setSubject('PHPExcel Test Document')
+                ->setDescription('Matriz de Dimensionamiento')
+                ->setKeywords('office PHPExcel php')
+                ->setCategory('Test result file');
+        $objPHPExcel->getActiveSheet()->setTitle('MatrizDotación');
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        //$objPHPExcel->getActiveSheet()->getRowDimension('7')->setRowHeight(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(12);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(8); //->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(50);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(8);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(50);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(8);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth(50);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth(8);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('I')->setWidth(50);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setWidth(50);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('L')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('M')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('N')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('O')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('P')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('Q')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('R')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('S')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('T')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('U')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('V')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('W')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('X')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('Y')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('Z')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('AA')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('AB')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('AC')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('AD')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('AE')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('AF')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('AG')->setWidth(10);
+
+        $objPHPExcel->getActiveSheet()->setCellValue('A1', 'Tipo proceso')
+                ->setCellValue('B1', 'Cod 0')
+                ->setCellValue('C1', 'Nivel 0')
+                ->setCellValue('D1', 'Cod 1')
+                ->setCellValue('E1', 'Nivel 1')
+                ->setCellValue('F1', 'Cod 2')
+                ->setCellValue('G1', 'Nivel 2')
+                ->setCellValue('H1', 'Cod 3')
+                ->setCellValue('I1', 'Nivel 3')
+                ->setCellValue('J1', 'Cod 4')
+                ->setCellValue('K1', 'Nivel 4')
+                ->setCellValue('L1', 'Cod Act')
+                ->setCellValue('M1', 'Actividad')
+                ->setCellValue('N1', 'Cod Tarea')
+                ->setCellValue('O1', 'Tarea')
+                ->setCellValue('P1', 'Número Correlativo')
+                ->setCellValue('Q1', 'Ejecutor')
+                ->setCellValue('R1', 'Naturaleza del Órgano')
+                ->setCellValue('S1', 'Órgano')
+                ->setCellValue('T1', 'Unidad Orgánica')
+                ->setCellValue('U1', 'Periodicidad')
+                ->setCellValue('V1', 'Frecuencia')
+                ->setCellValue('W1', 'Frecuencia Mensual')
+                ->setCellValue('X1', 'Duración (horas)')
+                ->setCellValue('Y1', 'Tiempo Suplementario')
+                ->setCellValue('Z1', 'Total Tiempo Mensual (horas)')
+                ->setCellValue('AA1', 'Horas por Trabajador')
+                ->setCellValue('AB1', 'Servidores Públicos')
+                ->setCellValue('AC1', 'Grupo')
+                ->setCellValue('AD1', 'Familia')
+                ->setCellValue('AE1', 'Rol')
+                ->setCellValue('AF1', 'Nivel')
+                ->setCellValue('AG1', 'Categoría')
+                ->setCellValue('AH1', 'Nombre puesto');
+
+        $objPHPExcel->getActiveSheet()->getStyle('A1:AH1')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:AH1')->getFill()->getStartColor()->setARGB('FF808080');
+
+        $data = $this->_proceson0->obtenerMatrizDimensionamiento($this->_proyecto);
+
+        //Generar nuevo array
+        $contador = 0;
+        $contadorNombre = 1;
+        $nivel1 = 1;
+        $nivel2 = 1;
+        $nivel3 = 1;
+        $nivel4 = 1;
+        $arrayNombreN0 = array();
+        $arrayNombreN1 = array();
+        $arrayNombreN2 = array();
+        $arrayNombreN3 = array();
+        $arrayNombreN4 = array();
+        foreach ($data as $value) {
+
+            if ($contador == 0) { //La primera vez
+                $data[$contador]['cod0'] = $contadorNombre;
+                $arrayNombreN0[] = $value['nivel0'];
+                $contadorNombre++;
+            } else { //Cuando es mayor al contador 0
+                //Extrae índice
+                $indice = array_search($value['nivel0'], $arrayNombreN0);
+                if (empty($indice)) { //No existe se agrega nuevo
+                    $data[$contador]['cod0'] = $contadorNombre;
+                    $arrayNombreN0[] = $value['nivel0'];
+                    $contadorNombre++;
+                    $nivel1 = 1;
+                    $arrayNombreN1[] = array();
+                } else { //Si existe
+                    $data[$contador]['cod0'] = $indice + 1;
+                }
+            }
+
+            if (empty($value['nivel1'])) {
+                $data[$contador]['cod1'] = '';
+            } else {
+                $indice1 = array_search($value['nivel1'], $arrayNombreN1);
+                if (empty($indice1)) { //Se agrega nuevo
+                    $arrayNombreN1[] = $value['nivel1'];
+                    $data[$contador]['cod1'] = $data[$contador]['cod0'] . "." . $nivel1;
+                    $nivel1++;
+                    $arrayNombreN2[] = array();
+                    $nivel2 = 1;
+                } else {
+                    $n = $nivel1 - 1;
+                    $data[$contador]['cod1'] = $data[$contador]['cod0'] . "." . $n;
+                }
+            }
+
+            if (empty($value['nivel2'])) {
+                $data[$contador]['cod2'] = '';
+            } else {
+                $indice2 = array_search($value['nivel2'], $arrayNombreN2);
+                if (empty($indice2)) { //Se agrega nuevo
+                    $arrayNombreN2[] = $value['nivel2'];
+                    $data[$contador]['cod2'] = $data[$contador]['cod1'] . "." . $nivel2;
+                    $nivel2++;
+                    $arrayNombreN3[] = array();
+                    $nivel3 = 1;
+                } else {
+                    $n = $nivel2 - 1;
+                    $data[$contador]['cod2'] = $data[$contador]['cod1'] . "." . $n;
+                }
+            }
+
+            if (empty($value['nivel3'])) {
+                $data[$contador]['cod3'] = '';
+            } else {
+                $indice3 = array_search($value['nivel3'], $arrayNombreN3);
+                if (empty($indice3)) { //Se agrega nuevo
+                    $arrayNombreN3[] = $value['nivel3'];
+                    $data[$contador]['cod3'] = $data[$contador]['cod2'] . "." . $nivel3;
+                    $nivel3++;
+                    $arrayNombreN4[] = array();
+                    $nivel4 = 1;
+                } else {
+                    $n = $nivel3 - 1;
+                    $data[$contador]['cod3'] = $data[$contador]['cod2'] . "." . $n;
+                }
+            }
+
+            if (empty($value['nivel4'])) {
+                $data[$contador]['cod4'] = '';
+            } else {
+                $indice4 = array_search($value['nivel4'], $arrayNombreN4);
+                if (empty($indice4)) { //Se agrega nuevo
+                    $arrayNombreN4[] = $value['nivel4'];
+                    $data[$contador]['cod4'] = $data[$contador]['cod3'] . "." . $nivel4;
+                    $nivel4++;
+                } else {
+                    $n = $nivel4 - 1;
+                    $data[$contador]['cod4'] = $data[$contador]['cod3'] . "." . $n;
+                }
+            }
+
+            $contador++;
+        }
+
+        $finalData = array();
+        foreach ($data AS $row) {
+            $finalData[] = array(
+                $row["tipoproceso"],
+                $row['cod0'],
+                $row["nivel0"],
+                $row['cod1'],
+                $row["nivel1"],
+                $row['cod2'],
+                $row["nivel2"],
+                $row['cod3'],
+                $row["nivel3"],
+                $row['cod4'],
+                $row["nivel4"],
+                $row['num_act'],
+                $row["actividad"],
+                $row["num_tarea"],
+                $row["tarea"],
+                $row["num_puesto"],
+                $row["puesto"],
+                $row["natu_orga"],
+                $row["organo"],
+                $row["unidad_organica"],
+                $row["periodicidad"],
+                $row["frecuencia"],
+                $row["frecuencia_mensual"],
+                $row["duracion_horas"],
+                $row["tiempo_suple"],
+                $row["total_tiempo_mensual"],
+                $row["horas_trabaja"],
+                $row["servidores_publicos"],
+                $row["grupo"],
+                $row["familia"],
+                $row["rol"],
+                $row["nivel_puesto"],
+                $row["categoria_puesto"],
+                $row['nombre_puesto']
+            );
+        }
+
+        $styleArray = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array('argb' => 'FF000000'),
+                )
+            ),
+        );
+
+        $objPHPExcel->getActiveSheet()->fromArray($finalData, NULL, 'A2');
+        $nReg = count($finalData) + 1;
+
+        $objPHPExcel->getActiveSheet()->getStyle('A1:AH' . $nReg)->applyFromArray($styleArray);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:AH1')->getFont()->setBold(true);
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="Matriz-Dimensionamiento.xlsx"');
         header('Cache-Control: max-age=0');
 
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');

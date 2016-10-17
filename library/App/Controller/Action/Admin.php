@@ -21,8 +21,6 @@ class App_Controller_Action_Admin extends App_Controller_Action {
 
         $rol = $sesion_usuario->sesion_usuario['id_rol'];
         $url = substr($_SERVER['REQUEST_URI'], 1);
-
-
         $valUrl = explode("/", $url);
         if (count($valUrl) == 3) {
             $valUrl = $valUrl[0] . "/" . $valUrl[1] . "/" . $valUrl[2];
@@ -34,7 +32,7 @@ class App_Controller_Action_Admin extends App_Controller_Action {
 
 
 
-        if (!$this->getRequest()->isXmlHttpRequest() && !in_array($valUrl, $dataUrl)) {
+        if (!$this->getRequest()->isXmlHttpRequest() && !in_array($valUrl, $dataUrl)) { //Si no viene por ajax y viene por POST
             //if (!$this->getRequest()->isXmlHttpRequest()) {
             if ($url != self::MODULO_ADMIN) {
                 $recursoModelo = new Application_Model_Recurso;
