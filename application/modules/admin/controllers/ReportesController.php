@@ -5,6 +5,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
     private $_puesto;
     private $_organo;
     private $_unidadOrganica;
+    private $_proceson0;
     private $_usuario;
     private $_rol;
     private $_proyecto;
@@ -13,6 +14,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         $this->_puesto = new Application_Model_Puesto;
         $this->_organo = new Application_Model_Organo;
         $this->_unidadOrganica = new Application_Model_UnidadOrganica;
+        $this->_proceson0 = new Application_Model_Proceso0;
 
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
         $this->_proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
@@ -435,6 +437,117 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="MapeoPuestos.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+        exit;
+    }
+
+    public function inventarioProcesosAction() {
+
+        $objPHPExcel = new PHPExcel();
+
+        $objPHPExcel->getProperties()->setCreator('Xperta Gestión Empresarial')
+                ->setTitle('PHPExcel Test Document')
+                ->setSubject('PHPExcel Test Document')
+                ->setDescription('Mapeo de puestos')
+                ->setKeywords('office PHPExcel php')
+                ->setCategory('Test result file');
+        $objPHPExcel->getActiveSheet()->setTitle('Inventario');
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        //$objPHPExcel->getActiveSheet()->getRowDimension('7')->setRowHeight(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(12);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(10); //->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(50);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(50);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth(50);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('I')->setWidth(50);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setWidth(50);
+
+        $objPHPExcel->getActiveSheet()->setCellValue('A1', 'Tipo proceso')
+                ->setCellValue('B1', 'Cod 0')
+                ->setCellValue('C1', 'Nivel 0')
+                ->setCellValue('D1', 'Cod 1')
+                ->setCellValue('E1', 'Nivel 1')
+                ->setCellValue('F1', 'Cod 2')
+                ->setCellValue('G1', 'Nivel 2')
+                ->setCellValue('H1', 'Cod 3')
+                ->setCellValue('I1', 'Nivel 3')
+                ->setCellValue('J1', 'Cod 4')
+                ->setCellValue('K1', 'Nivel 4');
+
+        $data = $this->_proceson0->obtenerInventarioProcesos($this->_proyecto);
+
+        //Generar nuevo array
+        $contador = 0;
+        $contadorNombre = 1;
+        $nivel1 = 1;
+        $nivel2 = 1;
+        $arrayNombreN0 = array();
+        $arrayNombreN1 = array();
+        foreach ($data as $value) {
+
+
+            if ($contador == 0) {
+                $data[$contador]['cod0'] = $contadorNombre;
+                $arrayNombreN0[] = $value['nivel0'];
+                $contadorNombre++;
+            } else { //Cuando es mayor al contador 0
+                //Extrae índice
+                $indice = array_search($value['nivel0'], $arrayNombreN0);
+                if (empty($indice)) { //No existe se agrega nuevo
+                    $data[$contador]['cod0'] = $contadorNombre;
+                    $arrayNombreN0[] = $value['nivel0'];
+                    $contadorNombre++;
+                } else { //Si existe
+                    $data[$contador]['cod0'] = $indice + 1;
+                }
+            }
+
+            $contador++;
+        }
+
+        $finalData = array();
+        foreach ($data AS $row) {
+            $finalData[] = array(
+                $row["tipoproceso"],
+                $row['cod0'],
+                $row["nivel0"],
+                $row['cod0'],
+                $row["nivel1"],
+                '',
+                $row["nivel2"],
+                '',
+                $row["nivel3"],
+                '',
+                $row["nivel4"]
+            );
+        }
+
+        $styleArray = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array('argb' => 'FF000000'),
+                )
+            ),
+        );
+
+        $objPHPExcel->getActiveSheet()->fromArray($finalData, NULL, 'A2');
+        $nReg = count($finalData) + 1;
+
+        $objPHPExcel->getActiveSheet()->getStyle('A1:K' . $nReg)->applyFromArray($styleArray);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:K1')->getFont()->setBold(true);
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="Inventario-Procesos.xlsx"');
         header('Cache-Control: max-age=0');
 
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
