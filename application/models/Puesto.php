@@ -150,5 +150,14 @@ class Application_Model_Puesto extends Zend_Db_Table {
                 ->query()->fetchAll();
 
     }
+    
+    public function puestosDotacion($unidad) {
+
+        return $this->getAdapter()->select()->from($this->_name,array('puesto' => 'descripcion', 'dotacion' => 'round(total_dotacion,2)'))
+                        ->where('id_uorganica = ?', $unidad)
+                        ->where('estado = ?', self::ESTADO_ACTIVO)
+                        ->order('descripcion asc')
+                        ->query()->fetchAll();
+    }
 
 }

@@ -1,0 +1,25 @@
+<style>
+    #tabla input, #tabla select {
+        font-size:8pt
+    }    
+</style>
+<?= $this->partial('_partials/mensajes.phtml', array('messages' => $this->messages, 'tipoMessages' => $this->tipoMessages)); ?>
+<div style="float:left">
+    <select id="organo" name="organo">
+        <option value=''>[Seleccione órgano]</option>
+        <?php
+        foreach ($this->organo as $val) {
+            echo "<option value=" . $val['id_organo'] . ">" . $val['organo'] . "</option>";
+        }
+        ?>
+    </select>
+</div>
+<div id="capa" style="float:left"></div>
+<div class="widget-box">
+    <div class="widget-title">	
+        <h5><?= $this->active ?></h5>
+    </div>
+    <div id="jqchart" style="width:700px;height:350px;margin: 0 auto;"></div>
+</div>
+<?= $this->partial('_partials/modal.phtml', array('model' => $this->model)); ?>
+

@@ -652,17 +652,17 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth(50);
         $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth(8);
         $objPHPExcel->getActiveSheet()->getColumnDimension('I')->setWidth(50);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setWidth(8);
         $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setWidth(50);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('L')->setWidth(10);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('M')->setWidth(10);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('N')->setWidth(10);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('O')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('L')->setWidth(8);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('M')->setWidth(25);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('N')->setWidth(8);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('O')->setWidth(20);
         $objPHPExcel->getActiveSheet()->getColumnDimension('P')->setWidth(10);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('Q')->setWidth(10);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('R')->setWidth(10);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('S')->setWidth(10);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('T')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('Q')->setWidth(15);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('R')->setWidth(13);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('S')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('T')->setWidth(20);
         $objPHPExcel->getActiveSheet()->getColumnDimension('U')->setWidth(10);
         $objPHPExcel->getActiveSheet()->getColumnDimension('V')->setWidth(10);
         $objPHPExcel->getActiveSheet()->getColumnDimension('W')->setWidth(10);
@@ -670,12 +670,13 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         $objPHPExcel->getActiveSheet()->getColumnDimension('Y')->setWidth(10);
         $objPHPExcel->getActiveSheet()->getColumnDimension('Z')->setWidth(10);
         $objPHPExcel->getActiveSheet()->getColumnDimension('AA')->setWidth(10);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('AB')->setWidth(10);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('AC')->setWidth(10);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('AD')->setWidth(10);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('AE')->setWidth(10);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('AF')->setWidth(10);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('AG')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('AB')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('AC')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('AD')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('AE')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('AF')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('AG')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('AH')->setWidth(20);
 
         $objPHPExcel->getActiveSheet()->setCellValue('A1', 'Tipo proceso')
                 ->setCellValue('B1', 'Cod 0')
