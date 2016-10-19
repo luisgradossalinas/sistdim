@@ -1,16 +1,42 @@
 $(document).ready(function () {
-    
-    var chart = new Highcharts.Chart(
-            {"credits": {"enabled": false},
-                "chart": {"renderTo": "jqchart"},
-                "series": [{"name": "Browser share", "data": [["Firefox", 45], ["IE", 26.8], {"name": "Chrome", "y": 12.8, "sliced": true, "selected": true}, ["Safari", 8.5], ["Opera", 6.2], ["Others", 0.7]], "type": "column"}],
-                "title": {"text": "Puestos por Unidad Orgánica"},
-                "tooltip": {"formatter": function () {
-                        return '<b>' + this.point.name + '</b>: ' + this.y + ' %';
-                    }}, "plotOptions": {"pie": {"allowPointSelect": true, "cursor": "pointer",
-                        "dataLabels": {"enabled": true, "color": "#000000", "connectorColor": "#000000", "formatter": function () {
-                                return '<b>' + this.point.name + '</b>: ' + this.y + ' %'
-                            }}}}});
+
+    //$("#jqRadialGauge").hide();
+
+    /*
+     var chart = new Highcharts.Chart(
+     {"credits": {"enabled": false},
+     "chart": {"renderTo": "jqRadialGauge"},
+     "series": [{"name": "Browser share", "data": [["Firefox", 45], ["IE", 26.8], {"name": "Chrome", "y": 12.8, "sliced": true, "selected": true}, ["Safari", 8.5], ["Opera", 6.2], ["Others", 0.7]], "type": "column"}],
+     "title": {"text": "Puestos por Unidad Orgánica"},
+     "tooltip": {"formatter": function () {
+     return '<b>' + this.point.name + '</b>: ' + this.y + ' %';
+     }}, "plotOptions": {"pie": {"allowPointSelect": true, "cursor": "pointer",
+     "dataLabels": {"enabled": true, "color": "#000000", "connectorColor": "#000000", "formatter": function () {
+     return '<b>' + this.point.name + '</b>: ' + this.y + ' %'
+     }}}}});
+     */
+
+    var generarGrafico = function (data, unidad) {
+        var chart = new Highcharts.Chart({
+        //    $('#capa_grafico').jqChart({
+            "chart": {"renderTo": "capa_grafico"},
+            title: {text: 'Unidad Orgánica:' + unidad},
+            legend: { title: 'Puestos' },
+            animation: {duration: 1},
+            shadows: {
+                enabled: true
+            },
+            series: [
+                {
+                    type: 'column', //pie
+                    title: 'Puestos',
+                    //fillStyle: '#418CF0',
+                    fillStyles: ['#418CF0', '#FCB441', '#E0400A', '#056492', '#BFBFBF', '#1A3B69', '#FFE382'],
+                    data: data
+                }
+            ]
+        });
+    }
 
 
     //Personalizar el listado de órganos
@@ -24,9 +50,11 @@ $(document).ready(function () {
 
     $("#organo").change(function () {
 
+        $("#capa_grafico").empty();
         var organo = $("#organo").val();
         if (organo == '') {
             $("#capa").html("<select id='unidad' style='width:320px'><option>[Selecione unidad orgánica]</option></select>");
+
             return false;
         }
 
@@ -37,7 +65,6 @@ $(document).ready(function () {
             },
             type: 'post',
             //dataType: 'json',
-            //Probar generando el html
             success: function (result) {
                 $("#capa").html(result);
                 $("#unidad").chosen();
@@ -57,56 +84,17 @@ $(document).ready(function () {
                         return false;
                     }
                     if (unidad == '') {
+                        $("#capa_grafico").empty();
                         return false;
                     }
-                    //Buscar y pintar la tablaOrgaUnidad de los puestos obtenidos
+
                     $.ajax({
-                        url: urls.siteUrl + '/admin/estadisticas/puestos-dotacion', //Cambiar url solo totales
-                        data: {
-                            unidad: unidad
-                        },
-                        type: 'post',
+                        url: urls.siteUrl + '/admin/estadisticas/puestos-dotacion',
                         dataType: 'json',
+                        data: {unidad: unidad},
+                        type: 'post',
                         success: function (result) {
-
-                            //Llenar tabla con los puestos
-                            var contador = 0;
-                            var totalQueda = 0;
-
-                            var tcant = 0;
-                            var tdotacion = 0;
-                            var tqueda = 0;
-
-                            var tdota = 0;
-
-                            if (result == '' || result == []) {
-                                alert('Unidad orgánica, no tiene puestos registrados.');
-                                return false;
-                            }
-                            
-                            //Actualizar gráfico
-                            alert("Actualizar gráfico");
-
-                            //0.56 es una persona
-                            $.each(result, function (key, obj) {
-                                contador++;
-
-                                tdota = parseFloat(obj['total_dotacion']).toFixed(2).split(".");
-                                if (parseInt(tdota[1]) >= urls.redondeo) {
-                                    tdota = parseInt(tdota[0]) + 1;
-                                } else {
-                                    tdota = parseInt(tdota[0]);
-                                }
-
-                                tdotacion += tdota;
-                                tcant += parseInt(obj['cantidad']);
-
-                                totalQueda = tdota - parseInt(obj['cantidad']);
-
-                            });
-
-                            //Agregando el total
-                            contador++;
+                            generarGrafico(result, nomunidad);
                         }
                     });
                 });
