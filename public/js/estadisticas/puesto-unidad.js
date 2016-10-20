@@ -36,7 +36,7 @@ $(document).ready(function () {
                 }
             ]
         });
-    }
+    };
 
 
     //Personalizar el listado de órganos
