@@ -9,6 +9,8 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
     private $_usuario;
     private $_rol;
     private $_proyecto;
+    
+    private $_mapaPuesto;
 
     public function init() {
         $this->_puesto = new Application_Model_Puesto;
@@ -20,6 +22,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         $this->_proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
         $this->_usuario = $sesion_usuario->sesion_usuario['id'];
         $this->_rol = $sesion_usuario->sesion_usuario['id_rol'];
+        $this->_mapaPuesto = $sesion_usuario->sesion_usuario['mapa_puesto'];
 
         Zend_Layout::getMvcInstance()->assign('show', '1'); //No mostrar en el menú la barra horizontal
         parent::init();
@@ -407,9 +410,16 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
 
         $data = $this->_puesto->obtenerMapeoPuesto($this->_proyecto);
         $finalData = array();
+        $contador = 0;
         foreach ($data AS $row) {
+            $contador++;
+            $numCorre = $row["num_correlativo"];
+            if ($this->_mapaPuesto == 1) {
+                $numCorre = $contador;
+            }
+            
             $finalData[] = array(
-                ($row["num_correlativo"]),
+                $numCorre,
                 ($row["naturaleza"]),
                 ($row["organo"]),
                 ($row["unidad"]),

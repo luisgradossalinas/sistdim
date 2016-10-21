@@ -1,5 +1,0 @@
-se crea el campo
-id_usuario en la tabla 
-rol_recurso
-
-Avanzar permisos

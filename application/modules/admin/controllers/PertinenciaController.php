@@ -29,7 +29,7 @@ class Admin_PertinenciaController extends App_Controller_Action_Admin {
     public function indexAction() {
 
         Zend_Layout::getMvcInstance()->assign('active', 'Análisis de pertinencia');
-        Zend_Layout::getMvcInstance()->assign('padre', 6);
+        Zend_Layout::getMvcInstance()->assign('padre', 7);
         Zend_Layout::getMvcInstance()->assign('link', 'pertinencia');
 
         $this->view->organo = $this->_organoModel->obtenerOrgano($this->_proyecto);
