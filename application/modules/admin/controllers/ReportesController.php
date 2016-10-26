@@ -9,7 +9,6 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
     private $_usuario;
     private $_rol;
     private $_proyecto;
-    
     private $_mapaPuesto;
 
     public function init() {
@@ -417,7 +416,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
             if ($this->_mapaPuesto == 1) {
                 $numCorre = $contador;
             }
-            
+
             $finalData[] = array(
                 $numCorre,
                 ($row["naturaleza"]),
@@ -883,6 +882,136 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="Matriz-Dimensionamiento.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+        exit;
+    }
+
+    public function resumenAction() {
+        Zend_Layout::getMvcInstance()->assign('active', 'Resumen');
+        Zend_Layout::getMvcInstance()->assign('padre', 8);
+        Zend_Layout::getMvcInstance()->assign('link', 'resumen');
+    }
+
+    public function exportResumenAction() {
+
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel->getProperties()->setCreator('Xperta Gestión Empresarial')
+                ->setTitle('PHPExcel Test Document')
+                ->setSubject('PHPExcel Test Document')
+                ->setDescription('Mapeo de puestos')
+                ->setKeywords('office PHPExcel php')
+                ->setCategory('Test result file');
+        $objPHPExcel->getActiveSheet()->setTitle('Resumen');
+        $objPHPExcel->setActiveSheetIndex(0);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(50);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(30); //->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(40);
+        
+        $objPHPExcel->getActiveSheet()->setCellValue('A1', 'Órgano / Unidad Orgánica')
+                ->setCellValue('B1', 'Cantidad de ocupados Situación Actual')
+                ->setCellValue('C1', 'Cantidad de Servidores Públicos según Carga de Trabajo');
+        $objPHPExcel->getActiveSheet()->getStyle('A1:C1')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:C1')->getFill()->getStartColor()->setARGB('FF808080');
+
+        $data = $this->_puesto->obtenerPuestosProyecto($this->_proyecto);
+        //Generar nuevo array
+        $contador = 0;
+        $nombreUnidad = array();
+        $dataResumen = array();
+        $sumaActual = 0;
+        $sumaDotacion = 0;
+        $indicaUnidad = 0;
+
+        $totalActual = 0;
+        $totalDotacion = 0;
+
+        foreach ($data as $value) {
+
+            if (!in_array($value['unidad'], $nombreUnidad)) {
+                $dataResumen[$contador]['puesto'] = $value['unidad'];
+                $dataResumen[$contador]['cantidad'] = '';
+                $dataResumen[$contador]['unidad'] = '';
+                $dataResumen[$contador]['total_dotacion'] = '0.00';
+                $dataResumen[$indicaUnidad]['cantidad'] = $sumaActual;
+                $dataResumen[$indicaUnidad]['total_dotacion'] = $sumaDotacion;
+                $totalActual += $sumaActual;
+                $totalDotacion += $sumaDotacion;
+                $indicaUnidad = $contador;
+                $contador++;
+                $dataResumen[$contador]['puesto'] = $value['puesto'];
+                $dataResumen[$contador]['cantidad'] = $value['cantidad'];
+                $dataResumen[$contador]['unidad'] = $value['unidad'];
+                $dataResumen[$contador]['total_dotacion'] = $value['total_dotacion'];
+                $nombreUnidad[] = $value['unidad'];
+                $sumaActual = 0;
+                $sumaActual += $value['cantidad'];
+                $sumaDotacion = 0;
+
+                $redondeo = round($value["total_dotacion"], 0);
+                if ($value['total_dotacion'] < 0.54) {
+                    $redondeo = 0;
+                }
+                $sumaDotacion += $redondeo;
+            } else { //Si existe
+                $dataResumen[$contador]['puesto'] = $value['puesto'];
+                $dataResumen[$contador]['cantidad'] = $value['cantidad'];
+                $dataResumen[$contador]['unidad'] = $value['unidad'];
+                $dataResumen[$contador]['total_dotacion'] = $value['total_dotacion'];
+                $sumaActual += $value['cantidad'];
+                $redondeo = round($value["total_dotacion"], 0);
+                if ($value['total_dotacion'] < 0.54) {
+                    $redondeo = 0;
+                }
+                $sumaDotacion += $redondeo;
+            }
+
+            $contador++;
+        }
+
+        $dataResumen[$indicaUnidad]['cantidad'] = $sumaActual;
+        $dataResumen[$indicaUnidad]['total_dotacion'] = $sumaDotacion;
+
+        //Totales
+        $dataResumen[$contador]['puesto'] = 'Total General';
+        $dataResumen[$contador]['cantidad'] = $totalActual + $sumaActual;
+        $dataResumen[$contador]['total_dotacion'] = $totalDotacion + $sumaDotacion;
+
+        $finalData = array();
+        foreach ($dataResumen AS $row) {
+
+            $redondeo = round($row["total_dotacion"], 0);
+            if ($row['total_dotacion'] < 0.54) {
+                $redondeo = "0";
+            }
+
+            $finalData[] = array(
+                $row["puesto"],
+                $row['cantidad'],
+                $redondeo
+            );
+        }
+
+        $styleArray = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array('argb' => 'FF000000'),
+                )
+            ),
+        );
+
+        $objPHPExcel->getActiveSheet()->fromArray($finalData, NULL, 'A2');
+        $nReg = count($finalData) + 1;
+
+        $objPHPExcel->getActiveSheet()->getStyle('A1:C' . $nReg)->applyFromArray($styleArray);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:C1')->getFont()->setBold(true);
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="Reporte-Resumen.xlsx"');
         header('Cache-Control: max-age=0');
 
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
