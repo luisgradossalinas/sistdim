@@ -120,7 +120,7 @@ $(document).ready(function () {
                             });
 
                             $('#tablaAnaPertinencia').DataTable().row.add([
-                                '<center><font color=white>' + contador + "</font></center>",
+                                '<span style="display:none">' + contador + "</span></center>",
                                 '',
                                 'Total General',
                                 "<center>" + tcantidad + "</center>"

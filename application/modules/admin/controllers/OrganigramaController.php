@@ -241,6 +241,7 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
         $unidad = $data['unidad'];
         $dataPuesto = $this->_puestoModel->obtenerPuestos($unidad);
         $contador = 0;
+        /*
         foreach ($dataPuesto as $value) {
             $dataPuesto[$contador]['ngrupo'] = $dataPuesto[$contador]['grupo'];
             $dataPuesto[$contador]['nfamilia'] = $dataPuesto[$contador]['familia'];
@@ -251,6 +252,7 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
             $dataPuesto[$contador]['rpuesto'] = $this->getHelper('rolpuesto')->select($value['codigo_familia'], $value['codigo_rol_puesto'], $contador + 1);
             $contador++;
         }
+        */
         echo Zend_Json::encode($dataPuesto);
     }
 
@@ -314,15 +316,16 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
             foreach ($puestos as $reg) {
                 $add = explode("|", $reg);
                 if ($add[0] == 0) { //Nuevo
-                    $dataNueva = array('id_puesto' => $add[0], 'descripcion' => $add[2], 'id_uorganica' => $add[7],
-                    'num_correlativo' => $add[1], 'cantidad' => $add[3], 'codigo_grupo' => $add[4],
-                    'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6],'nombre_trabajador' => '','nombre_personal' => $add[8],
+                    $dataNueva = array('id_puesto' => $add[0], 'descripcion' => $add[2], 'id_uorganica' => $add[4],
+                    'num_correlativo' => $add[1], 'cantidad' => $add[3], 
+                    //'codigo_grupo' => $add[4],'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6],
+                    'nombre_trabajador' => '','nombre_personal' => $add[5],
                     'usuario_crea' => $this->_usuario, 'fecha_crea' => date("Y-m-d H:i:s"));
                 } else { //existe
-                    $dataNueva = array('id_puesto' => $add[0], 'descripcion' => $add[2], 'id_uorganica' => $add[7],
-                    'num_correlativo' => $add[1], 'cantidad' => $add[3], 'codigo_grupo' => $add[4],
-                    'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6],'nombre_personal' => $add[8],
-                    'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
+                    $dataNueva = array('id_puesto' => $add[0], 'descripcion' => $add[2], 'id_uorganica' => $add[4],
+                    'num_correlativo' => $add[1], 'cantidad' => $add[3], 
+                    // 'codigo_grupo' => $add[4], 'codigo_familia' => $add[5], 'codigo_rol_puesto' => $add[6],
+                     'nombre_personal' => $add[5],'usuario_actu' => $this->_usuario, 'fecha_actu' => date("Y-m-d H:i:s"));
                 
                 }$this->_puestoModel->guardar($dataNueva);
             }

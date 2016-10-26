@@ -1,5 +1,3 @@
-var codigo = 0;
-var sentencia_crud = '';
 $(document).ready(function () {
 
     //Ocultar el botón listar puestos y nuevo puesto;
@@ -181,11 +179,12 @@ $(document).ready(function () {
                                                 contador,
                                                 "<input type=hidden name=id_actividad value='" + obj['id_actividad'] + "'>" + "<input type=hidden name=id_tarea value='" + obj['id_tarea'] + "'>"+ "<input type=hidden name=id_puesto value='" + obj['id_puesto'] + "'>" + obj['descripcion'],
                                                 obj['tarea'],
-                                                nombre_puesto,
+                                                'Grupo',//Grupo
+                                                'Familia',//Familia
+                                                'Rol',//Rol
                                                 obj['nivel_puesto'],
                                                 obj['categoria_puesto'],
-                                                '<input type=text value="' + obj['nombre_puesto'] + '" style="font-size: 8pt">',
-                                                ''
+                                                '<input type=text value="' + obj['nombre_puesto'] + '" style="font-size: 8pt">'
                                             ]).draw(false);
                                             $("#npuesto_" + contador).chosen();
                                             $("#npuesto_" + contador + "_chzn").css('font-size', '7pt');

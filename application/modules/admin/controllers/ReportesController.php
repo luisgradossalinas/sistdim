@@ -1059,7 +1059,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
     public function puestosNaturalezaAction() {
         Zend_Layout::getMvcInstance()->assign('active', 'Puestos por Naturaleza del Órgano');
         Zend_Layout::getMvcInstance()->assign('padre', 8);
-        Zend_Layout::getMvcInstance()->assign('link', 'analpert');
+        Zend_Layout::getMvcInstance()->assign('link', 'puestos_naturaleza');
 
         $this->view->headScript()->appendFile(SITE_URL . '/js/reportes/puestos-naturaleza.js');
         $this->view->organo = $this->_organo->obtenerOrgano($this->_proyecto);
@@ -1107,7 +1107,6 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         $dataResumen = array();
 
         foreach ($data as $value) {
-
             $contador++;
             $dataResumen[$contador]['num'] = $contador;
             $dataResumen[$contador]['puesto'] = $value['puesto'];
@@ -1154,7 +1153,6 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         header('Cache-Control: max-age=0');
 
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-        //$objWriter->save('php://output');
         $objWriter->save("Puestos-Naturaleza.xlsx");
 
         echo Zend_Json::encode(array("success" => 1));

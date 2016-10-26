@@ -35,6 +35,7 @@ class Admin_PertinenciaController extends App_Controller_Action_Admin {
         $this->view->organo = $this->_organoModel->obtenerOrgano($this->_proyecto);
     }
 
+    //Invocada por AJAX obtiene todas las actividades y tareas que tiene un ejecutor
     public function obtenerActividadPuestoAction() {
 
         $this->_helper->layout->disableLayout();

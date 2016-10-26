@@ -76,7 +76,7 @@ $(document).ready(function () {
 
     $("#nuevoPuesto").click(function () {
 
-        var numReg = ($('#tabla').DataTable().data().count() / 10) + 1;
+        var numReg = ($('#tabla').DataTable().data().count() / 7) + 1;
         var organo = $("#organo").val();
         var unidad = $("#unidad").val();
 
@@ -97,23 +97,24 @@ $(document).ready(function () {
             "<input type=number name=num_cor title='Ingrese el número correlativo del puesto' style='width:50%'>",
             "<input type=text name=puesto>",
             "<input type=number name=cantidad style='width:50%'>",
-            "<select style='width:90%' id=grupo_" + numReg + " name=grupo_" + numReg + "><option value=''>[Grupo]</option></select>",
-            "<select style='width:90%' id=familia_" + numReg + " name=familia><option value=''>[Familia]</option></select>",
-            "<select style='width:90%' id=rol_" + numReg + " name=rol><option value=''>[Rol]</option></select><input type=hidden name=unidadT value='" + unidad + "'>",
-            "<input type=text name=nombre_personal style='width:80%'>"
+            /* "<select style='width:90%' id=grupo_" + numReg + " name=grupo_" + numReg + "><option value=''>[Grupo]</option></select>",
+             "<select style='width:90%' id=familia_" + numReg + " name=familia><option value=''>[Familia]</option></select>",
+             "<select style='width:90%' id=rol_" + numReg + " name=rol><option value=''>[Rol]</option></select><input type=hidden name=unidadT value='" + unidad + "'>",*/
+            "<input type=hidden name=unidadT value='" + unidad + "'>" + "<input type=text name=nombre_personal style='width:80%'>"
         ]).draw(false);
 
-        $.ajax({
-            url: urls.siteUrl + '/admin/organigrama/obtener-grupos',
-            type: 'post',
-            dataType: 'json',
-            success: function (result) {
-                //Llenar familia
-                $.each(result, function (key, obj) {
-                    $("#grupo_" + numReg).append("<option value='" + obj['codigo_grupo'] + "'>" + obj['descripcion'] + "</option>");
-                });
-            }
-        });
+        /*
+         $.ajax({
+         url: urls.siteUrl + '/admin/organigrama/obtener-grupos',
+         type: 'post',
+         dataType: 'json',
+         success: function (result) {
+         //Llenar familia
+         $.each(result, function (key, obj) {
+         $("#grupo_" + numReg).append("<option value='" + obj['codigo_grupo'] + "'>" + obj['descripcion'] + "</option>");
+         });
+         }
+         });*/
     });
 
     grabarPuestos = function () {
@@ -150,24 +151,24 @@ $(document).ready(function () {
             var grupo = $(this).find("td select").eq(0).val();
             var familia = $(this).find("td select").eq(1).val();
             var rol = $(this).find("td select").eq(2).val();
-            var unidad = $(this).find("td input").eq(4 - control).val();
+            var unidad = $(this).find("td input").eq(4 - control).val(); //ver
             var nombre_personal = $(this).find("td input").eq(5 - control).val();
 
             if (mapaPuesto == 0) {
                 if ((correlativo == '' || correlativo == 0) || nom_puesto == '' ||
-                        (cantidad == '' || cantidad == 0) || grupo == '' || familia == '' || rol == '') {
+                        (cantidad == '' || cantidad == 0)) {
                     mensaje += "En la fila " + contador + ": Debe completar todos los campos \n";
                     mostrarMensaje = 1;
                 }
             } else if (mapaPuesto == 1) {
-                if (nom_puesto == '' || (cantidad == '' || cantidad == 0) || grupo == '' || familia == '' || rol == '') {
+                if (nom_puesto == '' || (cantidad == '' || cantidad == 0)) {
                     mensaje += "En la fila " + contador + ": Debe completar todos los campos \n";
                     mostrarMensaje = 1;
                 }
                 correlativo = '';
             }
             dataPuesto.push(id_puesto + "|" + correlativo + '|' + nom_puesto + '|' + cantidad
-                    + "|" + grupo + "|" + familia + "|" + rol + "|" + unidad + "|" + nombre_personal);
+                    + "|" + unidad + "|" + nombre_personal);
 
 
             $.each(nombrePuesto, function (index, value) {
@@ -265,10 +266,10 @@ $(document).ready(function () {
                                 "<input type=number name=num_cor value='" + obj['numcor'] + "' style='width:50%'>",
                                 "<input type=text name=puesto value='" + obj['puesto'] + "'>",
                                 "<input type=number name=cantidad value='" + obj['cantidad'] + "' style='width:50%'>",
-                                obj['grupo'],
-                                obj['familia'],
-                                obj['rpuesto'] + "<input type=hidden name=unidadT value='" + unidad + "'>",
-                                "<input type=text name=nom_personal value='" + obj['nombre_personal'] + "' style='width:80%'>"
+                                /*obj['grupo'],
+                                 obj['familia'],
+                                 obj['rpuesto'] + "<input type=hidden name=unidadT value='" + unidad + "'>",*/
+                                "<input type=hidden name=unidadT value='" + unidad + "'>" + "<input type=text name=nom_personal value='" + obj['nombre_personal'] + "' style='width:80%'>"
                             ]).draw(false);
                         });
                     }
@@ -397,10 +398,10 @@ $(document).ready(function () {
                                     "<input type=number name=num_cor value='" + obj['numcor'] + "' style='width:50%'>",
                                     "<input type=text name=puesto value='" + obj['puesto'] + "'>",
                                     "<input type=number name=cantidad value='" + obj['cantidad'] + "' style='width:50%'>",
-                                    obj['grupo'],
-                                    obj['familia'],
-                                    obj['rpuesto'] + "<input type=hidden name=unidadT value='" + unidad + "'>",
-                                    "<input type=text name=nom_personal value='" + obj['nombre_personal'] + "' style='width:80%'>"
+                                    /*obj['grupo'],
+                                     obj['familia'],
+                                     obj['rpuesto'] + "<input type=hidden name=unidadT value='" + unidad + "'>",*/
+                                    "<input type=hidden name=unidadT value='" + unidad + "'>" + "<input type=text name=nom_personal value='" + obj['nombre_personal'] + "' style='width:80%'>"
                                 ]).draw(false);
                             });
                             $("#nuevoPuesto").show();
