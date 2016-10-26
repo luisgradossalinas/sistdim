@@ -61,25 +61,25 @@ class Application_Model_Puesto extends Zend_Db_Table {
 
     public function obtenerPuestoPertinencia($unidad) {
 
-        return $this->getAdapter()->query('SELECT puesto,descripcion,nombre_puesto,SUM(dotacion) AS dotacion
+        return $this->getAdapter()->query('SELECT puesto,nombre_puesto,SUM(dotacion) AS dotacion
             FROM
-            (SELECT p.`descripcion` AS puesto,np.`descripcion`,a.`nombre_puesto`,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2),0.00)
+            (SELECT p.`descripcion` AS puesto,a.`nombre_puesto`,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2),0.00)
                         AS dotacion
                         FROM puesto p INNER JOIN actividad a ON p.`id_puesto` = a.`id_puesto` 
                        LEFT JOIN nivel_puesto np ON np.`id_nivel_puesto` = a.`id_nivel_puesto` 
                        LEFT JOIN tiempo t ON t.`id_tiempo` = a.`id_tiempo` 
                        LEFT JOIN periodicidad pe ON pe.id_periodicidad = a.`id_periodicidad` 
                        WHERE  np.`id_nivel_puesto` IN (1,2,3,4) AND a.`tiene_tarea` = 0 AND a.`id_uorganica` = ' . $unidad . ' 
-                       GROUP BY p.`descripcion`,np.`descripcion`,a.`nombre_puesto`
+                       GROUP BY p.`descripcion`,a.`nombre_puesto`
                        UNION ALL
-                       SELECT p.`descripcion` AS puesto,np.`descripcion`,a.`nombre_puesto`,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2),0.00) AS dotacion
+                       SELECT p.`descripcion` AS puesto,a.`nombre_puesto`,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2),0.00) AS dotacion
                         FROM puesto p INNER JOIN tarea a ON p.`id_puesto` = a.`id_puesto` 
                        LEFT JOIN nivel_puesto np ON np.`id_nivel_puesto` = a.`id_nivel_puesto` 
                        LEFT JOIN tiempo t ON t.`id_tiempo` = a.`id_tiempo` 
                        LEFT JOIN periodicidad pe ON pe.id_periodicidad = a.`id_periodicidad` 
-                       WHERE  np.`id_nivel_puesto` IN (1,2,3,4) AND a.`estado` = 1 AND a.`id_uorganica` = ' . $unidad . ' GROUP BY p.`descripcion`,np.`descripcion`,a.`nombre_puesto`)
+                       WHERE  np.`id_nivel_puesto` IN (1,2,3,4) AND a.`estado` = 1 AND a.`id_uorganica` = ' . $unidad . ' GROUP BY p.`descripcion`,a.`nombre_puesto`)
                        t 
-                       GROUP BY puesto,descripcion,nombre_puesto')
+                       GROUP BY puesto,nombre_puesto')
                         ->fetchAll();
     }
 
@@ -172,6 +172,30 @@ class Application_Model_Puesto extends Zend_Db_Table {
                         ->where('o.id_proyecto = ?', $proyecto)
                         ->order(array('o.organo asc','uo.descripcion asc','p.descripcion asc'))
                         ->query();//->fetchAll();
+    }
+    
+    public function obtenerPuestoDotacion($unidad) {
+
+        return $this->getAdapter()->query('SELECT puesto,nombre_puesto,cantidad,SUM(dotacion) AS dotacion
+            FROM
+            (SELECT p.`descripcion` AS puesto,a.`nombre_puesto`,p.cantidad,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2),0.00)
+                        AS dotacion
+                        FROM puesto p INNER JOIN actividad a ON p.`id_puesto` = a.`id_puesto` 
+                       LEFT JOIN nivel_puesto np ON np.`id_nivel_puesto` = a.`id_nivel_puesto` 
+                       LEFT JOIN tiempo t ON t.`id_tiempo` = a.`id_tiempo` 
+                       LEFT JOIN periodicidad pe ON pe.id_periodicidad = a.`id_periodicidad` 
+                       WHERE  np.`id_nivel_puesto` IN (1,2,3,4) AND a.`tiene_tarea` = 0 AND a.`id_uorganica` = ' . $unidad . ' 
+                       GROUP BY p.`descripcion`,a.`nombre_puesto`,p.cantidad
+                       UNION ALL
+                       SELECT p.`descripcion` AS puesto,a.`nombre_puesto`,p.cantidad,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2),0.00) AS dotacion
+                        FROM puesto p INNER JOIN tarea a ON p.`id_puesto` = a.`id_puesto` 
+                       LEFT JOIN nivel_puesto np ON np.`id_nivel_puesto` = a.`id_nivel_puesto` 
+                       LEFT JOIN tiempo t ON t.`id_tiempo` = a.`id_tiempo` 
+                       LEFT JOIN periodicidad pe ON pe.id_periodicidad = a.`id_periodicidad` 
+                       WHERE  np.`id_nivel_puesto` IN (1,2,3,4) AND a.`estado` = 1 AND a.`id_uorganica` = ' . $unidad . ' GROUP BY p.`descripcion`,a.`nombre_puesto`,p.cantidad)
+                       t 
+                       GROUP BY puesto,nombre_puesto,cantidad')
+                        ->fetchAll();
     }
 
 }

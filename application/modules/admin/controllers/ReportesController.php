@@ -27,16 +27,16 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         parent::init();
     }
 
-    public function organoUnidadAction() {
-        Zend_Layout::getMvcInstance()->assign('active', 'Por Órgano / Unidad Orgánica');
+    public function resumenDotacionAction() {
+        Zend_Layout::getMvcInstance()->assign('active', 'Resumen de dotación');
         Zend_Layout::getMvcInstance()->assign('padre', 8);
-        Zend_Layout::getMvcInstance()->assign('link', 'reporteorganounidad');
+        Zend_Layout::getMvcInstance()->assign('link', 'resu_dotacion');
 
-        $this->view->headScript()->appendFile(SITE_URL . '/js/reportes/organo-unidad.js');
+        $this->view->headScript()->appendFile(SITE_URL . '/js/reportes/resumen-dotacion.js');
         $this->view->organo = $this->_organo->obtenerOrgano($this->_proyecto);
     }
 
-    public function exportWordOrganoUnidadAction() {
+    public function exportWordDotacionAction() {
 
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
@@ -52,29 +52,37 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
 
         if ($this->_hasParam('unidad')) {
             $unidad = $this->_getParam('unidad');
-            $dataPuesto = $this->_puesto->obtenerPuestos($unidad);
+            $dataPuesto = $this->_puesto->obtenerPuestoDotacion($unidad);
             $valorServir = (int) $this->getConfig()->valor->redondeo;
             $contador = 0;
             $tcant = 0;
             $tdota = 0;
             $dataWord = array();
+            $nombrePuesto = array();
             foreach ($dataPuesto as $value) {
 
                 $dataWord[$contador]['puesto'] = $value['puesto'];
-                $dataWord[$contador]['cantidad'] = $value['cantidad'];
 
-                $tdotacion = explode('.', round($value['total_dotacion'], 2));
+                $tdotacion = explode('.', round($value['dotacion'], 2));
                 if ((int) @$tdotacion[1] >= $valorServir) {
                     $tdotacion = (int) $tdotacion[0] + 1;
                 } else {
                     $tdotacion = (int) $tdotacion[0];
                 }
 
+                //$indice = array_search($value['puesto'], $nombrePuesto);
+                if (in_array($value['puesto'],$nombrePuesto)) {
+                    $value['cantidad'] = 0;
+                }
+                $nombrePuesto[] = $value['puesto'];
+
                 $tcant += $value['cantidad'];
                 $tdota += $tdotacion;
 
+                $dataWord[$contador]['cantidad'] = $value['cantidad'];
                 $dataWord[$contador]['tdota'] = $tdotacion;
                 $dataWord[$contador]['necesidades'] = $tdotacion - $value['cantidad'];
+                $dataWord[$contador]['nombre_puesto'] = $value['nombre_puesto'];
                 $contador++;
             }
 
@@ -82,6 +90,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
             $dataWord[$contador]['cantidad'] = $tcant;
             $dataWord[$contador]['tdota'] = $tdota;
             $dataWord[$contador]['necesidades'] = $tdota - $tcant;
+            $dataWord[$contador]['nombre_puesto'] = '';
 
             $nomorgano = $this->_getParam('nomorgano');
             $nomunidad = $this->_getParam('nomunidad');
@@ -110,10 +119,11 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
 
             // Add cells
             $table->addCell(200, $styleCell)->addText('N', $fontStyle);
-            $table->addCell(3000, $styleCell)->addText('Ejecutor', $fontStyle);
-            $table->addCell(2000, $styleCell)->addText(utf8_decode('Suma Dotación Actual'), $fontStyle);
-            $table->addCell(2000, $styleCell)->addText(utf8_decode('Suma según Carga de Trabajo'), $fontStyle);
-            $table->addCell(2000, $styleCell)->addText(utf8_decode('Suma de Necesidades de Dotación'), $fontStyle);
+            $table->addCell(3000, $styleCell)->addText('Nombre del puesto actual', $fontStyle);
+            $table->addCell(2000, $styleCell)->addText(utf8_decode('Dotación Actual'), $fontStyle);
+            $table->addCell(2000, $styleCell)->addText(utf8_decode('Dotación calculada'), $fontStyle);
+            $table->addCell(2000, $styleCell)->addText(utf8_decode('Necesidades Dotación'), $fontStyle);
+            $table->addCell(2000, $styleCell)->addText(utf8_decode('Nombre del puesto propuesto'), $fontStyle);
 
             $contador = 0;
             $nreg = count($dataWord);
@@ -129,9 +139,10 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
                 $table->addCell(2000, $styleCell)->addText($value['cantidad'], $textoCenter); //Suma dotación atual X
                 $table->addCell(2000, $styleCell)->addText($value['tdota'], $textoCenter); //Suma carga de trabajo Y
                 $table->addCell(2000, $styleCell)->addText($value['necesidades'], $textoCenter); //Y-X
+                $table->addCell(2000, $styleCell)->addText($value['nombre_puesto'], $textoCenter);
             }
 
-            $filename = 'Organo-Unidad.docx';
+            $filename = 'Resumen-Dotacion.docx';
             $objWriter = PHPWord_IOFactory::createWriter($PHPWord, 'Word2007');
             $objWriter->save($filename);
 
@@ -276,20 +287,20 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         $contador = 0;
         foreach ($data as $value) {
 
-            $data[$contador]['dotacion'] = $this->_puesto->puestosSinDotacion($data[$contador]['id_uorganica']);
-            $data[$contador]['pertinencia'] = $this->_puesto->puestosSinPertinencia($data[$contador]['id_uorganica']);
+            $data[$contador]['dotacion'] = $this->_puesto->puestosSinDotacion($value['id_uorganica']);
+            $data[$contador]['pertinencia'] = $this->_puesto->puestosSinPertinencia($value['id_uorganica']);
             $contador++;
         }
 
         $this->view->organoUnidad = $data;
     }
 
-    public function analisisPertinenciaAction() {
-        Zend_Layout::getMvcInstance()->assign('active', 'Reporte análisis de pertinencia');
+    public function resumenPertinenciaAction() {
+        Zend_Layout::getMvcInstance()->assign('active', 'Resumen de pertinencia');
         Zend_Layout::getMvcInstance()->assign('padre', 8);
         Zend_Layout::getMvcInstance()->assign('link', 'analpert');
 
-        $this->view->headScript()->appendFile(SITE_URL . '/js/reportes/analisis-pertinencia.js');
+        $this->view->headScript()->appendFile(SITE_URL . '/js/reportes/resumen-pertinencia.js');
         $this->view->organo = $this->_organo->obtenerOrgano($this->_proyecto);
     }
 
@@ -301,7 +312,6 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         foreach ($data as $key => $val) {
             $data[$key] = $filtro->filter(trim($val));
         }
-
 
         if (!$this->getRequest()->isXmlHttpRequest())
             exit('Acción solo válida para peticiones ajax');
@@ -334,20 +344,27 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
 
             // Add cells
             $table->addCell(200, $styleCell)->addText('N', $fontStyle);
-            $table->addCell(3000, $styleCell)->addText('Ejecutor', $fontStyle);
-            $table->addCell(3000, $styleCell)->addText('Nivel', $fontStyle);
-            $table->addCell(3000, $styleCell)->addText('Nombre del Puesto', $fontStyle);
+            $table->addCell(3000, $styleCell)->addText('Nombre del puesto actual', $fontStyle);
+            $table->addCell(3000, $styleCell)->addText('Nombre del Puesto propuesto', $fontStyle);
             $table->addCell(3000, $styleCell)->addText('Total', $fontStyle);
 
             $contador = 0;
             foreach ($dataPuesto as $value) {
+
+                $valorServir = (int) $this->getConfig()->valor->redondeo;
+                $tdotacion = explode('.', round($value['dotacion'], 2));
+                if ((int) @$tdotacion[1] >= $valorServir) {
+                    $tdotacion = (int) $tdotacion[0] + 1;
+                } else {
+                    $tdotacion = (int) $tdotacion[0];
+                }
+
                 $contador++;
                 $table->addRow();
                 $table->addCell(200)->addText($contador);
-                $table->addCell(3000)->addText(utf8_decode($value['puesto'])); //Grupo
-                $table->addCell(3000)->addText(utf8_decode($value['descripcion'])); //Familia
-                $table->addCell(3000)->addText(utf8_decode($value['nombre_puesto'])); //Rol
-                $table->addCell(3000)->addText(utf8_decode($value['dotacion'])); //Ejecutor
+                $table->addCell(3000)->addText(utf8_decode($value['puesto']));
+                $table->addCell(3000)->addText(utf8_decode($value['nombre_puesto']));
+                $table->addCell(3000)->addText(utf8_decode($tdotacion));
             }
 
             $filename = 'Pertinencia.docx';
@@ -909,7 +926,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(50);
         $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(30); //->setAutoSize(true);
         $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(40);
-        
+
         $objPHPExcel->getActiveSheet()->setCellValue('A1', 'Órgano / Unidad Orgánica')
                 ->setCellValue('B1', 'Cantidad de ocupados Situación Actual')
                 ->setCellValue('C1', 'Cantidad de Servidores Públicos según Carga de Trabajo');
@@ -1017,6 +1034,26 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save('php://output');
         exit;
+    }
+
+    public function obtenerPuestosDotacionAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        $unidad = $data['unidad'];
+        $dataPuesto = $this->_puesto->obtenerPuestoDotacion($unidad);
+        echo Zend_Json::encode($dataPuesto);
     }
 
 }
