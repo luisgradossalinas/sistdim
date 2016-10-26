@@ -42,6 +42,7 @@ class Application_Model_Puesto extends Zend_Db_Table {
                         ->joinInner(array('g' => Application_Model_Grupo::TABLA), 'g.codigo_grupo = p.codigo_grupo', array('codigo_grupo', 'grupo' => 'descripcion'))
                         ->joinInner(array('f' => Application_Model_Familia::TABLA), 'f.codigo_familia = p.codigo_familia', array('codigo_familia', 'familia' => 'descripcion'))
                         ->joinInner(array('rp' => Application_Model_Rolpuesto::TABLA), 'rp.codigo_rol_puesto = p.codigo_rol_puesto', array('codigo_rol_puesto', 'rpuesto' => 'descripcion'))
+                        ->joinInner(array('no' => Application_Model_Natuorganica::TABLA), 'o.codigo_natuorganica = no.codigo_natuorganica', array('naturaleza' => 'descripcion'))
                         ->where('p.id_uorganica = ?', $unidad)
                         ->order('p.descripcion asc')
                         ->query()->fetchAll();
@@ -50,6 +51,7 @@ class Application_Model_Puesto extends Zend_Db_Table {
     /*
       Esta función sirve para listar los puestos en la tabla donde se van a crear actividades.
      *  */
+
     public function puestosActividades($unidad) {
 
         return $this->getAdapter()->select()->from($this->_name)
@@ -137,29 +139,28 @@ class Application_Model_Puesto extends Zend_Db_Table {
     public function obtenerMapeoPuesto($proyecto) {
 
         return $this->getAdapter()->select()->from(array('p' => self::TABLA), array('num_correlativo', 'puesto' => 'descripcion',
-                    'cantidad', 'nombre_personal'))
-                ->joinInner(array('uo' => Application_Model_UnidadOrganica::TABLA), 'uo.id_uorganica = p.id_uorganica', array('unidad' => 'descripcion'))
-                ->joinInner(array('o' => Application_Model_Organo::TABLA), 'o.id_organo = uo.id_organo', array('organo'))
-                ->joinInner(array('nat' => Application_Model_Natuorganica::TABLA), 'nat.codigo_natuorganica = o.codigo_natuorganica', array('naturaleza' => 'descripcion'))
-                ->joinInner(array('g' => Application_Model_Grupo::TABLA), 'g.codigo_grupo = p.codigo_grupo', array('grupo' => 'descripcion'))
-                ->joinInner(array('f' => Application_Model_Familia::TABLA), 'f.codigo_familia = p.codigo_familia', array('familia' => 'descripcion'))
-                ->joinInner(array('rp' => Application_Model_Rolpuesto::TABLA), 'rp.codigo_rol_puesto = p.codigo_rol_puesto', array('rpuesto' => 'descripcion'))
-                ->where('o.id_proyecto = ?', $proyecto)
-                ->where('p.estado = ?', self::ESTADO_ACTIVO)
-                ->order(array('nat.descripcion asc', 'o.organo asc', 'uo.descripcion asc', 'p.descripcion asc'))
-                ->query()->fetchAll();
-
+                            'cantidad', 'nombre_personal'))
+                        ->joinInner(array('uo' => Application_Model_UnidadOrganica::TABLA), 'uo.id_uorganica = p.id_uorganica', array('unidad' => 'descripcion'))
+                        ->joinInner(array('o' => Application_Model_Organo::TABLA), 'o.id_organo = uo.id_organo', array('organo'))
+                        ->joinInner(array('nat' => Application_Model_Natuorganica::TABLA), 'nat.codigo_natuorganica = o.codigo_natuorganica', array('naturaleza' => 'descripcion'))
+                        ->joinInner(array('g' => Application_Model_Grupo::TABLA), 'g.codigo_grupo = p.codigo_grupo', array('grupo' => 'descripcion'))
+                        ->joinInner(array('f' => Application_Model_Familia::TABLA), 'f.codigo_familia = p.codigo_familia', array('familia' => 'descripcion'))
+                        ->joinInner(array('rp' => Application_Model_Rolpuesto::TABLA), 'rp.codigo_rol_puesto = p.codigo_rol_puesto', array('rpuesto' => 'descripcion'))
+                        ->where('o.id_proyecto = ?', $proyecto)
+                        ->where('p.estado = ?', self::ESTADO_ACTIVO)
+                        ->order(array('nat.descripcion asc', 'o.organo asc', 'uo.descripcion asc', 'p.descripcion asc'))
+                        ->query()->fetchAll();
     }
-    
+
     public function puestosDotacion($unidad) {
 
-        return $this->getAdapter()->select()->from($this->_name,array('puesto' => 'descripcion', 'dotacion' => 'round(total_dotacion,2)'))
+        return $this->getAdapter()->select()->from($this->_name, array('puesto' => 'descripcion', 'dotacion' => 'round(total_dotacion,2)'))
                         ->where('id_uorganica = ?', $unidad)
                         ->where('estado = ?', self::ESTADO_ACTIVO)
                         ->order('descripcion asc')
                         ->query()->fetchAll();
     }
-    
+
     public function obtenerPuestosProyecto($proyecto) {
 
         return $this->getAdapter()->select()->from(array('p' => self::TABLA), array('id_puesto', 'puesto' => 'descripcion',
@@ -170,10 +171,10 @@ class Application_Model_Puesto extends Zend_Db_Table {
                         ->joinInner(array('f' => Application_Model_Familia::TABLA), 'f.codigo_familia = p.codigo_familia', array('codigo_familia', 'familia' => 'descripcion'))
                         ->joinInner(array('rp' => Application_Model_Rolpuesto::TABLA), 'rp.codigo_rol_puesto = p.codigo_rol_puesto', array('codigo_rol_puesto', 'rpuesto' => 'descripcion'))
                         ->where('o.id_proyecto = ?', $proyecto)
-                        ->order(array('o.organo asc','uo.descripcion asc','p.descripcion asc'))
-                        ->query();//->fetchAll();
+                        ->order(array('o.organo asc', 'uo.descripcion asc', 'p.descripcion asc'))
+                        ->query(); //->fetchAll();
     }
-    
+
     public function obtenerPuestoDotacion($unidad) {
 
         return $this->getAdapter()->query('SELECT puesto,nombre_puesto,cantidad,SUM(dotacion) AS dotacion

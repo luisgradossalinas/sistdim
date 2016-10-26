@@ -71,7 +71,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
                 }
 
                 //$indice = array_search($value['puesto'], $nombrePuesto);
-                if (in_array($value['puesto'],$nombrePuesto)) {
+                if (in_array($value['puesto'], $nombrePuesto)) {
                     $value['cantidad'] = 0;
                 }
                 $nombrePuesto[] = $value['puesto'];
@@ -1054,6 +1054,110 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         $unidad = $data['unidad'];
         $dataPuesto = $this->_puesto->obtenerPuestoDotacion($unidad);
         echo Zend_Json::encode($dataPuesto);
+    }
+
+    public function puestosNaturalezaAction() {
+        Zend_Layout::getMvcInstance()->assign('active', 'Puestos por Naturaleza del Órgano');
+        Zend_Layout::getMvcInstance()->assign('padre', 8);
+        Zend_Layout::getMvcInstance()->assign('link', 'analpert');
+
+        $this->view->headScript()->appendFile(SITE_URL . '/js/reportes/puestos-naturaleza.js');
+        $this->view->organo = $this->_organo->obtenerOrgano($this->_proyecto);
+    }
+
+    public function exportExcelPuestosNaturalezaAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel->getProperties()->setCreator('Xperta Gestión Empresarial')
+                ->setTitle('PHPExcel Test Document')
+                ->setSubject('PHPExcel Test Document')
+                ->setDescription('Mapeo de puestos')
+                ->setKeywords('office PHPExcel php')
+                ->setCategory('Test result file');
+        $objPHPExcel->getActiveSheet()->setTitle('Puestos_Naturaleza');
+        $objPHPExcel->setActiveSheetIndex(0);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(10);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(30); //->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(40);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(10);
+
+        $nomOrgano = $this->_getParam('nomorgano');
+        $nomUnidad = $this->_getParam('nomunidad');
+        
+        $objPHPExcel->getActiveSheet()->setCellValue('A1', 'Órgano')
+                ->setCellValue('B1', $nomOrgano)
+                ->setCellValue('C1', 'Unidad Orgánica')
+                ->setCellValue('D1', $nomUnidad);
+        
+        $objPHPExcel->getActiveSheet()->setCellValue('A2', 'N')
+                ->setCellValue('B2', 'Naturaleza del Órgano')
+                ->setCellValue('C2', 'Nombre del puesto')
+                ->setCellValue('D2', 'Posiciones');
+        $objPHPExcel->getActiveSheet()->getStyle('A2:D2')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('A2:D2')->getFill()->getStartColor()->setARGB('FF808080');
+
+        $unidad = $this->_getParam('unidad');
+        $data = $this->_puesto->obtenerPuestos($unidad);
+        //Generar nuevo array
+        $contador = 0;
+        $totalCantidad = 0;
+        $dataResumen = array();
+
+        foreach ($data as $value) {
+
+            $contador++;
+            $dataResumen[$contador]['num'] = $contador;
+            $dataResumen[$contador]['puesto'] = $value['puesto'];
+            $dataResumen[$contador]['cantidad'] = $value['cantidad'];
+            $dataResumen[$contador]['naturaleza'] = $value['naturaleza'];
+            $totalCantidad += $value['cantidad'];
+        }
+        
+        $contador++;
+
+        $dataResumen[$contador]['num'] = '';
+        $dataResumen[$contador]['puesto'] = 'Total General';
+        $dataResumen[$contador]['cantidad'] = $totalCantidad;
+        $dataResumen[$contador]['naturaleza'] = '';
+
+        $finalData = array();
+        foreach ($dataResumen AS $row) {
+            $finalData[] = array(
+                $row["num"],
+                $row["naturaleza"],
+                $row["puesto"],
+                $row['cantidad']
+            );
+        }
+
+        $styleArray = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array('argb' => 'FF000000'),
+                )
+            ),
+        );
+
+        $objPHPExcel->getActiveSheet()->fromArray($finalData, NULL, 'A3');
+        $nReg = count($finalData) + 1;
+
+        $objPHPExcel->getActiveSheet()->getStyle('A1:D' . $nReg)->applyFromArray($styleArray);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:D1')->getFont()->setBold(true);
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="Puestos-Naturaleza.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        //$objWriter->save('php://output');
+        $objWriter->save("Puestos-Naturaleza.xlsx");
+
+        echo Zend_Json::encode(array("success" => 1));
     }
 
 }
