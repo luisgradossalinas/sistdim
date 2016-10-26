@@ -6,7 +6,6 @@ class Admin_PertinenciaController extends App_Controller_Action_Admin {
     private $_actividad;
     private $_tarea;
     private $_puesto;
-    
     private $_usuario;
     private $_proyecto;
 
@@ -63,6 +62,11 @@ class Admin_PertinenciaController extends App_Controller_Action_Admin {
                 if ($dataAct[$contador]['tarea'] == "0") {
                     $dataAct[$contador]['tarea'] = '';
                 }
+
+                $dataAct[$contador]['grupo'] = $this->getHelper('grupo')->select($value['codigo_grupo'], $contador + 1);
+                $dataAct[$contador]['familia'] = $this->getHelper('familia')->select($value['codigo_grupo'], $value['codigo_familia'], $contador + 1);
+                $dataAct[$contador]['rpuesto'] = $this->getHelper('rolpuesto')->select($value['codigo_familia'], $value['codigo_rol_puesto'], $contador + 1);
+
                 $contador++;
             }
             echo Zend_Json::encode($dataAct);
@@ -88,21 +92,21 @@ class Admin_PertinenciaController extends App_Controller_Action_Admin {
                 $add = explode("|", $reg);
                 $idAct = $add[0];
                 $idTarea = $add[1];
-                
+
                 if ($idTarea == 0) { //Es actividad
                     $dataActividad = array('id_actividad' => $idAct, 'id_nivel_puesto' => $add[3],
-                        'id_categoria_puesto' => $add[4],'nombre_puesto' => $add[5],'usuario_actu_pertinencia' => $this->_usuario, 'fecha_actu_pertinencia' => date("Y-m-d H:i:s"));
+                        'id_categoria_puesto' => $add[4], 'nombre_puesto' => $add[5], 'usuario_actu_pertinencia' => $this->_usuario, 'fecha_actu_pertinencia' => date("Y-m-d H:i:s"));
                     $this->_actividad->guardar($dataActividad);
                 } else { // Es tarea
                     $dataTarea = array('id_tarea' => $idTarea, 'id_nivel_puesto' => $add[3],
-                        'id_categoria_puesto' => $add[4],'nombre_puesto' => $add[5],'usuario_actu_pertinencia' => $this->_usuario, 'fecha_actu_pertinencia' => date("Y-m-d H:i:s"));
+                        'id_categoria_puesto' => $add[4], 'nombre_puesto' => $add[5], 'usuario_actu_pertinencia' => $this->_usuario, 'fecha_actu_pertinencia' => date("Y-m-d H:i:s"));
                     $this->_tarea->guardar($dataTarea);
                 }
             }
         }
         echo Zend_Json::encode('Pertinencia grabada satisfactoriamente.');
     }
-    
+
     public function obtenerPuestosAction() {
 
         $this->_helper->layout->disableLayout();

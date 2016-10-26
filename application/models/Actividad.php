@@ -100,14 +100,14 @@ class Application_Model_Actividad extends Zend_Db_Table {
 
         $sqlActividades = $this->getAdapter()->select()->from(array('a' => $this->_name), array('id_actividad', 'codigo_actividad',
                     'descripcion', 'id_proceso', 'nivel', 'id_tarea' => new Zend_Db_Expr("0"), 'tarea' => new Zend_Db_Expr("0"),
-                    'id_puesto', 'id_nivel_puesto', 'id_categoria_puesto', 'nombre_puesto'))
-                ->joinInner(array('p' => Application_Model_Puesto::TABLA), 'p.id_puesto = a.id_puesto', array('puesto' => 'descripcion', 'codigo_grupo', 'codigo_familia'))
+                    'id_puesto', 'id_nivel_puesto', 'id_categoria_puesto', 'nombre_puesto','codigo_grupo','codigo_familia','codigo_rol_puesto'))
+                ->joinInner(array('p' => Application_Model_Puesto::TABLA), 'p.id_puesto = a.id_puesto', array('puesto' => 'descripcion'))
                 ->where('a.id_puesto = ?', $puesto);
 
         $sqlTarea = $this->getAdapter()->select()->from(array('a' => $this->_name), array('id_actividad', 'codigo_actividad',
                     'descripcion', 'id_proceso', 'nivel'))
-                ->joinInner(array('t' => Application_Model_Tarea::TABLA), 't.id_actividad = a.id_actividad', array('id_tarea', 'tarea' => 'descripcion', 'id_puesto', 'id_nivel_puesto', 'id_categoria_puesto', 'nombre_puesto'))
-                ->joinInner(array('p' => Application_Model_Puesto::TABLA), 'p.id_puesto = t.id_puesto', array('puesto' => 'descripcion', 'codigo_grupo', 'codigo_familia'))
+                ->joinInner(array('t' => Application_Model_Tarea::TABLA), 't.id_actividad = a.id_actividad', array('id_tarea', 'tarea' => 'descripcion', 'id_puesto', 'id_nivel_puesto', 'id_categoria_puesto', 'nombre_puesto','codigo_grupo','codigo_familia','codigo_rol_puesto'))
+                ->joinInner(array('p' => Application_Model_Puesto::TABLA), 'p.id_puesto = t.id_puesto', array('puesto' => 'descripcion'))
                 ->where('t.id_puesto = ?', $puesto)
                 ->where('a.estado = ?', self::ESTADO_ACTIVO);
 

@@ -179,13 +179,19 @@ $(document).ready(function () {
                                                 contador,
                                                 "<input type=hidden name=id_actividad value='" + obj['id_actividad'] + "'>" + "<input type=hidden name=id_tarea value='" + obj['id_tarea'] + "'>"+ "<input type=hidden name=id_puesto value='" + obj['id_puesto'] + "'>" + obj['descripcion'],
                                                 obj['tarea'],
-                                                'Grupo',//Grupo
-                                                'Familia',//Familia
-                                                'Rol',//Rol
+                                                obj['grupo'],
+                                                obj['familia'],
+                                                obj['rpuesto'],
                                                 obj['nivel_puesto'],
                                                 obj['categoria_puesto'],
-                                                '<input type=text value="' + obj['nombre_puesto'] + '" style="font-size: 8pt">'
+                                                '<input type=text value="' + obj['nombre_puesto'] + '" style="font-size: 7pt;width:80%">'
                                             ]).draw(false);
+                                            $("#grupo_" + contador).chosen();
+                                            $("#grupo_" + contador + "_chzn").css('font-size', '7pt');
+                                            $("#familia_" + contador).chosen();
+                                            $("#familia_" + contador + "_chzn").css('font-size', '7pt');
+                                            $("#rol_" + contador).chosen();
+                                            $("#rol_" + contador + "_chzn").css('font-size', '7pt');
                                             $("#npuesto_" + contador).chosen();
                                             $("#npuesto_" + contador + "_chzn").css('font-size', '7pt');
                                             $("#cat_" + contador).chosen();
