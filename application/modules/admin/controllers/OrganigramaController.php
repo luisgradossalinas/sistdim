@@ -10,6 +10,8 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
     private $_familiaModel;
     private $_rolPuestoModel;
     private $_grupoModel;
+    private $_nivelPuesto;
+    private $_categoriaPuesto;
     private $_proyecto;
     private $_usuario;
     private $_mapaPuesto;
@@ -28,6 +30,8 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
         $this->_grupoModel = new Application_Model_Grupo;
         $this->_familiaModel = new Application_Model_Familia;
         $this->_rolPuestoModel = new Application_Model_Rolpuesto;
+        $this->_nivelPuesto = new Application_Model_Nivelpuesto;
+        $this->_categoriaPuesto = new Application_Model_Categoriapuesto;
 
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
         $this->_proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
@@ -332,6 +336,42 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
         }
 
         echo Zend_Json::encode('Puestos actualizados satisfactoriamente.');
+    }
+    
+    public function obtenerNivelPuestoAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+        
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+        
+        $dataNivel = $this->_nivelPuesto->obtenerNiveles($data['grupo']);
+        echo Zend_Json::encode($dataNivel);
+    }
+    
+    public function obtenerCategoriaPuestoAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+        
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+        
+        $dataCategoria = $this->_categoriaPuesto->obtenerCategoria($data['familia']);
+        echo Zend_Json::encode($dataCategoria);
     }
 
 }

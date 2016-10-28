@@ -8,6 +8,87 @@ $(document).ready(function () {
         "sPaginationType": "full_numbers",
         "lengthMenu": [[-1], ["All"]]
     });
+    
+    $('#tablaPertinencia').on('change', 'tr td select', function () {
+
+        var id = ($(this).attr("id"));
+        var valor = $(this).val();
+        var result = id.split('_');
+        var tipo = result[0];
+        var num = result[1];
+        //Llenar familia y limpiar rol
+        if (tipo == 'grupo') {
+            $.ajax({
+                url: urls.siteUrl + '/admin/organigrama/obtener-familias',
+                data: {
+                    grupo: valor
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function (result) {
+                    //Llenar familia
+                    $("#familia_" + num).empty().append("<option value=''>[Familia]</option>");
+                    $("#rol_" + num).empty().append("<option value=''>[Rol]</option>");
+                    $.each(result, function (key, obj) {
+                        $("#familia_" + num).append("<option value='" + obj['codigo_familia'] + "'>" + obj['descripcion'] + "</option>");
+                    });
+                }
+            });
+            
+            //Nivel
+            $.ajax({
+                url: urls.siteUrl + '/admin/organigrama/obtener-nivel-puesto',
+                data: {
+                    grupo: valor
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function (result) {
+                    //Llenar Nivel Puesto
+                    $("#npuesto_" + num).empty().append("<option value=''>[Nivel]</option>");
+                    $.each(result, function (key, obj) {
+                        $("#npuesto_" + num).append("<option value='" + obj['id_nivel_puesto'] + "'>" + obj['descripcion'] + "</option>");
+                    });
+                }
+            });
+        }
+
+        //Llenar roles y limpiar rol
+        if (tipo == 'familia') {
+            $.ajax({
+                url: urls.siteUrl + '/admin/organigrama/obtener-roles',
+                data: {
+                    familia: valor
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function (result) {
+                    //Llenar rol
+                    $("#rol_" + num).empty().append("<option value=''>[Rol]</option>");
+                    $.each(result, function (key, obj) {
+                        $("#rol_" + num).append("<option value='" + obj['codigo_rol_puesto'] + "'>" + obj['descripcion'] + "</option>");
+                    });
+                }
+            });
+            
+            //Categoría
+            $.ajax({
+                url: urls.siteUrl + '/admin/organigrama/obtener-categoria-puesto',
+                data: {
+                    familia: valor
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function (result) {
+                    //Llenar Nivel Puesto
+                    $("#cat_" + num).empty().append("<option value=''>[Categoría]</option>");
+                    $.each(result, function (key, obj) {
+                        $("#cat_" + num).append("<option value='" + obj['id_categoria_puesto'] + "'>" + obj['descripcion'] + "</option>");
+                    });
+                }
+            });
+        }
+    });
 
     //Personalizar el listado de órganos
     $("#organo_chzn").css('width', '420px');
@@ -36,17 +117,22 @@ $(document).ready(function () {
             var id_act = $(this).find("td input").eq(0).val();
             var id_tarea = $(this).find("td input").eq(1).val();
             var id_puesto = $(this).find("td input").eq(2).val();
-            var nivel_puesto = $(this).find("td select").eq(0).val();
-            var categoria_puesto = $(this).find("td select").eq(1).val();
-            var nombre_puesto = $(this).find("td input").eq(5).val();
-
-            if (nombre_puesto == '' || (nivel_puesto == '' || nivel_puesto == 0) || (categoria_puesto == '' || categoria_puesto == 0)) {
+            var nombre_puesto = $(this).find("td input").eq(3).val();
+            var grupo = $(this).find("td select").eq(0).val();
+            var familia = $(this).find("td select").eq(1).val();
+            var rol = $(this).find("td select").eq(2).val();
+            var nivel_puesto = $(this).find("td select").eq(3).val();
+            var categoria_puesto = $(this).find("td select").eq(4).val();
+            
+            if (nombre_puesto == '' || (nivel_puesto == '' || nivel_puesto == 0) || (categoria_puesto == '' || categoria_puesto == 0)
+                    || (grupo == '' || grupo == 0) || (familia == '' || familia == 0)
+                    || (rol == '' || rol == 0)) {
                 mensaje += "En la fila " + contador + ": Debe completar todos los campos \n";
                 mostrarMensaje = 1;
             }
 
-            dataPertinencia.push(id_act + "|" + id_tarea + '|' + id_puesto + '|' + nivel_puesto
-                    + "|" + categoria_puesto + "|" + nombre_puesto);
+            dataPertinencia.push(id_act + "|" + id_tarea + '|' + id_puesto + '|' + grupo + '|' + familia + '|' +
+                    + rol + '|' + nivel_puesto + "|" + categoria_puesto + "|" + nombre_puesto);
 
         });
         
@@ -186,6 +272,7 @@ $(document).ready(function () {
                                                 obj['categoria_puesto'],
                                                 '<input type=text value="' + obj['nombre_puesto'] + '" style="font-size: 7pt;width:80%">'
                                             ]).draw(false);
+                                            /*
                                             $("#grupo_" + contador).chosen();
                                             $("#grupo_" + contador + "_chzn").css('font-size', '7pt');
                                             $("#familia_" + contador).chosen();
@@ -196,6 +283,7 @@ $(document).ready(function () {
                                             $("#npuesto_" + contador + "_chzn").css('font-size', '7pt');
                                             $("#cat_" + contador).chosen();
                                             $("#cat_" + contador + "_chzn").css('font-size', '6pt');
+                                            */
                                         });
                                         $("#grabarPertinencia").show();
                                     }
