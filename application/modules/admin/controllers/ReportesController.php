@@ -8,6 +8,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
     private $_proceson0;
     private $_usuario;
     private $_rol;
+    private $_grupo;
     private $_proyecto;
     private $_mapaPuesto;
 
@@ -16,6 +17,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         $this->_organo = new Application_Model_Organo;
         $this->_unidadOrganica = new Application_Model_UnidadOrganica;
         $this->_proceson0 = new Application_Model_Proceso0;
+        $this->_grupo = new Application_Model_Grupo;
 
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
         $this->_proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
@@ -529,22 +531,26 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         $arrayNombreN3 = array();
         $arrayNombreN4 = array();
         foreach ($data as $value) {
-
             if ($contador == 0) { //La primera vez
                 $data[$contador]['cod0'] = $contadorNombre;
                 $arrayNombreN0[] = $value['nivel0'];
-                $contadorNombre++;
+                if ($data[$contador]['nivel0'] != $data[$contador + 1]['nivel0']) {
+                    $contadorNombre++;
+                    $arrayNombreN0[] = $data[$contador + 1]['nivel0'];
+                }
             } else { //Cuando es mayor al contador 0
                 //Extrae índice
                 $indice = array_search($value['nivel0'], $arrayNombreN0);
-                if (empty($indice)) { //No existe se agrega nuevo
+                if (!in_array($value['nivel0'], $arrayNombreN0)) {
+                //if (empty($indice)) { //No existe se agrega nuevo
+                    $contadorNombre++;
                     $data[$contador]['cod0'] = $contadorNombre;
                     $arrayNombreN0[] = $value['nivel0'];
-                    $contadorNombre++;
                     $nivel1 = 1;
                     $arrayNombreN1[] = array();
                 } else { //Si existe
-                    $data[$contador]['cod0'] = $indice + 1;
+                    //$data[$contador]['cod0'] = $indice + 1;
+                    $data[$contador]['cod0'] = $contadorNombre;
                 }
             }
 
@@ -1086,12 +1092,12 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
 
         $nomOrgano = $this->_getParam('nomorgano');
         $nomUnidad = $this->_getParam('nomunidad');
-        
+
         $objPHPExcel->getActiveSheet()->setCellValue('A1', 'Órgano')
                 ->setCellValue('B1', $nomOrgano)
                 ->setCellValue('C1', 'Unidad Orgánica')
                 ->setCellValue('D1', $nomUnidad);
-        
+
         $objPHPExcel->getActiveSheet()->setCellValue('A2', 'N')
                 ->setCellValue('B2', 'Naturaleza del Órgano')
                 ->setCellValue('C2', 'Nombre del puesto')
@@ -1114,7 +1120,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
             $dataResumen[$contador]['naturaleza'] = $value['naturaleza'];
             $totalCantidad += $value['cantidad'];
         }
-        
+
         $contador++;
 
         $dataResumen[$contador]['num'] = '';
@@ -1156,6 +1162,324 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         $objWriter->save("Puestos-Naturaleza.xlsx");
 
         echo Zend_Json::encode(array("success" => 1));
+    }
+
+    public function resumenGruposAction() {
+        Zend_Layout::getMvcInstance()->assign('active', 'Puestos por grupos');
+        Zend_Layout::getMvcInstance()->assign('padre', 8);
+        Zend_Layout::getMvcInstance()->assign('link', 'resu_grupos');
+
+        $this->view->headScript()->appendFile(SITE_URL . '/js/reportes/resumen-grupos.js');
+        $this->view->grupo = $this->_grupo->combo();
+    }
+
+    public function obtenerPuestosGruposAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        $grupo = $data['grupo'];
+        $dataPuesto = $this->_puesto->obtenerPuestoGrupoPertinencia($this->_proyecto, $grupo);
+        echo Zend_Json::encode($dataPuesto);
+    }
+
+    public function exportExcelPuestoGrupoAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel->getProperties()->setCreator('Xperta Gestión Empresarial')
+                ->setTitle('PHPExcel Test Document')
+                ->setSubject('PHPExcel Test Document')
+                ->setDescription('Puestos por Grupo')
+                ->setKeywords('office PHPExcel php')
+                ->setCategory('Test result file');
+        $objPHPExcel->getActiveSheet()->setTitle('Puesto_Grupo');
+        $objPHPExcel->setActiveSheetIndex(0);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(30);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(40);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(40);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(30);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(20);
+
+        $nomGrupo = $this->_getParam('nomgrupo');
+        $grupo = $this->_getParam('grupo');
+
+        $objPHPExcel->getActiveSheet()->setCellValue('A1', 'Grupo')
+                ->setCellValue('B1', $nomGrupo)
+                ->setCellValue('C1', '')
+                ->setCellValue('D1', '');
+
+        $objPHPExcel->getActiveSheet()->setCellValue('A2', 'Grupo')
+                ->setCellValue('B2', 'Familia')
+                ->setCellValue('C2', 'Rol')
+                ->setCellValue('D2', 'Nombre del puesto')
+                ->setCellValue('E2', 'Núm Posiciones');
+
+        $objPHPExcel->getActiveSheet()->getStyle('A2:E2')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('A2:E2')->getFill()->getStartColor()->setARGB('FF808080');
+
+        $data = $this->_puesto->obtenerPuestoGrupoPertinencia($this->_proyecto, $grupo);
+        //Generar nuevo array
+        $contador = 0;
+        $totalCantidad = 0;
+        $dataResumen = array();
+        $valorServir = (int) $this->getConfig()->valor->redondeo;
+
+        foreach ($data as $value) {
+            $contador++;
+            $dataResumen[$contador]['grupo'] = $value['grupo'];
+            $dataResumen[$contador]['familia'] = $value['familia'];
+            $dataResumen[$contador]['rol'] = $value['rol'];
+            $dataResumen[$contador]['nombre_puesto'] = $value['nombre_puesto'];
+
+            $tdotacion = explode('.', round($value['dotacion'], 2));
+            if ((int) @$tdotacion[1] >= $valorServir) {
+                $tdotacion = (int) $tdotacion[0] + 1;
+            } else {
+                $tdotacion = (int) $tdotacion[0];
+            }
+
+            $dataResumen[$contador]['dotacion'] = $tdotacion;
+            $totalCantidad += $tdotacion;
+        }
+
+        $contador++;
+
+        $dataResumen[$contador]['grupo'] = '';
+        $dataResumen[$contador]['familia'] = '';
+        $dataResumen[$contador]['rol'] = '';
+        $dataResumen[$contador]['nombre_puesto'] = '';
+        $dataResumen[$contador]['dotacion'] = $totalCantidad;
+
+        $finalData = array();
+        foreach ($dataResumen AS $row) {
+
+            $redondeo = round($row["dotacion"], 0);
+            if ($row['dotacion'] < 0.54) {
+                $redondeo = "0";
+            }
+
+            $finalData[] = array(
+                $row["grupo"],
+                $row["familia"],
+                $row["rol"],
+                $row["nombre_puesto"],
+                $redondeo
+            );
+        }
+
+        $styleArray = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array('argb' => 'FF000000'),
+                )
+            ),
+        );
+
+        $objPHPExcel->getActiveSheet()->fromArray($finalData, NULL, 'A3');
+        $nReg = count($finalData) + 1;
+
+        $objPHPExcel->getActiveSheet()->getStyle('A1:E' . $nReg)->applyFromArray($styleArray);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:E1')->getFont()->setBold(true);
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="Resumen-Puestos-Grupos.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save("Resumen-Puestos-Grupos.xlsx");
+
+        echo Zend_Json::encode(array("success" => 1));
+    }
+
+    public function unidadOrganicaAction() {
+        Zend_Layout::getMvcInstance()->assign('active', 'Puestos por Unidad Orgánica');
+        Zend_Layout::getMvcInstance()->assign('padre', 8);
+        Zend_Layout::getMvcInstance()->assign('link', 'rep_uorganica');
+
+        $this->view->headScript()->appendFile(SITE_URL . '/js/reportes/unidad-organica.js');
+        $this->view->organo = $this->_organo->obtenerOrgano($this->_proyecto);
+    }
+
+    public function obtenerPuestosGruposUnidadAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        $unidad = $data['unidad'];
+        $dataPuesto = $this->_puesto->obtenerPuestoGrupoUnidadPertinencia($this->_proyecto, $unidad);
+        echo Zend_Json::encode($dataPuesto);
+    }
+
+    public function exportExcelPuestoUnidadAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel->getProperties()->setCreator('Xperta Gestión Empresarial')
+                ->setTitle('PHPExcel Test Document')
+                ->setSubject('PHPExcel Test Document')
+                ->setDescription('Puestos por Grupo')
+                ->setKeywords('office PHPExcel php')
+                ->setCategory('Test result file');
+        $objPHPExcel->getActiveSheet()->setTitle('Puesto-Unidad');
+        $objPHPExcel->setActiveSheetIndex(0);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(35);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(35);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth(10);
+
+        $nomUnidad = $this->_getParam('nomunidad');
+        $nomOrgano = $this->_getParam('nomorgano');
+        $unidad = $this->_getParam('unidad');
+
+        $objPHPExcel->getActiveSheet()->setCellValue('A1', 'Órgano')
+                ->setCellValue('B1', $nomOrgano)
+                ->setCellValue('C1', 'Unidad Orgánica')
+                ->setCellValue('D1', $nomUnidad);
+
+        $objPHPExcel->getActiveSheet()->setCellValue('A2', 'Órgano')
+                ->setCellValue('B2', 'Unidad Orgánica')
+                ->setCellValue('C2', 'Grupo')
+                ->setCellValue('D2', 'Familia')
+                ->setCellValue('E2', 'Rol')
+                ->setCellValue('F2', 'Nombre del puesto')
+                ->setCellValue('G2', 'Núm Posiciones');
+
+        $objPHPExcel->getActiveSheet()->getStyle('A2:G2')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('A2:G2')->getFill()->getStartColor()->setARGB('FF808080');
+
+        $data = $this->_puesto->obtenerPuestoGrupoUnidadPertinencia($this->_proyecto, $unidad);
+        //Generar nuevo array
+        $contador = 0;
+        $totalCantidad = 0;
+        $dataResumen = array();
+        $valorServir = (int) $this->getConfig()->valor->redondeo;
+
+        foreach ($data as $value) {
+            $contador++;
+            $dataResumen[$contador]['organo'] = $value['organo'];
+            $dataResumen[$contador]['unidad'] = $value['unidad'];
+            $dataResumen[$contador]['grupo'] = $value['grupo'];
+            $dataResumen[$contador]['familia'] = $value['familia'];
+            $dataResumen[$contador]['rol'] = $value['rol'];
+            $dataResumen[$contador]['nombre_puesto'] = $value['nombre_puesto'];
+
+            $tdotacion = explode('.', round($value['dotacion'], 2));
+            if ((int) @$tdotacion[1] >= $valorServir) {
+                $tdotacion = (int) $tdotacion[0] + 1;
+            } else {
+                $tdotacion = (int) $tdotacion[0];
+            }
+
+            $dataResumen[$contador]['dotacion'] = $tdotacion;
+            $totalCantidad += $tdotacion;
+        }
+
+        $contador++;
+
+        $dataResumen[$contador]['organo'] = '';
+        $dataResumen[$contador]['unidad'] = '';
+        $dataResumen[$contador]['grupo'] = '';
+        $dataResumen[$contador]['familia'] = '';
+        $dataResumen[$contador]['rol'] = '';
+        $dataResumen[$contador]['nombre_puesto'] = '';
+        $dataResumen[$contador]['dotacion'] = $totalCantidad;
+
+        $finalData = array();
+        foreach ($dataResumen AS $row) {
+
+            $redondeo = round($row["dotacion"], 0);
+            if ($row['dotacion'] < 0.54) {
+                $redondeo = "0";
+            }
+
+            $finalData[] = array(
+                $row["organo"],
+                $row["unidad"],
+                $row["grupo"],
+                $row["familia"],
+                $row["rol"],
+                $row["nombre_puesto"],
+                $redondeo
+            );
+        }
+
+        $styleArray = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array('argb' => 'FF000000'),
+                )
+            )
+        );
+
+        $objPHPExcel->getActiveSheet()->fromArray($finalData, NULL, 'A3');
+        $nReg = count($finalData) + 1;
+
+        $objPHPExcel->getActiveSheet()->getStyle('A1:G' . $nReg)->applyFromArray($styleArray);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:G1')->getFont()->setBold(true);
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="Puestos-Unidad-Organica.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save("Puestos-Unidad-Organica.xlsx");
+
+        echo Zend_Json::encode(array("success" => 1));
+    }
+
+    public function servidoresAction() {
+
+        Zend_Layout::getMvcInstance()->assign('active', 'Servidores Civiles de Carrera');
+        Zend_Layout::getMvcInstance()->assign('padre', 8);
+        Zend_Layout::getMvcInstance()->assign('link', 'rep_servidores');
+
+        $dataServidores = $this->_puesto->obtenerServidoresCivilesCarrera($this->_proyecto);
+        $nreg = count($dataServidores);
+        $contador = 0;
+        $total = 0;
+
+        foreach ($dataServidores as $value) {
+            $dataServidores[$contador]['dotacion'] = (int) $dataServidores[$contador]['dotacion'];
+            $total += $value['dotacion'];
+            $contador++;
+        }
+
+        $dataServidores[$nreg + 1]['nivel'] = 'Total de Servidores Civiles de Carrera';
+        $dataServidores[$nreg + 1]['dotacion'] = $total;
+
+        $this->view->servidores = $dataServidores;
     }
 
 }

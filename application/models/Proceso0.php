@@ -60,6 +60,7 @@ class Application_Model_Proceso0 extends Zend_Db_Table {
                         ->joinLeft(array('n3' => Application_Model_Proceso3::TABLA), 'n3.id_proceso_n2 = n2.id_proceso_n2', array('nivel3' => "IFNULL(n3.descripcion,'')"))
                         ->joinLeft(array('n4' => Application_Model_Proceso4::TABLA), 'n4.id_proceso_n3 = n3.id_proceso_n3', array('nivel4' => "IFNULL(n4.descripcion,'')"))
                         ->where('n0.id_proyecto = ?', $proyecto)
+                        ->where('n0.descripcion not like ?', '%No relacionada%')
                         ->order(array('tp.orden asc', 'n0.descripcion asc', 'n1.descripcion asc', 'n2.descripcion asc', 'n3.descripcion'))->query()->fetchAll();
     }
 
@@ -116,9 +117,8 @@ IFNULL(per.descripcion,'') AS periodicidad,
  LEFT JOIN rolpuesto rp ON rp.codigo_rol_puesto = p.codigo_rol_puesto
  LEFT JOIN nivel_puesto np ON (np.id_nivel_puesto = a.id_nivel_puesto) OR (np.id_nivel_puesto = t.id_nivel_puesto)
  LEFT JOIN categoria_puesto cp ON (cp.id_categoria_puesto = a.id_categoria_puesto) OR (cp.id_categoria_puesto = t.id_categoria_puesto)
- WHERE (n0.id_proyecto = '".$proyecto."') ORDER BY `tp`.`orden` ASC, `n0`.`descripcion` ASC, `n1`.`descripcion` ASC, `n2`.`descripcion` ASC, `n3`.`descripcion` ASC,
+ WHERE (n0.id_proyecto = '" . $proyecto . "') ORDER BY `tp`.`orden` ASC, `n0`.`descripcion` ASC, `n1`.`descripcion` ASC, `n2`.`descripcion` ASC, `n3`.`descripcion` ASC,
  a.`codigo_actividad` ASC,t.`codigo_tarea` ASC")->fetchAll();
-        
     }
 
 }

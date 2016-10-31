@@ -1,0 +1,44 @@
+<style>
+    #tabla input, #tabla select {
+        font-size:8pt
+    }    
+</style>
+<?= $this->partial('_partials/mensajes.phtml', array('messages' => $this->messages, 'tipoMessages' => $this->tipoMessages)); ?>
+<div style="float:left">
+    <select id="grupo" name="grupo">
+        <option value=''>[Seleccione grupo]</option>
+        <?php
+        foreach ($this->grupo as $val) {
+            echo "<option value=" . $val['key'] . ">" . $val['value'] . "</option>";
+        }
+        ?>
+    </select>
+</div>
+<div id="capa" style="float:left"></div>
+<a id="generarExcel"  role="button" class="btn tip-right" onclick="generarExcel()" title="Exportar a Excel">
+    <li class="icon-check"></li>Exportar a Excel
+</a>
+<div class="widget-box">
+    <div class="widget-title">	
+        <h5><?= $this->active ?></h5>
+    </div>
+    <div class="widget-content nopadding">
+        <table id='tablaGrupos' width="100%" class="table table-condensed table-bordered">
+            <thead>
+                <tr>
+                    <th width="5%" style="text-align: center">#</th>
+                    <th width="20%">Grupo</th>
+                    <th width="20%" style="text-align:center">Familia</th>
+                    <th width="20%" style="text-align:center">Rol</th>
+                    <th width="20%" style="text-align:center">Nombre del puesto</th>
+                    <th width="25%" style="text-align:center">Núm de posiciones</th>
+                </tr>
+            </thead>
+            <tbody>     
+            </tbody>
+        </table>
+        <br>
+        <br>
+    </div>
+</div>
+<?= $this->partial('_partials/modal.phtml', array('model' => $this->model)); ?>

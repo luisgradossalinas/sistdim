@@ -188,7 +188,7 @@ class Application_Model_Puesto extends Zend_Db_Table {
                        LEFT JOIN nivel_puesto np ON np.`id_nivel_puesto` = a.`id_nivel_puesto` 
                        LEFT JOIN tiempo t ON t.`id_tiempo` = a.`id_tiempo` 
                        LEFT JOIN periodicidad pe ON pe.id_periodicidad = a.`id_periodicidad` 
-                       WHERE  np.`id_nivel_puesto` IN (1,2,3,4) AND a.`tiene_tarea` = 0 AND a.`id_uorganica` = ' . $unidad . ' 
+                       WHERE a.`tiene_tarea` = 0 AND a.`id_uorganica` = ' . $unidad . ' 
                        GROUP BY p.`descripcion`,a.`nombre_puesto`,p.cantidad
                        UNION ALL
                        SELECT p.`descripcion` AS puesto,a.`nombre_puesto`,p.cantidad,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2),0.00) AS dotacion
@@ -196,9 +196,101 @@ class Application_Model_Puesto extends Zend_Db_Table {
                        LEFT JOIN nivel_puesto np ON np.`id_nivel_puesto` = a.`id_nivel_puesto` 
                        LEFT JOIN tiempo t ON t.`id_tiempo` = a.`id_tiempo` 
                        LEFT JOIN periodicidad pe ON pe.id_periodicidad = a.`id_periodicidad` 
-                       WHERE  np.`id_nivel_puesto` IN (1,2,3,4) AND a.`estado` = 1 AND a.`id_uorganica` = ' . $unidad . ' GROUP BY p.`descripcion`,a.`nombre_puesto`,p.cantidad)
+                       WHERE  a.`estado` = 1 AND a.`id_uorganica` = ' . $unidad . ' GROUP BY p.`descripcion`,a.`nombre_puesto`,p.cantidad)
                        t 
                        GROUP BY puesto,nombre_puesto,cantidad')
+                        ->fetchAll();
+    }
+    
+    public function obtenerPuestoGrupoPertinencia($proyecto, $grupo) {
+
+        return $this->getAdapter()->query('SELECT grupo,familia,rol,nombre_puesto,SUM(dotacion) AS dotacion
+            FROM
+            (SELECT g.`descripcion` as grupo,f.`descripcion` as familia,rp.`descripcion` as rol,a.`nombre_puesto`,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2),0.00)
+                        AS dotacion
+                        FROM puesto p INNER JOIN actividad a ON p.`id_puesto` = a.`id_puesto` 
+                       LEFT JOIN nivel_puesto np ON np.`id_nivel_puesto` = a.`id_nivel_puesto` 
+                       LEFT JOIN tiempo t ON t.`id_tiempo` = a.`id_tiempo` 
+                       LEFT JOIN periodicidad pe ON pe.id_periodicidad = a.`id_periodicidad` 
+                       inner join grupo g on g.`codigo_grupo` = a.`codigo_grupo`
+                       inner join familia f on f.`codigo_familia` = a.`codigo_familia`
+                       inner join rolpuesto rp on rp.`codigo_rol_puesto` = a.`codigo_rol_puesto`
+                       WHERE  a.`tiene_tarea` = 0 AND a.`codigo_grupo` = '.$grupo.' and a.`id_proyecto` = '.$proyecto.'
+                       GROUP BY g.`descripcion`,f.`descripcion`,rp.`descripcion`,a.`nombre_puesto`
+                       UNION ALL
+                       SELECT g.`descripcion` as grupo,f.`descripcion` as familia,rp.`descripcion` as rol,a.`nombre_puesto`,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2),0.00) AS dotacion
+                        FROM puesto p INNER JOIN tarea a ON p.`id_puesto` = a.`id_puesto` 
+                       LEFT JOIN nivel_puesto np ON np.`id_nivel_puesto` = a.`id_nivel_puesto` 
+                       LEFT JOIN tiempo t ON t.`id_tiempo` = a.`id_tiempo` 
+                       LEFT JOIN periodicidad pe ON pe.id_periodicidad = a.`id_periodicidad` 
+                       INNER JOIN grupo g ON g.`codigo_grupo` = a.`codigo_grupo`
+                       inner join familia f on f.`codigo_familia` = a.`codigo_familia`
+                       INNER JOIN rolpuesto rp ON rp.`codigo_rol_puesto` = a.`codigo_rol_puesto`
+                       WHERE a.`estado` = 1 AND a.`codigo_grupo` = '.$grupo.' and a.`id_proyecto` = '.$proyecto.'
+                        GROUP BY g.`descripcion`,f.`descripcion`,rp.`descripcion`,a.`nombre_puesto`)
+                       t 
+                       GROUP BY grupo,familia,rol,nombre_puesto')
+                        ->fetchAll();
+    }
+    
+    public function obtenerPuestoGrupoUnidadPertinencia($proyecto, $unidad) {
+
+        return $this->getAdapter()->query('SELECT organo,unidad,grupo,familia,rol,nombre_puesto,SUM(dotacion) AS dotacion
+            FROM
+            (SELECT o.`organo`,uo.`descripcion` AS unidad,g.`descripcion` AS grupo,f.`descripcion` AS familia,rp.`descripcion` AS rol,a.`nombre_puesto`,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2),0.00)
+                        AS dotacion
+                        FROM puesto p INNER JOIN actividad a ON p.`id_puesto` = a.`id_puesto` 
+                       LEFT JOIN nivel_puesto np ON np.`id_nivel_puesto` = a.`id_nivel_puesto` 
+                       LEFT JOIN tiempo t ON t.`id_tiempo` = a.`id_tiempo` 
+                       LEFT JOIN periodicidad pe ON pe.id_periodicidad = a.`id_periodicidad` 
+                       INNER JOIN grupo g ON g.`codigo_grupo` = a.`codigo_grupo`
+                       INNER JOIN familia f ON f.`codigo_familia` = a.`codigo_familia`
+                       INNER JOIN rolpuesto rp ON rp.`codigo_rol_puesto` = a.`codigo_rol_puesto`
+                       INNER JOIN unidad_organica uo ON uo.`id_uorganica` = p.`id_uorganica`
+                       INNER JOIN organo o ON o.`id_organo` = uo.`id_organo`
+                       WHERE a.`tiene_tarea` = 0 AND p.`id_uorganica` = '.$unidad.' AND a.`id_proyecto` = '.$proyecto.'
+                       GROUP BY o.`organo`,uo.`descripcion`,g.`descripcion`,f.`descripcion`,rp.`descripcion`,a.`nombre_puesto`
+                       UNION ALL
+                       SELECT o.`organo`,uo.`descripcion` AS unidad,g.`descripcion` AS grupo,f.`descripcion` AS familia,rp.`descripcion` AS rol,a.`nombre_puesto`,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2),0.00) AS dotacion
+                        FROM puesto p INNER JOIN tarea a ON p.`id_puesto` = a.`id_puesto` 
+                       LEFT JOIN nivel_puesto np ON np.`id_nivel_puesto` = a.`id_nivel_puesto` 
+                       LEFT JOIN tiempo t ON t.`id_tiempo` = a.`id_tiempo` 
+                       LEFT JOIN periodicidad pe ON pe.id_periodicidad = a.`id_periodicidad` 
+                       INNER JOIN grupo g ON g.`codigo_grupo` = a.`codigo_grupo`
+                       INNER JOIN familia f ON f.`codigo_familia` = a.`codigo_familia`
+                       INNER JOIN rolpuesto rp ON rp.`codigo_rol_puesto` = a.`codigo_rol_puesto`
+                       INNER JOIN unidad_organica uo ON uo.`id_uorganica` = p.`id_uorganica`
+                       INNER JOIN organo o ON o.`id_organo` = uo.`id_organo`
+                       WHERE a.`estado` = 1 AND p.`id_uorganica` = '.$unidad.' AND a.`id_proyecto` = '.$proyecto.'
+                        GROUP BY o.`organo`,uo.`descripcion`,g.`descripcion`,f.`descripcion`,rp.`descripcion`,a.`nombre_puesto`)
+                       t 
+                       GROUP BY organo,unidad,grupo,familia,rol,nombre_puesto')
+                        ->fetchAll();
+    }
+    
+    public function obtenerServidoresCivilesCarrera($proyecto) {
+
+        return $this->getAdapter()->query('SELECT nivel,SUM(dotacion) AS dotacion
+            FROM
+            (SELECT np.`descripcion` as nivel,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),0),0.00)
+                        AS dotacion
+                        FROM puesto p INNER JOIN actividad a ON p.`id_puesto` = a.`id_puesto` 
+                       LEFT JOIN nivel_puesto np ON np.`id_nivel_puesto` = a.`id_nivel_puesto` 
+                       LEFT JOIN tiempo t ON t.`id_tiempo` = a.`id_tiempo` 
+                       LEFT JOIN periodicidad pe ON pe.id_periodicidad = a.`id_periodicidad` 
+                       inner join grupo g on g.`codigo_grupo` = a.`codigo_grupo`
+                       WHERE a.`tiene_tarea` = 0 and a.`id_proyecto` = '.$proyecto.' and g.`codigo_grupo` = 1
+                       GROUP BY np.`descripcion`
+                       UNION ALL
+                       SELECT np.`descripcion` as nivel,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),0),0.00) AS dotacion
+                        FROM puesto p INNER JOIN tarea a ON p.`id_puesto` = a.`id_puesto` 
+                       LEFT JOIN nivel_puesto np ON np.`id_nivel_puesto` = a.`id_nivel_puesto` 
+                       LEFT JOIN tiempo t ON t.`id_tiempo` = a.`id_tiempo` 
+                       LEFT JOIN periodicidad pe ON pe.id_periodicidad = a.`id_periodicidad` 
+                       INNER JOIN grupo g ON g.`codigo_grupo` = a.`codigo_grupo`
+                       WHERE a.`estado` = 1  AND a.`id_proyecto` = '.$proyecto.' and g.`codigo_grupo` = 1
+                        GROUP BY  np.`descripcion`)
+                       t  GROUP BY nivel ')
                         ->fetchAll();
     }
 
