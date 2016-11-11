@@ -141,7 +141,17 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
             }
 
             $sesionMvc->tipoMessages = self::SUCCESS;
-            $modelo->guardar($data);
+            $id = $modelo->guardar($data);
+            
+            if ($this->_getParam('scrud') == 'nuevo' && $tipo == 'organo') {
+                $uni['descripcion'] = $data['organo'];
+                $uni['fecha_crea'] = date("Y-m-d H:i:s");
+                $uni['usuario_crea'] = Zend_Auth::getInstance()->getIdentity()->id;
+                $uni['id_proyecto'] = $this->_proyecto;
+                $uni['id_organo'] = $id;
+                $this->_unidadModel->guardar($uni);
+            }
+            
             echo Zend_Json::encode($sesionMvc->messages);
         }
     }
