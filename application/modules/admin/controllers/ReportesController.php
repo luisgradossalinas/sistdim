@@ -351,6 +351,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
             $table->addCell(3000, $styleCell)->addText('Total', $fontStyle);
 
             $contador = 0;
+            $tdot = 0;
             foreach ($dataPuesto as $value) {
 
                 $valorServir = (int) $this->getConfig()->valor->redondeo;
@@ -367,7 +368,15 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
                 $table->addCell(3000)->addText(utf8_decode($value['puesto']));
                 $table->addCell(3000)->addText(utf8_decode($value['nombre_puesto']));
                 $table->addCell(3000)->addText(utf8_decode($tdotacion));
+                
+                $tdot +=$tdotacion;
             }
+
+            $table->addRow();
+            $table->addCell(200)->addText('');
+            $table->addCell(3000)->addText('');
+            $table->addCell(3000)->addText('Total');
+            $table->addCell(3000)->addText($tdot);
 
             $filename = 'Pertinencia.docx';
             $objWriter = PHPWord_IOFactory::createWriter($PHPWord, 'Word2007');
@@ -542,7 +551,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
                 //Extrae índice
                 $indice = array_search($value['nivel0'], $arrayNombreN0);
                 if (!in_array($value['nivel0'], $arrayNombreN0)) {
-                //if (empty($indice)) { //No existe se agrega nuevo
+                    //if (empty($indice)) { //No existe se agrega nuevo
                     $contadorNombre++;
                     $data[$contador]['cod0'] = $contadorNombre;
                     $arrayNombreN0[] = $value['nivel0'];

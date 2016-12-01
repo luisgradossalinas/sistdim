@@ -202,7 +202,6 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
         Zend_Layout::getMvcInstance()->assign('link', 'regpuestos');
         //Listado de órganos registrados del proyecto
         $this->view->organo = $this->_organoModel->obtenerOrgano($this->_proyecto);
-        //$this->view->unidad = $this->_unidadModel->obtenerUOrganica($this->_proyecto, null);
         $this->view->mapaPuesto = $this->_mapaPuesto;
     }
 
