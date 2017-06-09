@@ -69,8 +69,18 @@ class Application_Model_Proceso1 extends Zend_Db_Table {
         } else {
             $select->where('tiene_hijo = ?', self::TIENE_HIJO);
         }
-        
+
         return $select->query()->fetchAll();
+    }
+
+    /*
+     * Función para validar los procesos nivel 1 a la hora de eliminar el proceso de nivel 0
+     */
+    public function obtenerProcesos1Val($proceso0) {
+        return $this->getAdapter()->select()->from(array('n1' => $this->_name))
+                        ->where('estado = ?', self::ESTADO_ACTIVO)
+                        ->where('id_proceso_n0 = ?', $proceso0)
+                        ->query()->fetchAll();
     }
 
 }

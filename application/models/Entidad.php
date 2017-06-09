@@ -8,9 +8,7 @@ class Application_Model_Entidad extends Zend_Db_Table
     protected $_primary = 'id_entidad';
 
     const ESTADO_INACTIVO = 0;
-
     const ESTADO_ACTIVO = 1;
-
     const ESTADO_ELIMINADO = 2;
 
     const TABLA = 'entidad';

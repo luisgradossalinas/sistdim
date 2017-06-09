@@ -127,11 +127,22 @@ class Admin_DotacionController extends App_Controller_Action_Admin {
             $puesto = $this->_getParam('puesto');
             $nomTrabajador = $this->_getParam('nombre_trabajador');
             //Actualizar dotación del puesto
-            $dataPuesto = array('id_puesto' => $puesto, 'total_dotacion' => $totalDotacion, 'nombre_trabajador' => $nomTrabajador,
+
+            //Requerimiento 5
+            //Validar si es invitado solo actualizar el nombre_trabajador
+            if (!empty($nomTrabajador)) { //Invitado
+                $dataPuesto = array('id_puesto' => $puesto, 'total_dotacion' => $totalDotacion, 'nombre_trabajador' => $nomTrabajador,
                 'usuario_actu_dotacion' => $this->_usuario, 'fecha_actu_dotacion' => date("Y-m-d H:i:s"));
+            } else {
+                $dataPuesto = array('id_puesto' => $puesto, 'total_dotacion' => $totalDotacion,
+                'usuario_actu_dotacion' => $this->_usuario, 'fecha_actu_dotacion' => date("Y-m-d H:i:s"));
+            }
+            
             $this->_puesto->guardar($dataPuesto);
         }
-        echo Zend_Json::encode('Dotación grabada satisfactoriamente.');
+        $data['msg'] = 'Dotación grabada satisfactoriamente.';
+        $data['rol'] =  $this->_rol;
+        echo Zend_Json::encode($data);
     }
     
     public function avanceAction() {

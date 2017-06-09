@@ -73,6 +73,26 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
         echo Zend_Json::encode($dataProceso0);
     }
 
+    public function eliminarProcesos0Action() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        $n0 = $this->_getParam('n0');
+
+        $this->_proceso0->eliminarProcesoN0($n0);
+        echo Zend_Json::encode("Registro eliminado");
+    }
+
     public function obtenerProcesos1Action() {
 
         $this->_helper->layout->disableLayout();
@@ -90,6 +110,27 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
         if ($this->_hasParam('n0')) {
             $n0 = $this->_getParam('n0');
             $dataProceso1 = $this->_proceso1->obtenerProcesos1($n0);
+            echo Zend_Json::encode($dataProceso1);
+        }
+    }
+
+    public function obtenerProcesos1ValAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        if ($this->_hasParam('n0')) {
+            $n0 = $this->_getParam('n0');
+            $dataProceso1 = $this->_proceso1->obtenerProcesos1Val($n0);
             echo Zend_Json::encode($dataProceso1);
         }
     }
@@ -546,7 +587,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
             foreach ($tarea as $reg) {
 
                 $add = explode("|", $reg);
-                
+
                 //$actividad = $add[0];
                 $maxCodigo = $this->_tarea->obtenerMaxPosicion($add[1]) + 1;
                 if ($add[0] == 0) { //Nuevo

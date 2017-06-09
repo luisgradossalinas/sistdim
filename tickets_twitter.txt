@@ -1,8 +1,5 @@
-1. Al crear un recurso .. que se pueda tener un padre.
+﻿1. Al crear un recurso .. que se pueda tener un padre.
 2. Manejo de fechas al guardar y mostrar en las tablas. 
 3. Estadísticas con jQuery jGrap 
-4. Al crear usuarios ... ver los campos de la clave
 
-JS FRONT -END
-
-1. Los datepicket los años sean desde 1920 ordenados descendentemente
+UPDATE tipoproceso SET orden = 4 WHERE codigo_tipoproceso = 4;

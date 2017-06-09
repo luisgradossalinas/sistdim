@@ -288,7 +288,6 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
 
         $contador = 0;
         foreach ($data as $value) {
-
             $data[$contador]['dotacion'] = $this->_puesto->puestosSinDotacion($value['id_uorganica']);
             $data[$contador]['pertinencia'] = $this->_puesto->puestosSinPertinencia($value['id_uorganica']);
             $contador++;
@@ -484,6 +483,7 @@ class Admin_ReportesController extends App_Controller_Action_Admin {
         exit;
     }
 
+    //Requerimiento 2
     public function inventarioProcesosAction() {
 
         $objPHPExcel = new PHPExcel();

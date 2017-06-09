@@ -52,7 +52,7 @@ class Application_Model_Proceso0 extends Zend_Db_Table {
     }
 
     public function obtenerInventarioProcesos($proyecto) {
-
+       
         return $this->getAdapter()->select()->from(array('n0' => self::TABLA), array('tipoproceso' => 'tp.descripcion', 'nivel0' => 'descripcion'))
                         ->joinLeft(array('tp' => Application_Model_Tipoproceso::TABLA), 'tp.codigo_tipoproceso = n0.codigo_tipoproceso', null)
                         ->joinLeft(array('n1' => Application_Model_Proceso1::TABLA), 'n1.id_proceso_n0 = n0.id_proceso_n0', array('nivel1' => "IFNULL(n1.descripcion,'')"))
@@ -60,7 +60,7 @@ class Application_Model_Proceso0 extends Zend_Db_Table {
                         ->joinLeft(array('n3' => Application_Model_Proceso3::TABLA), 'n3.id_proceso_n2 = n2.id_proceso_n2', array('nivel3' => "IFNULL(n3.descripcion,'')"))
                         ->joinLeft(array('n4' => Application_Model_Proceso4::TABLA), 'n4.id_proceso_n3 = n3.id_proceso_n3', array('nivel4' => "IFNULL(n4.descripcion,'')"))
                         ->where('n0.id_proyecto = ?', $proyecto)
-                        ->where('n0.descripcion not like ?', '%No relacionada%')
+                        //->where('n0.descripcion not like ?', '%No relacionada%') -- Antes no se mostraba los procesos No relacionados
                         ->order(array('tp.orden asc', 'n0.descripcion asc', 'n1.descripcion asc', 'n2.descripcion asc', 'n3.descripcion'))->query()->fetchAll();
     }
 
@@ -121,4 +121,12 @@ IFNULL(per.descripcion,'') AS periodicidad,
  a.`codigo_actividad` ASC,t.`codigo_tarea` ASC")->fetchAll();
     }
 
+    public function eliminarProcesoN0($proceso) {
+        
+        $data['estado'] = self::ESTADO_ELIMINADO;
+        $this->update($data, $this->_primary . ' = ' . $proceso);
+        
+    }
+    
+    
 }

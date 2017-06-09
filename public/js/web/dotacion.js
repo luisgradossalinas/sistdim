@@ -145,8 +145,12 @@ $(document).ready(function () {
             type: 'post',
             dataType: 'json',
             success: function (result) {
-                alert(result);
+                alert(result['msg']);
+                //Verificar si es INVITADO para actualizar
                 $("#grabarDotacion").attr('onclick', 'grabarDotacion()');
+                if (result['rol'] == 3) { //Invitado
+                    location.reload();
+                }
             }
         });
     };
@@ -218,7 +222,12 @@ $(document).ready(function () {
                             var html = '';
                             var contador = 0;
                             if (result == '' || result == []) {
-                                alert('Unidad orgánica, no tiene puestos registrados.');
+                                if ($("#rol").val() == 3) { //Invitado
+                                    alert('No hay puestos para registrar dotación');
+                                } else {
+                                    alert('Unidad orgánica, no tiene puestos registrados.');
+                                }
+                                
                                 $('#tablaDotacion').DataTable().clear().draw();
                                 $("#grabarDotacion").hide();
                                 return false;

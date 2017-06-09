@@ -39,12 +39,11 @@ class Application_Model_Puesto extends Zend_Db_Table {
                             'numcor' => 'num_correlativo', 'cantidad', 'total_dotacion', 'nombre_trabajador', 'nombre_personal'))
                         ->joinInner(array('uo' => Application_Model_UnidadOrganica::TABLA), 'uo.id_uorganica = p.id_uorganica', array('id_uorganica', 'unidad' => 'descripcion'))
                         ->joinInner(array('o' => Application_Model_Organo::TABLA), 'o.id_organo = uo.id_organo', array('id_organo', 'organo'))
-                /*        
-                ->joinInner(array('g' => Application_Model_Grupo::TABLA), 'g.codigo_grupo = p.codigo_grupo', array('codigo_grupo', 'grupo' => 'descripcion'))
-                        ->joinInner(array('f' => Application_Model_Familia::TABLA), 'f.codigo_familia = p.codigo_familia', array('codigo_familia', 'familia' => 'descripcion'))
-                        ->joinInner(array('rp' => Application_Model_Rolpuesto::TABLA), 'rp.codigo_rol_puesto = p.codigo_rol_puesto', array('codigo_rol_puesto', 'rpuesto' => 'descripcion'))
-                 * */
-                 
+                        /*
+                          ->joinInner(array('g' => Application_Model_Grupo::TABLA), 'g.codigo_grupo = p.codigo_grupo', array('codigo_grupo', 'grupo' => 'descripcion'))
+                          ->joinInner(array('f' => Application_Model_Familia::TABLA), 'f.codigo_familia = p.codigo_familia', array('codigo_familia', 'familia' => 'descripcion'))
+                          ->joinInner(array('rp' => Application_Model_Rolpuesto::TABLA), 'rp.codigo_rol_puesto = p.codigo_rol_puesto', array('codigo_rol_puesto', 'rpuesto' => 'descripcion'))
+                         * */
                         ->joinInner(array('no' => Application_Model_Natuorganica::TABLA), 'o.codigo_natuorganica = no.codigo_natuorganica', array('naturaleza' => 'descripcion'))
                         ->where('p.id_uorganica = ?', $unidad)
                         ->order('p.descripcion asc')
@@ -139,6 +138,38 @@ class Application_Model_Puesto extends Zend_Db_Table {
                         ->query()->fetchColumn();
     }
 
+    public function puestosSinDotacionInvitado($unidad) {
+
+
+        
+        $sqlAct = $this->getAdapter()->select()->from(array('a' => Application_Model_Actividad::TABLA), null)
+                ->joinInner(array('p' => self::TABLA), 'p.id_puesto = a.id_puesto', array('id_puesto', 'puesto' => 'p.descripcion'))
+                ->where('a.id_uorganica = ?', $unidad)
+                ->where('a.tiene_tarea = ?', 0)
+                ->where('a.id_periodicidad = ?', 0)
+                ->group(array('a.id_puesto'));
+
+        $sqlTarea = $this->getAdapter()->select()->from(array('a' => Application_Model_Tarea::TABLA), null)
+                ->joinInner(array('p' => self::TABLA), 'p.id_puesto = a.id_puesto', array('id_puesto', 'puesto' => 'p.descripcion'))
+                ->where('a.id_uorganica = ?', $unidad)
+                ->where('a.id_periodicidad = ?', 0)
+                ->where('a.estado = ?', self::ESTADO_ACTIVO)
+                ->group(array('a.id_puesto'));
+        
+        /*
+        $sqlDotacionVacia = $this->getAdapter()->select()->from(array('p' => self::TABLA), array('id_puesto', 'puesto' => 'p.descripcion'))
+                ->where('id_uorganica = ?', $unidad)
+                ->where('total_dotacion = ?', 0);
+         */
+
+        
+        //$sqlUnion = $this->getAdapter()->select()->union(array($sqlAct, $sqlTarea, $sqlDotacionVacia));
+        $sqlUnion = $this->getAdapter()->select()->union(array($sqlAct, $sqlTarea));
+        
+        return $sqlUnion->query()->fetchAll();
+        
+    }
+
     public function obtenerMapeoPuesto($proyecto) {
 
         return $this->getAdapter()->select()->from(array('p' => self::TABLA), array('num_correlativo', 'puesto' => 'descripcion',
@@ -201,7 +232,7 @@ class Application_Model_Puesto extends Zend_Db_Table {
                        GROUP BY puesto,nombre_puesto,cantidad')
                         ->fetchAll();
     }
-    
+
     public function obtenerPuestoGrupoPertinencia($proyecto, $grupo) {
 
         return $this->getAdapter()->query('SELECT grupo,familia,rol,nombre_puesto,SUM(dotacion) AS dotacion
@@ -215,7 +246,7 @@ class Application_Model_Puesto extends Zend_Db_Table {
                        inner join grupo g on g.`codigo_grupo` = a.`codigo_grupo`
                        inner join familia f on f.`codigo_familia` = a.`codigo_familia`
                        inner join rolpuesto rp on rp.`codigo_rol_puesto` = a.`codigo_rol_puesto`
-                       WHERE  a.`tiene_tarea` = 0 AND a.`codigo_grupo` = '.$grupo.' and a.`id_proyecto` = '.$proyecto.'
+                       WHERE  a.`tiene_tarea` = 0 AND a.`codigo_grupo` = ' . $grupo . ' and a.`id_proyecto` = ' . $proyecto . '
                        GROUP BY g.`descripcion`,f.`descripcion`,rp.`descripcion`,a.`nombre_puesto`
                        UNION ALL
                        SELECT g.`descripcion` as grupo,f.`descripcion` as familia,rp.`descripcion` as rol,a.`nombre_puesto`,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2),0.00) AS dotacion
@@ -226,13 +257,13 @@ class Application_Model_Puesto extends Zend_Db_Table {
                        INNER JOIN grupo g ON g.`codigo_grupo` = a.`codigo_grupo`
                        inner join familia f on f.`codigo_familia` = a.`codigo_familia`
                        INNER JOIN rolpuesto rp ON rp.`codigo_rol_puesto` = a.`codigo_rol_puesto`
-                       WHERE a.`estado` = 1 AND a.`codigo_grupo` = '.$grupo.' and a.`id_proyecto` = '.$proyecto.'
+                       WHERE a.`estado` = 1 AND a.`codigo_grupo` = ' . $grupo . ' and a.`id_proyecto` = ' . $proyecto . '
                         GROUP BY g.`descripcion`,f.`descripcion`,rp.`descripcion`,a.`nombre_puesto`)
                        t 
                        GROUP BY grupo,familia,rol,nombre_puesto')
                         ->fetchAll();
     }
-    
+
     public function obtenerPuestoGrupoUnidadPertinencia($proyecto, $unidad) {
 
         return $this->getAdapter()->query('SELECT organo,unidad,grupo,familia,rol,nombre_puesto,SUM(dotacion) AS dotacion
@@ -248,7 +279,7 @@ class Application_Model_Puesto extends Zend_Db_Table {
                        INNER JOIN rolpuesto rp ON rp.`codigo_rol_puesto` = a.`codigo_rol_puesto`
                        INNER JOIN unidad_organica uo ON uo.`id_uorganica` = p.`id_uorganica`
                        INNER JOIN organo o ON o.`id_organo` = uo.`id_organo`
-                       WHERE a.`tiene_tarea` = 0 AND p.`id_uorganica` = '.$unidad.' AND a.`id_proyecto` = '.$proyecto.'
+                       WHERE a.`tiene_tarea` = 0 AND p.`id_uorganica` = ' . $unidad . ' AND a.`id_proyecto` = ' . $proyecto . '
                        GROUP BY o.`organo`,uo.`descripcion`,g.`descripcion`,f.`descripcion`,rp.`descripcion`,a.`nombre_puesto`
                        UNION ALL
                        SELECT o.`organo`,uo.`descripcion` AS unidad,g.`descripcion` AS grupo,f.`descripcion` AS familia,rp.`descripcion` AS rol,a.`nombre_puesto`,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),2),0.00) AS dotacion
@@ -261,13 +292,13 @@ class Application_Model_Puesto extends Zend_Db_Table {
                        INNER JOIN rolpuesto rp ON rp.`codigo_rol_puesto` = a.`codigo_rol_puesto`
                        INNER JOIN unidad_organica uo ON uo.`id_uorganica` = p.`id_uorganica`
                        INNER JOIN organo o ON o.`id_organo` = uo.`id_organo`
-                       WHERE a.`estado` = 1 AND p.`id_uorganica` = '.$unidad.' AND a.`id_proyecto` = '.$proyecto.'
+                       WHERE a.`estado` = 1 AND p.`id_uorganica` = ' . $unidad . ' AND a.`id_proyecto` = ' . $proyecto . '
                         GROUP BY o.`organo`,uo.`descripcion`,g.`descripcion`,f.`descripcion`,rp.`descripcion`,a.`nombre_puesto`)
                        t 
                        GROUP BY organo,unidad,grupo,familia,rol,nombre_puesto')
                         ->fetchAll();
     }
-    
+
     public function obtenerServidoresCivilesCarrera($proyecto) {
 
         return $this->getAdapter()->query('SELECT nivel,SUM(dotacion) AS dotacion
@@ -279,7 +310,7 @@ class Application_Model_Puesto extends Zend_Db_Table {
                        LEFT JOIN tiempo t ON t.`id_tiempo` = a.`id_tiempo` 
                        LEFT JOIN periodicidad pe ON pe.id_periodicidad = a.`id_periodicidad` 
                        inner join grupo g on g.`codigo_grupo` = a.`codigo_grupo`
-                       WHERE a.`tiene_tarea` = 0 and a.`id_proyecto` = '.$proyecto.' and g.`codigo_grupo` = 1
+                       WHERE a.`tiene_tarea` = 0 and a.`id_proyecto` = ' . $proyecto . ' and g.`codigo_grupo` = 1
                        GROUP BY np.`descripcion`
                        UNION ALL
                        SELECT np.`descripcion` as nivel,IFNULL(ROUND(SUM((pe.`valor`*a.`frecuencia`)*(ROUND(t.`valor`*a.`duracion`,2)*1.1/176)),0),0.00) AS dotacion
@@ -288,7 +319,7 @@ class Application_Model_Puesto extends Zend_Db_Table {
                        LEFT JOIN tiempo t ON t.`id_tiempo` = a.`id_tiempo` 
                        LEFT JOIN periodicidad pe ON pe.id_periodicidad = a.`id_periodicidad` 
                        INNER JOIN grupo g ON g.`codigo_grupo` = a.`codigo_grupo`
-                       WHERE a.`estado` = 1  AND a.`id_proyecto` = '.$proyecto.' and g.`codigo_grupo` = 1
+                       WHERE a.`estado` = 1  AND a.`id_proyecto` = ' . $proyecto . ' and g.`codigo_grupo` = 1
                         GROUP BY  np.`descripcion`)
                        t  GROUP BY nivel ')
                         ->fetchAll();

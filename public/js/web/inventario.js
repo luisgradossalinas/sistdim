@@ -1,7 +1,57 @@
 var sentencia_crud = '';
 $(document).ready(function () {
 
-//Ocultar tabla
+    //Eliminar proceso y actualizar tabla
+    eliminarProceso = function (proceso) {
+
+        $('#ventana-modal').empty().html('¿Está seguro que desea eliminar registro?');
+        $('#ventana-modal').dialog({
+            height: 'auto',
+            width: 350,
+            modal: true,
+            resizable: false,
+            title: 'Mensaje del sistema',
+            buttons: {
+                "Eliminar": function () {
+                    dialog = $(this);
+                    $.ajax({
+                        url: urls.siteUrl + '/admin/procesos/obtener-procesos1-val',
+                        data: {n0: proceso},
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (result) {
+
+                            //Primero validar que se obtenga data
+                            if (result == '' || result == []) {
+                                $("#tabla_wrapper").show();
+
+                                $.ajax({
+                                    url: urls.siteUrl + '/admin/procesos/eliminar-procesos0',
+                                    data: {n0: proceso},
+                                    type: 'post',
+                                    dataType: 'json',
+                                    success: function (result) {
+                                        alert(result);
+                                        location.reload();
+                                    }
+                                });
+                            } else {
+                                alert("No se puede eliminar, el proceso tiene niveles hijos.");
+                            }
+
+                        }
+                    })
+                },
+                "Cancelar": function () {
+                    $(this).dialog("close");
+                }
+            },
+            close: function () {
+            }
+        });
+    }
+
+    //Ocultar tabla
     $("#tabla_wrapper").hide();
     //Grabar proceso
     $("#grabarProceso").click(function () {
@@ -89,7 +139,7 @@ $(document).ready(function () {
             $("#grabarProceso").show();
             return false;
         }
-        
+
         if ($('#tabla').DataTable().data().count() / 7 == 1) {
             alert('Debe agregar más de 1 proceso para poder grabar. (SERVIR)');
             $("#grabarProceso").show();
@@ -119,7 +169,7 @@ $(document).ready(function () {
                             $.each(result, function (key, obj) {
                                 contador++;
                                 $('#tabla').DataTable().row.add([
-                                    "<center>" + contador + "</center>",
+                                    "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso(' + obj['id_proceso_n0'] + ')><i class="icon-trash"></i></a>' + "</center>",
                                     obj['codigo_tipoproceso'],
                                     "<input type=hidden name=id_puesto value='" + obj['id_proceso_n0'] + "'><input type=text name=n0_" + contador + " id=n0_" + contador + " value='" + obj['descripcion'] + "' style='width:90%'>",
                                     '',
@@ -416,6 +466,7 @@ $(document).ready(function () {
                 "<input type=text name=n3_" + numReg + " id=n3_" + numReg + ">",
                 "<input type=text name=n4_" + numReg + " id=n4_" + numReg + ">"
             ]).draw(false);
+
             $.ajax({
                 url: urls.siteUrl + '/admin/procesos/obtener-tipo-proceso',
                 type: 'post',
@@ -533,7 +584,7 @@ $(document).ready(function () {
                 $("#n0").chosen();
                 $("#n0").hide();
                 $("#n0_chzn").hide();
-                
+
             }
 
         })
@@ -541,7 +592,7 @@ $(document).ready(function () {
 
     //listaNivel0();
     ocultarSelect();
-    
+
     $("#nivel").change(function () {
 
         var nivel = $(this).val();
@@ -598,7 +649,7 @@ $(document).ready(function () {
                     $.each(result, function (key, obj) {
                         contador++;
                         $('#tabla').DataTable().row.add([
-                            "<center>" + contador + "</center>",
+                            "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso(' + obj['id_proceso_n0'] + ')"><i class="icon-trash"></i></a>' + "</center>",
                             obj['codigo_tipoproceso'],
                             "<input type=hidden name=id_puesto value='" + obj['id_proceso_n0'] + "'><input type=text name=n0_" + contador + " id=n0_" + contador + " value='" + obj['descripcion'] + "' style='width:90%'>",
                             '',
