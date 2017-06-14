@@ -55,6 +55,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
         $data = $this->_getAllParams();
+
         //Previene vulnerabilidad XSS (Cross-site scripting)
         $filtro = new Zend_Filter_StripTags();
         foreach ($data as $key => $val) {
@@ -93,6 +94,86 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
         echo Zend_Json::encode("Registro eliminado");
     }
 
+    public function eliminarProcesos1Action() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        $n1 = $this->_getParam('n1');
+
+        $this->_proceso1->eliminarProcesoN1($n1);
+        echo Zend_Json::encode("Registro eliminado");
+    }
+
+    public function eliminarProcesos2Action() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        $n2 = $this->_getParam('n2');
+
+        $this->_proceso2->eliminarProcesoN2($n2);
+        echo Zend_Json::encode("Registro eliminado");
+    }
+
+    public function eliminarProcesos3Action() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        $n3 = $this->_getParam('n3');
+
+        $this->_proceso3->eliminarProcesoN3($n3);
+        echo Zend_Json::encode("Registro eliminado");
+    }
+
+    public function eliminarProcesos4Action() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        $n4 = $this->_getParam('n4');
+
+        $this->_proceso4->eliminarProcesoN4($n4);
+        echo Zend_Json::encode("Registro eliminado");
+    }
+
     public function obtenerProcesos1Action() {
 
         $this->_helper->layout->disableLayout();
@@ -114,6 +195,10 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
         }
     }
 
+    /*
+     * Función para validar los procesos nivel 1 a la hora de eliminar el proceso de nivel 0
+     */
+
     public function obtenerProcesos1ValAction() {
 
         $this->_helper->layout->disableLayout();
@@ -132,6 +217,116 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
             $n0 = $this->_getParam('n0');
             $dataProceso1 = $this->_proceso1->obtenerProcesos1Val($n0);
             echo Zend_Json::encode($dataProceso1);
+        }
+    }
+
+    /*
+     * Función para validar los procesos nivel 2 a la hora de eliminar el proceso de nivel 1
+     */
+
+    public function obtenerProcesos2ValAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        if ($this->_hasParam('n1')) {
+            $n1 = $this->_getParam('n1');
+            $dataProceso2 = $this->_proceso2->obtenerProcesos2Val($n1);
+            if (empty($dataProceso2)) {
+                $dataProceso2 = $this->_actividad->obtenerActividadesVal($n1, 1);
+            }
+            echo Zend_Json::encode($dataProceso2);
+        }
+    }
+
+    /*
+     * Función para validar los procesos nivel 3 a la hora de eliminar el proceso de nivel 2
+     */
+
+    public function obtenerProcesos3ValAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        if ($this->_hasParam('n2')) {
+            $n2 = $this->_getParam('n2');
+            $dataProceso3 = $this->_proceso3->obtenerProcesos3Val($n2);
+            if (empty($dataProceso3)) {
+                $dataProceso3 = $this->_actividad->obtenerActividadesVal($n2, 2);
+            }
+            echo Zend_Json::encode($dataProceso3);
+        }
+    }
+
+    /*
+     * Función para validar los procesos nivel 4 a la hora de eliminar el proceso de nivel 3
+     */
+
+    public function obtenerProcesos4ValAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        if ($this->_hasParam('n3')) {
+            $n3 = $this->_getParam('n3');
+            $dataProceso4 = $this->_proceso4->obtenerProcesos4Val($n3);
+            if (empty($dataProceso4)) {
+                $dataProceso4 = $this->_actividad->obtenerActividadesVal($n3, 3);
+            }
+
+            echo Zend_Json::encode($dataProceso4);
+        }
+    }
+
+    /*
+     * Función para validar las actividades  a la hora de eliminar el proceso de nivel 4
+     */
+    public function obtenerActividadesValAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        if ($this->_hasParam('n4')) {
+            $n4 = $this->_getParam('n4');
+            $nivel = 4;
+            $dataActividad = $this->_actividad->obtenerActividadesVal($n4, $nivel);
+            echo Zend_Json::encode($dataActividad);
         }
     }
 

@@ -45,14 +45,13 @@ class Application_Model_Proceso1 extends Zend_Db_Table {
     /*
       No considera los procesos que ya tiene actividades, esto es para que no se agreguen más niveles
      * */
-
     public function obtenerProcesos1($proceso0) {
         return $this->getAdapter()->select()->from(array('n1' => $this->_name))
                         ->joinInner(array('n0' => Application_Model_Proceso0::TABLA), 'n0.id_proceso_n0 = n1.id_proceso_n0', array('nivel0' => 'descripcion'))
                         ->joinInner(array('tp' => Application_Model_Tipoproceso::TABLA), 'tp.codigo_tipoproceso = n0.codigo_tipoproceso', array('tipo' => 'descripcion'))
                         ->where('n1.estado = ?', self::ESTADO_ACTIVO)
                         ->where('n1.id_proceso_n0 = ?', $proceso0)
-                        ->where('n1.tiene_actividad = ?', 0)
+                        //->where('n1.tiene_actividad = ?', 0)
                         ->order('n1.descripcion asc')
                         ->query()->fetchAll();
     }
@@ -62,7 +61,8 @@ class Application_Model_Proceso1 extends Zend_Db_Table {
     public function obtenerProcesos1Actividad($proceso0, $nivel) {
 
         $select = $this->getAdapter()->select()->from($this->_name)
-                ->where('id_proceso_n0 = ?', $proceso0);
+                ->where('id_proceso_n0 = ?', $proceso0)
+                ->where('estado = ?', self::ESTADO_ACTIVO);
 
         if ($nivel == 1) {
             $select->where('tiene_hijo <> ?', self::TIENE_HIJO);
@@ -81,6 +81,13 @@ class Application_Model_Proceso1 extends Zend_Db_Table {
                         ->where('estado = ?', self::ESTADO_ACTIVO)
                         ->where('id_proceso_n0 = ?', $proceso0)
                         ->query()->fetchAll();
+    }
+    
+    public function eliminarProcesoN1($proceso) {
+        
+        $data['estado'] = self::ESTADO_ELIMINADO;
+        $this->update($data, $this->_primary . ' = ' . $proceso);
+        
     }
 
 }

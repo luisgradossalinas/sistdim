@@ -46,7 +46,7 @@ class Application_Model_Proceso2 extends Zend_Db_Table {
         return $this->getAdapter()->select()->from($this->_name)
                         ->where('estado = ?', self::ESTADO_ACTIVO)
                         ->where('id_proceso_n1 = ?', $proceso1)
-                        ->where('tiene_actividad = ?', 0)
+                        //->where('tiene_actividad = ?', 0)
                         ->order('descripcion asc')
                         ->query()->fetchAll();
     }
@@ -56,7 +56,8 @@ class Application_Model_Proceso2 extends Zend_Db_Table {
     public function obtenerProcesos2Actividad($proceso1, $nivel) {
 
         $select = $this->getAdapter()->select()->from($this->_name)
-                ->where('id_proceso_n1 = ?', $proceso1);
+                ->where('id_proceso_n1 = ?', $proceso1)
+                ->where('estado = ?', self::ESTADO_ACTIVO);
 
         if ($nivel == 2) {
             $select->where('tiene_hijo <> ?', self::TIENE_HIJO);
@@ -64,6 +65,25 @@ class Application_Model_Proceso2 extends Zend_Db_Table {
         
         
         return $select->query()->fetchAll();
+    }
+    
+    /*
+     * Función para validar los procesos nivel 2 a la hora de eliminar el proceso de nivel 1
+     */
+    public function obtenerProcesos2Val($proceso0) {
+        
+        
+        return $this->getAdapter()->select()->from(array('n2' => $this->_name))
+                        ->where('estado = ?', self::ESTADO_ACTIVO)
+                        ->where('id_proceso_n1 = ?', $proceso0)
+                        ->query()->fetchAll();
+    }
+    
+    public function eliminarProcesoN2($proceso) {
+        
+        $data['estado'] = self::ESTADO_ELIMINADO;
+        $this->update($data, $this->_primary . ' = ' . $proceso);
+        
     }
 
 }

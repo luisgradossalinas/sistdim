@@ -172,5 +172,17 @@ class Application_Model_Actividad extends Zend_Db_Table {
 
         return $data;
     }
+    
+    /*
+     * Función para validar las actividades a la hora de eliminar el proceso de nivel 4
+     */
+    public function obtenerActividadesVal($proceso4 , $nivel) {
+        
+        return $this->getAdapter()->select()->from(array('n4' => $this->_name))
+                        ->where('estado = ?', self::ESTADO_ACTIVO)
+                        ->where('id_proceso = ?', $proceso4)
+                        ->where('nivel = ?', $nivel)
+                        ->query()->fetchAll();
+    }
 
 }

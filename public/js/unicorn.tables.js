@@ -9,7 +9,8 @@ $(document).ready(function(){
         $('#tabla').dataTable({
 		"bJQueryUI": true,
 		"sPaginationType": "full_numbers",
-                 "lengthMenu": [[50, -1], [50, "All"]]
+//                 "lengthMenu": [[50, -1], [50, "All"]]
+                 "lengthMenu": [[ -1], ["All"]]
                // "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>"
 		//"sDom": '<""l>t<"F"fp>'
 	});

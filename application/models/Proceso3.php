@@ -51,7 +51,7 @@ class Application_Model_Proceso3 extends Zend_Db_Table
         return $this->getAdapter()->select()->from($this->_name)
                 ->where('estado = ?',self::ESTADO_ACTIVO)
                 ->where('id_proceso_n2 = ?', $proceso2)
-                ->where('tiene_actividad = ?', 0)
+                //->where('tiene_actividad = ?', 0)
                 ->order('descripcion asc')
                 ->query()->fetchAll();
     }
@@ -61,13 +61,34 @@ class Application_Model_Proceso3 extends Zend_Db_Table
     public function obtenerProcesos3Actividad($proceso2, $nivel) {
 
         $select = $this->getAdapter()->select()->from($this->_name)
-                ->where('id_proceso_n2 = ?', $proceso2);
+                ->where('id_proceso_n2 = ?', $proceso2)
+                ->where('estado = ?', self::ESTADO_ACTIVO);
 
         if ($nivel == 3) {
             $select->where('tiene_hijo <> ?', self::TIENE_HIJO);
         }
         return $select->query()->fetchAll();
     }
+    
+    /*
+     * Función para validar los procesos nivel 3 a la hora de eliminar el proceso de nivel 2
+     */
+    public function obtenerProcesos3Val($proceso0) {
+        
+        
+        return $this->getAdapter()->select()->from(array('n3' => $this->_name))
+                        ->where('estado = ?', self::ESTADO_ACTIVO)
+                        ->where('id_proceso_n2 = ?', $proceso0)
+                        ->query()->fetchAll();
+    }
+    
+    public function eliminarProcesoN3($proceso) {
+        
+        $data['estado'] = self::ESTADO_ELIMINADO;
+        $this->update($data, $this->_primary . ' = ' . $proceso);
+        
+    }
+
 
 
 }

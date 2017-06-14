@@ -29,7 +29,7 @@ $(document).ready(function () {
             alert('No existen actividades para grabar');
             return false;
         }
-        
+
         //Recorrer toda la tabla
         $("#tabla tbody tr").each(function () {
             contador++;
@@ -37,7 +37,7 @@ $(document).ready(function () {
             id_actividad = $(this).find("td input").eq(0).val();
             proceso = $(this).find("td input").eq(1).val();
             actividad = $(this).find("td input").eq(2).val();
-            
+
             unidad = $(this).find("td select").eq(1).val();
             puesto = $(this).find("td select").eq(2).val();
             tieneTarea = $(this).find("td select").eq(0).val();
@@ -59,24 +59,24 @@ $(document).ready(function () {
             }
             dataActividad.push(id_actividad + "|" + proceso + "|" + actividad + "|" + unidad + "|" + puesto + "|" + tieneTarea);
         });
-        
+
         //Mostrar mensaje si existen datos por completar
         if (mostrarMensaje == 1) {
             alert(mensaje);
             return false;
         }
-        
+
         //Validar que se agreguen de 2 a más actividades
         if ($('#tabla').DataTable().data().count() / 5 == 1) {
             alert('Debe agregar más de 1 actividad para poder grabar.');
             return false;
         }
 
-/*
-        console.log(dataActividad);
-        alert("probando no grabar");
-        return false;
-*/
+        /*
+         console.log(dataActividad);
+         alert("probando no grabar");
+         return false;
+         */
 
         $.ajax({
             url: urls.siteUrl + '/admin/procesos/grabar-actividad',
@@ -440,12 +440,12 @@ $(document).ready(function () {
         html += '</div>';
         html += '</div>';
 
-        $('#ventana-modal').empty().html(html);       
+        $('#ventana-modal').empty().html(html);
         $('#tablaTarea').dataTable({
-		"bJQueryUI": true,
-		"sPaginationType": "full_numbers",
-                 "lengthMenu": [[50, -1], [50, "All"]]
-	});
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "lengthMenu": [[50, -1], [50, "All"]]
+        });
 
         var contador = 0;
         $.each(data, function (key, obj) {
@@ -611,7 +611,7 @@ $(document).ready(function () {
                         alert(mensajito);
                         return false;
                     }
-                    
+
                     if ($('#tablaTarea').DataTable().data().count() / 4 == 1) {
                         alert('Debe agregar más de 1 tarea para poder grabar.');
                         return false;

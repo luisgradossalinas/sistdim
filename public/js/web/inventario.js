@@ -2,9 +2,9 @@ var sentencia_crud = '';
 $(document).ready(function () {
 
     //Eliminar proceso y actualizar tabla
-    eliminarProceso = function (proceso) {
+    eliminarProceso0 = function (proceso) {
 
-        $('#ventana-modal').empty().html('¿Está seguro que desea eliminar registro?');
+        $('#ventana-modal').empty().html('¿Está seguro que desea eliminar proceso?');
         $('#ventana-modal').dialog({
             height: 'auto',
             width: 350,
@@ -13,6 +13,7 @@ $(document).ready(function () {
             title: 'Mensaje del sistema',
             buttons: {
                 "Eliminar": function () {
+                    $(this).dialog("close");
                     dialog = $(this);
                     $.ajax({
                         url: urls.siteUrl + '/admin/procesos/obtener-procesos1-val',
@@ -32,11 +33,37 @@ $(document).ready(function () {
                                     dataType: 'json',
                                     success: function (result) {
                                         alert(result);
-                                        location.reload();
+                                        $("ventana-modal").dialog("close");
+
+                                        $.ajax({
+                                            url: urls.siteUrl + '/admin/procesos/obtener-procesos0',
+                                            type: 'post',
+                                            dataType: 'json',
+                                            success: function (result) {
+                                                var contador = 0;
+                                                $('#tabla').DataTable().clear().draw();
+                                                $.each(result, function (key, obj) {
+                                                    contador++;
+                                                    $('#tabla').DataTable().row.add([
+                                                        "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso0(' + obj['id_proceso_n0'] + ')"><i class="icon-trash"></i></a>' + "</center>",
+                                                        obj['codigo_tipoproceso'],
+                                                        "<input type=hidden name=id_puesto value='" + obj['id_proceso_n0'] + "'><input type=text name=n0_" + contador + " id=n0_" + contador + " value='" + obj['descripcion'] + "' style='width:90%'>",
+                                                        '',
+                                                        '',
+                                                        '',
+                                                        ''
+                                                    ]).draw(false);
+                                                });
+                                                $("#th0").css('width', '80%');
+                                                $("#tabla_wrapper").show();
+                                                $("#nuevoProceso").show();
+                                                $("#grabarProceso").show();
+                                            }
+                                        });
                                     }
                                 });
                             } else {
-                                alert("No se puede eliminar, el proceso tiene niveles hijos.");
+                                alert("No se puede eliminar, el proceso tiene niveles hijos registrados.");
                             }
 
                         }
@@ -50,6 +77,662 @@ $(document).ready(function () {
             }
         });
     }
+
+    eliminarProceso1 = function (proceso) {
+
+        var nivel0_nombre = $("#n0 option:selected").text();
+        var nivel0 = $("#n0").val();
+        /*
+         var nivel1_nombre = $("#n1 option:selected").text();
+         var nivel2;
+         var nivel2_nombre = $("#n2 option:selected").text();
+         var nivel3;
+         var nivel3_nombre = $("#n3 option:selected").text();
+         var nivel4;
+         var nivel4_nombre = $("#n4 option:selected").text();
+         */
+
+        $('#ventana-modal').empty().html('¿Está seguro que desea eliminar proceso?');
+        $('#ventana-modal').dialog({
+            height: 'auto',
+            width: 350,
+            modal: true,
+            resizable: false,
+            title: 'Mensaje del sistema',
+            buttons: {
+                "Eliminar": function () {
+                    $(this).dialog("close");
+                    dialog = $(this);
+                    $.ajax({
+                        url: urls.siteUrl + '/admin/procesos/obtener-procesos2-val',
+                        data: {n1: proceso},
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (result) {
+
+                            //Primero validar que se obtenga data
+                            if (result == '' || result == []) {
+                                $("#tabla_wrapper").show();
+
+                                $.ajax({
+                                    url: urls.siteUrl + '/admin/procesos/eliminar-procesos1',
+                                    data: {n1: proceso},
+                                    type: 'post',
+                                    dataType: 'json',
+                                    success: function (result) {
+                                        alert(result);
+                                        $("ventana-modal").dialog("close");
+
+                                        $.ajax({
+                                            url: urls.siteUrl + '/admin/procesos/obtener-procesos1',
+                                            data: {n0: nivel0},
+                                            type: 'post',
+                                            dataType: 'json',
+                                            success: function (result) {
+                                                var contador = 0;
+                                                $('#tabla').DataTable().clear().draw();
+                                                $("#th0").css('width', '30%');
+                                                $("#th1").css('width', '65%');
+                                                $.each(result, function (key, obj) {
+                                                    contador++;
+                                                    $('#tabla').DataTable().row.add([
+                                                        "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso1(' + obj['id_proceso_n1'] + ')"><i class="icon-trash"></i></a>' + "</center>",
+                                                        '',
+                                                        "<input type=hidden name=id_proceso_n0 value='" + nivel0 + "'>" + nivel0_nombre,
+                                                        "<input type=hidden name=id_proceso_n1 value='" + obj['id_proceso_n1'] + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>",
+                                                        '',
+                                                        '',
+                                                        ''
+                                                    ]).draw(false);
+
+                                                });
+                                                $("#tabla_wrapper").show();
+                                                $("#nuevoProceso").show();
+                                                $("#grabarProceso").show();
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                alert("No se puede eliminar, el proceso tiene niveles hijos o actividades registrados.");
+                            }
+
+                        }
+                    })
+                },
+                "Cancelar": function () {
+                    $(this).dialog("close");
+                }
+            },
+            close: function () {
+            }
+        });
+    }
+
+    eliminarProceso2 = function (proceso) {
+
+        var nivel0_nombre = $("#n0 option:selected").text();
+        var nivel0 = $("#n0").val();
+
+        var nivel1_nombre = $("#n1 option:selected").text();
+        var nivel1 = $("#n1").val();
+        /*
+         var nivel2;
+         var nivel2_nombre = $("#n2 option:selected").text();
+         var nivel3;
+         var nivel3_nombre = $("#n3 option:selected").text();
+         var nivel4;
+         var nivel4_nombre = $("#n4 option:selected").text();
+         */
+
+        $('#ventana-modal').empty().html('¿Está seguro que desea eliminar proceso?');
+        $('#ventana-modal').dialog({
+            height: 'auto',
+            width: 350,
+            modal: true,
+            resizable: false,
+            title: 'Mensaje del sistema',
+            buttons: {
+                "Eliminar": function () {
+                    $(this).dialog("close");
+                    dialog = $(this);
+                    $.ajax({
+                        url: urls.siteUrl + '/admin/procesos/obtener-procesos3-val',
+                        data: {n2: proceso},
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (result) {
+
+                            //Primero validar que se obtenga data
+                            if (result == '' || result == []) {
+                                $("#tabla_wrapper").show();
+
+                                $.ajax({
+                                    url: urls.siteUrl + '/admin/procesos/eliminar-procesos2',
+                                    data: {n2: proceso},
+                                    type: 'post',
+                                    dataType: 'json',
+                                    success: function (result) {
+                                        alert(result);
+                                        $("ventana-modal").dialog("close");
+
+                                        $.ajax({
+                                            url: urls.siteUrl + '/admin/procesos/obtener-procesos2',
+                                            data: {n1: nivel1},
+                                            type: 'post',
+                                            dataType: 'json',
+                                            success: function (result) {
+                                                var contador = 0;
+                                                $('#tabla').DataTable().clear().draw();
+                                                $("#thp").css('width', '6%');
+                                                $("#th0").css('width', '25%');
+                                                $("#th1").css('width', '25%');
+                                                $("#th2").css('width', '44%');
+                                                $.each(result, function (key, obj) {
+                                                    contador++;
+                                                    $('#tabla').DataTable().row.add([
+                                                        "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso2(' + obj['id_proceso_n2'] + ')"><i class="icon-trash"></i></a>' + "</center>",
+                                                        '',
+                                                        nivel0_nombre,
+                                                        "<input type=hidden name=id_proceso_n1 value='" + nivel1 + "'>" + nivel1_nombre,
+                                                        "<input type=hidden name=id_proceso_n2 value='" + obj['id_proceso_n2'] + "'><input type=text name=n2_" + contador + " id=n2_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>",
+                                                        '',
+                                                        ''
+                                                    ]).draw(false);
+                                                });
+
+
+                                                $("#tabla_wrapper").show();
+                                                $("#nuevoProceso").show();
+                                                $("#grabarProceso").show();
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                alert("No se puede eliminar, el proceso tiene niveles hijos o actividades registrados.");
+                            }
+
+                        }
+                    })
+                },
+                "Cancelar": function () {
+                    $(this).dialog("close");
+                }
+            },
+            close: function () {
+            }
+        });
+    }
+
+    eliminarProceso3 = function (proceso) {
+
+        var nivel0_nombre = $("#n0 option:selected").text();
+        var nivel0 = $("#n0").val();
+
+        var nivel1_nombre = $("#n1 option:selected").text();
+        var nivel1 = $("#n1").val();
+
+        var nivel2_nombre = $("#n2 option:selected").text();
+        var nivel2 = $("#n2").val();
+
+        /*
+         var nivel3;
+         var nivel3_nombre = $("#n3 option:selected").text();
+         var nivel4;
+         var nivel4_nombre = $("#n4 option:selected").text();
+         */
+
+        $('#ventana-modal').empty().html('¿Está seguro que desea eliminar proceso?');
+        $('#ventana-modal').dialog({
+            height: 'auto',
+            width: 350,
+            modal: true,
+            resizable: false,
+            title: 'Mensaje del sistema',
+            buttons: {
+                "Eliminar": function () {
+                    $(this).dialog("close");
+                    dialog = $(this);
+                    $.ajax({
+                        url: urls.siteUrl + '/admin/procesos/obtener-procesos4-val',
+                        data: {n3: proceso},
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (result) {
+
+                            //Primero validar que se obtenga data
+                            if (result == '' || result == []) {
+                                $("#tabla_wrapper").show();
+
+                                $.ajax({
+                                    url: urls.siteUrl + '/admin/procesos/eliminar-procesos3',
+                                    data: {n3: proceso},
+                                    type: 'post',
+                                    dataType: 'json',
+                                    success: function (result) {
+                                        alert(result);
+                                        $("ventana-modal").dialog("close");
+
+                                        $.ajax({
+                                            url: urls.siteUrl + '/admin/procesos/obtener-procesos3',
+                                            data: {n2: nivel2},
+                                            type: 'post',
+                                            dataType: 'json',
+                                            success: function (result) {
+                                                var contador = 0;
+                                                $('#tabla').DataTable().clear().draw();
+                                                $("#tabla").DataTable().column(1).visible(false);
+                                                $("#tabla").DataTable().column(5).visible(true);
+                                                $("#tabla").DataTable().column(6).visible(false);
+                                                $("#th3").css('width', '50%');
+                                                $.each(result, function (key, obj) {
+                                                    contador++;
+                                                    $('#tabla').DataTable().row.add([
+                                                        "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso3(' + obj['id_proceso_n3'] + ')"><i class="icon-trash"></i></a>' + "</center>",
+                                                        '',
+                                                        nivel0_nombre,
+                                                        nivel1_nombre,
+                                                        "<input type=hidden name=id_proceso_n2 value='" + nivel2 + "'>" + nivel2_nombre,
+                                                        "<input type=hidden name=id_proceso_n3 value='" + obj['id_proceso_n3'] + "'><input type=text name=n3_" + contador + " id=n3_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>",
+                                                        ''
+                                                    ]).draw(false);
+                                                });
+
+
+                                                $("#tabla_wrapper").show();
+                                                $("#nuevoProceso").show();
+                                                $("#grabarProceso").show();
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                alert("No se puede eliminar, el proceso tiene niveles hijos o actividades registrados.");
+                            }
+
+                        }
+                    })
+                },
+                "Cancelar": function () {
+                    $(this).dialog("close");
+                }
+            },
+            close: function () {
+            }
+        });
+    }
+
+    eliminarProceso4 = function (proceso) {
+
+        var nivel0_nombre = $("#n0 option:selected").text();
+        var nivel0 = $("#n0").val();
+
+        var nivel1_nombre = $("#n1 option:selected").text();
+        var nivel1 = $("#n1").val();
+
+        var nivel2_nombre = $("#n2 option:selected").text();
+        var nivel2 = $("#n2").val();
+
+        var nivel3_nombre = $("#n3 option:selected").text();
+        var nivel3 = $("#n3").val();
+
+        $('#ventana-modal').empty().html('¿Está seguro que desea eliminar proceso?');
+        $('#ventana-modal').dialog({
+            height: 'auto',
+            width: 350,
+            modal: true,
+            resizable: false,
+            title: 'Mensaje del sistema',
+            buttons: {
+                "Eliminar": function () {
+                    $(this).dialog("close");
+                    dialog = $(this);
+                    $.ajax({
+                        url: urls.siteUrl + '/admin/procesos/obtener-actividades-val', //Actividades
+                        data: {n4: proceso},
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (result) {
+
+                            //Primero validar que se obtenga data
+                            if (result == '' || result == []) {
+                                $("#tabla_wrapper").show();
+
+                                $.ajax({
+                                    url: urls.siteUrl + '/admin/procesos/eliminar-procesos4',
+                                    data: {n4: proceso},
+                                    type: 'post',
+                                    dataType: 'json',
+                                    success: function (result) {
+                                        alert(result);
+                                        $("ventana-modal").dialog("close");
+
+                                        $.ajax({
+                                            url: urls.siteUrl + '/admin/procesos/obtener-procesos4',
+                                            data: {n3: nivel3},
+                                            type: 'post',
+                                            dataType: 'json',
+                                            success: function (result) {
+                                                var contador = 0;
+                                                $('#tabla').DataTable().clear().draw();
+                                                $("#th4").css('width', '50%');
+                                                $.each(result, function (key, obj) {
+                                                    contador++;
+                                                    $('#tabla').DataTable().row.add([
+                                                        "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso4(' + obj['id_proceso_n4'] + ')"><i class="icon-trash"></i></a>' + "</center>",
+                                                        '',
+                                                        nivel0_nombre,
+                                                        nivel1_nombre,
+                                                        nivel2_nombre,
+                                                        "<input type=hidden name=id_proceso_n3 value='" + nivel3 + "'>" + nivel3_nombre,
+                                                        "<input type=hidden name=id_proceso_n4 value='" + obj['id_proceso_n4'] + "'><input type=text name=n4_" + contador + " id=n4_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>",
+                                                    ]).draw(false);
+                                                });
+
+
+                                                $("#tabla_wrapper").show();
+                                                $("#nuevoProceso").show();
+                                                $("#grabarProceso").show();
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                alert("No se puede eliminar, el proceso tiene actividades.");
+                            }
+
+                        }
+                    })
+                },
+                "Cancelar": function () {
+                    $(this).dialog("close");
+                }
+            },
+            close: function () {
+            }
+        });
+    }
+
+    $("#refrescar").click(function () {
+        var nivel = $("#nivel").val();
+
+        $('#tabla').DataTable().clear().draw();
+
+        if (nivel == 0) {
+            $.ajax({
+                url: urls.siteUrl + '/admin/procesos/obtener-procesos0',
+                type: 'post',
+                dataType: 'json',
+                success: function (result) {
+                    var contador = 0;
+                    $.each(result, function (key, obj) {
+                        contador++;
+                        $('#tabla').DataTable().row.add([
+                            "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso0(' + obj['id_proceso_n0'] + ')"><i class="icon-trash"></i></a>' + "</center>",
+                            obj['codigo_tipoproceso'],
+                            "<input type=hidden name=id_puesto value='" + obj['id_proceso_n0'] + "'><input type=text name=n0_" + contador + " id=n0_" + contador + " value='" + obj['descripcion'] + "' style='width:90%'>",
+                            '',
+                            '',
+                            '',
+                            ''
+                        ]).draw(false);
+                    });
+                    $("#th0").css('width', '80%');
+                    $("#tabla_wrapper").show();
+                    $("#nuevoProceso").show();
+                    $("#grabarProceso").show();
+                    $("#refrescar").show();
+                }
+            });
+        } else if (nivel == 1) {
+
+            var n0 = $("#n0").val();
+            var nom_n0 = $("#n0 option:selected").text();
+            $.ajax({
+                url: urls.siteUrl + '/admin/procesos/obtener-procesos1',
+                data: {n0: n0},
+                type: 'post',
+                dataType: 'json',
+                success: function (result) {
+                    var contador = 0;
+                    $("#tabla").DataTable().column(0).visible(true);
+                    $("#tabla").DataTable().column(1).visible(false);
+                    $("#tabla").DataTable().column(2).visible(true);
+                    $("#tabla").DataTable().column(3).visible(true);
+                    $("#tabla").DataTable().column(4).visible(false);
+                    $("#tabla").DataTable().column(5).visible(false);
+                    $("#tabla").DataTable().column(6).visible(false);
+                    $("#n1").empty().append("<option value=''>[Proceso nivel 1]</option>");
+                    $("#n1_chzn .chzn-results").empty().append('<li id="n1_chzn_o_0" class="active-result result-selected" style="">[Proceso nivel 1]</li>');
+                    $("#n1_chzn a span").empty().append('[Proceso nivel 1]');
+                    $("#n2").empty().append("<option value=''>[Proceso nivel 2]</option>");
+                    $("#n2_chzn .chzn-results").empty().append('<li id="n2_chzn_o_0" class="active-result" style="">[Proceso nivel 2]</li>');
+                    $("#n2_chzn a span").empty().append('[Proceso nivel 2]');
+                    $("#n3").empty().append("<option value=''>[Proceso nivel 3]</option>");
+                    $("#n3_chzn .chzn-results").empty().append('<li id="n3_chzn_o_0" class="active-result" style="">[Proceso nivel 3]</li>');
+                    $("#n3_chzn a span").empty().append('[Proceso nivel 3]');
+                    //Primero validar que se obtenga data
+                    if (result == '' || result == []) {
+                        $('#tabla').DataTable().clear().draw();
+                        $("#tabla_wrapper").show();
+                        $("#nuevoProceso").show();
+                        $("#grabarProceso").show();
+                        return false;
+                    }
+
+                    $('#tabla').DataTable().clear().draw();
+                    $("#th0").css('width', '30%');
+                    $("#th1").css('width', '65%');
+                    $.each(result, function (key, obj) {
+                        contador++;
+                        $('#tabla').DataTable().row.add([
+                            "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso1(' + obj['id_proceso_n1'] + ')"><i class="icon-trash"></i></a>' + "</center>",
+                            '',
+                            "<input type=hidden name=id_proceso_n0 value='" + n0 + "'>" + nom_n0,
+                            "<input type=hidden name=id_proceso_n1 value='" + obj['id_proceso_n1'] + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>",
+                            '',
+                            '',
+                            ''
+                        ]).draw(false);
+                    });
+                    $("#nuevoProceso").show();
+                    $("#grabarProceso").show();
+                    $("#refrescar").show();
+                    $("#tabla_wrapper").show();
+                    return false;
+
+                }
+
+            })
+        } else if (nivel == 2) {
+
+            var n0 = $("#n0").val();
+            var nom_n0 = $("#n0 option:selected").text();
+            var n1 = $("#n1").val();
+            var nom_n1 = $("#n1 option:selected").text();
+            $.ajax({
+                url: urls.siteUrl + '/admin/procesos/obtener-procesos2',
+                data: {n1: n1},
+                type: 'post',
+                dataType: 'json',
+                success: function (result) {
+                    var contador = 0;
+                    $("#tabla").DataTable().column(0).visible(true);
+                    $("#tabla").DataTable().column(1).visible(false);
+                    $("#tabla").DataTable().column(2).visible(true);
+                    $("#tabla").DataTable().column(3).visible(true);
+                    $("#tabla").DataTable().column(4).visible(true);
+                    $("#tabla").DataTable().column(5).visible(false);
+                    $("#tabla").DataTable().column(6).visible(false);
+                    $("#n2").empty().append("<option value=''>[Proceso nivel 2]</option>");
+                    $("#n2_chzn .chzn-results").empty().append('<li id="n2_chzn_o_0" class="active-result" style="">[Proceso nivel 2]</li>');
+                    $("#n2_chzn a span").empty().append('[Proceso nivel 2]');
+                    $("#n3").empty().append("<option value=''>[Proceso nivel 3]</option>");
+                    $("#n3_chzn .chzn-results").empty().append('<li id="n3_chzn_o_0" class="active-result" style="">[Proceso nivel 3]</li>');
+                    $("#n3_chzn a span").empty().append('[Proceso nivel 3]');
+                    //Primero validar que se obtenga data
+                    if (result == '' || result == []) {
+                        if (nivel == 2) {
+                            $('#tabla').DataTable().clear().draw();
+                            $("#tabla_wrapper").show();
+                            $("#nuevoProceso").show();
+                            $("#grabarProceso").show();
+                            $("#refrescar").show();
+                        }
+                        return false;
+                    }
+
+                    $('#tabla').DataTable().clear().draw();
+
+                    $("#thp").css('width', '6%');
+                    $("#th0").css('width', '25%');
+                    $("#th1").css('width', '25%');
+                    $("#th2").css('width', '44%');
+                    $.each(result, function (key, obj) {
+                        contador++;
+                        $('#tabla').DataTable().row.add([
+                            "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso2(' + obj['id_proceso_n2'] + ')"><i class="icon-trash"></i></a>' + "</center>",
+                            '',
+                            nom_n0,
+                            "<input type=hidden name=id_proceso_n1 value='" + n1 + "'>" + nom_n1,
+                            "<input type=hidden name=id_proceso_n2 value='" + obj['id_proceso_n2'] + "'><input type=text name=n2_" + contador + " id=n2_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>",
+                            '',
+                            ''
+                        ]).draw(false);
+                    });
+                    $("#nuevoProceso").show();
+                    $("#grabarProceso").show();
+                    $("#tabla_wrapper").show();
+                    $("#refrescar").show();
+                    return false;
+
+                }
+            });
+
+        } else if (nivel == 3) {
+
+            var n0 = $("#n0").val();
+            var nom_n0 = $("#n0 option:selected").text();
+            var n1 = $("#n1").val();
+            var nom_n1 = $("#n1 option:selected").text();
+            var n2 = $("#n2").val();
+            var nom_n2 = $("#n2 option:selected").text();
+            $.ajax({
+                url: urls.siteUrl + '/admin/procesos/obtener-procesos3',
+                data: {n2: n2},
+                type: 'post',
+                dataType: 'json',
+                success: function (result) {
+
+                    var contador = 0;
+                    $("#n3").empty().append("<option value=''>[Proceso nivel 3]</option>");
+                    $("#n3_chzn .chzn-results").empty().append('<li id="n3_chzn_o_0" class="active-result" style="">[Proceso nivel 3]</li>');
+                    $("#n3_chzn a span").empty().append('[Proceso nivel 3]');
+                    //Primero validar que se obtenga data
+                    if (result == '' || result == []) {
+                        if (nivel == 3) {
+                            $('#tabla').DataTable().clear().draw();
+                            $("#tabla_wrapper").show();
+                            $("#nuevoProceso").show();
+                            $("#grabarProceso").show();
+                            $("#refrescar").show();
+                        }
+                    }
+                    $('#tabla').DataTable().clear().draw();
+                    if (nivel == 3) {
+                        $("#tabla").DataTable().column(1).visible(false);
+                        $("#tabla").DataTable().column(5).visible(true);
+                        $("#tabla").DataTable().column(6).visible(false);
+                        $("#th3").css('width', '50%');
+                        $.each(result, function (key, obj) {
+                            contador++;
+                            $('#tabla').DataTable().row.add([
+                                "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso3(' + obj['id_proceso_n3'] + ')"><i class="icon-trash"></i></a>' + "</center>",
+                                '',
+                                nom_n0,
+                                nom_n1,
+                                "<input type=hidden name=id_proceso_n2 value='" + n2 + "'>" + nom_n2,
+                                "<input type=hidden name=id_proceso_n3 value='" + obj['id_proceso_n3'] + "'><input type=text name=n3_" + contador + " id=n3_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>",
+                                ''
+                            ]).draw(false);
+                        });
+                        $("#tabla_wrapper").show();
+                        $("#nuevoProceso").show();
+                        $("#grabarProceso").show();
+                        $("#refrescar").show();
+                        return false;
+                    }
+                }
+            });
+
+        } else if (nivel == 4) {
+            var n0 = $("#n0").val();
+            var nom_n0 = $("#n0 option:selected").text();
+            var n1 = $("#n1").val();
+            var nom_n1 = $("#n1 option:selected").text();
+            var n2 = $("#n2").val();
+            var nom_n2 = $("#n2 option:selected").text();
+            var n3 = $("#n3").val();
+            var nom_n3 = $("#n3 option:selected").text();
+            $.ajax({
+                url: urls.siteUrl + '/admin/procesos/obtener-procesos4',
+                data: {n3: n3},
+                type: 'post',
+                dataType: 'json',
+                success: function (result) {
+
+                    var contador = 0;
+                    $("#tabla").DataTable().column(0).visible(true);
+                    $("#tabla").DataTable().column(1).visible(false);
+                    $("#tabla").DataTable().column(2).visible(true);
+                    $("#tabla").DataTable().column(3).visible(true);
+                    $("#tabla").DataTable().column(4).visible(true);
+                    $("#tabla").DataTable().column(5).visible(true);
+                    $("#tabla").DataTable().column(6).visible(true);
+                    //Primero validar que se obtenga data
+                    if (result == '' || result == []) {
+                        if (nivel == 4) {
+                            $('#tabla').DataTable().clear().draw();
+                            $("#tabla_wrapper").show();
+                            $("#nuevoProceso").show();
+                            $("#grabarProceso").show();
+                            $("#refrescar").show();
+                        }
+                        return false;
+                    }
+
+                    $('#tabla').DataTable().clear().draw();
+                    $("#th4").css('width', '50%');
+                    $.each(result, function (key, obj) {
+                        contador++;
+                        $('#tabla').DataTable().row.add([
+                            "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso4(' + obj['id_proceso_n4'] + ')"><i class="icon-trash"></i></a>' + "</center>",
+                            '',
+                            nom_n0,
+                            nom_n1,
+                            nom_n2,
+                            "<input type=hidden name=id_proceso_n3 value='" + n3 + "'>" + nom_n3,
+                            "<input type=hidden name=id_proceso_n4 value='" + obj['id_proceso_n4'] + "'><input type=text name=n4_" + contador + " id=n4_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>"
+                        ]).draw(false);
+                    });
+                    $("#th4").css('width', '50%');
+                    $("#tabla_wrapper").show();
+                    $("#nuevoProceso").show();
+                    $("#grabarProceso").show();
+                    $("#refrescar").show();
+
+                }
+            });
+
+
+        }
+
+
+
+
+
+    })
 
     //Ocultar tabla
     $("#tabla_wrapper").hide();
@@ -137,12 +820,14 @@ $(document).ready(function () {
         if (mostrarMensaje == 1) {
             alert(mensaje);
             $("#grabarProceso").show();
+            $("#refrescar").show();
             return false;
         }
 
         if ($('#tabla').DataTable().data().count() / 7 == 1) {
             alert('Debe agregar más de 1 proceso para poder grabar. (SERVIR)');
             $("#grabarProceso").show();
+            $("#refrescar").show();
             return false;
         }
 
@@ -157,7 +842,7 @@ $(document).ready(function () {
                 dataType: 'json',
                 success: function (result) {
                     alert(result);
-                    location.reload();
+                    //location.reload();
                     //listaNivel0();
                     $.ajax({
                         url: urls.siteUrl + '/admin/procesos/obtener-procesos0',
@@ -169,7 +854,7 @@ $(document).ready(function () {
                             $.each(result, function (key, obj) {
                                 contador++;
                                 $('#tabla').DataTable().row.add([
-                                    "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso(' + obj['id_proceso_n0'] + ')><i class="icon-trash"></i></a>' + "</center>",
+                                    "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso0(' + obj['id_proceso_n0'] + ')"><i class="icon-trash"></i></a>' + "</center>",
                                     obj['codigo_tipoproceso'],
                                     "<input type=hidden name=id_puesto value='" + obj['id_proceso_n0'] + "'><input type=text name=n0_" + contador + " id=n0_" + contador + " value='" + obj['descripcion'] + "' style='width:90%'>",
                                     '',
@@ -182,6 +867,7 @@ $(document).ready(function () {
                             $("#tabla_wrapper").show();
                             $("#nuevoProceso").show();
                             $("#grabarProceso").show();
+                            $("#refrescar").show();
                         }
                     });
                 }
@@ -223,10 +909,11 @@ $(document).ready(function () {
                             $('#tabla').DataTable().clear().draw();
                             $("#th0").css('width', '30%');
                             $("#th1").css('width', '65%');
+
                             $.each(result, function (key, obj) {
                                 contador++;
                                 $('#tabla').DataTable().row.add([
-                                    "<center>" + contador + "</center>",
+                                    "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso1(' + obj['id_proceso_n1'] + ')"><i class="icon-trash"></i></a>' + "</center>",
                                     '',
                                     "<input type=hidden name=id_proceso_n0 value='" + nivel0 + "'>" + nivel0_nombre,
                                     "<input type=hidden name=id_proceso_n1 value='" + obj['id_proceso_n1'] + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>",
@@ -238,6 +925,7 @@ $(document).ready(function () {
                             $("#tabla_wrapper").show();
                             $("#nuevoProceso").show();
                             $("#grabarProceso").show();
+                            $("#refrescar").show();
                         }
                     });
                 }
@@ -279,6 +967,7 @@ $(document).ready(function () {
                                 $("#tabla_wrapper").show();
                                 $("#nuevoProceso").show();
                                 $("#grabarProceso").show();
+                                $("#refrescar").show();
                                 return false;
                             }
 
@@ -291,7 +980,7 @@ $(document).ready(function () {
                                 $.each(result, function (key, obj) {
                                     contador++;
                                     $('#tabla').DataTable().row.add([
-                                        "<center>" + contador + "</center>",
+                                        "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso2(' + obj['id_proceso_n2'] + ')"><i class="icon-trash"></i></a>' + "</center>",
                                         '',
                                         nivel0_nombre,
                                         "<input type=hidden name=id_proceso_n1 value='" + nivel1 + "'>" + nivel1_nombre,
@@ -303,6 +992,7 @@ $(document).ready(function () {
                                 $("#nuevoProceso").show();
                                 $("#grabarProceso").show();
                                 $("#tabla_wrapper").show();
+                                $("#refrescar").show();
                             }
                         }
                     });
@@ -335,6 +1025,7 @@ $(document).ready(function () {
                                 $("#tabla_wrapper").show();
                                 $("#nuevoProceso").show();
                                 $("#grabarProceso").show();
+                                $("#refrescar").show();
                                 return false;
                             }
                             $('#tabla').DataTable().clear().draw();
@@ -346,7 +1037,7 @@ $(document).ready(function () {
                                 $.each(result, function (key, obj) {
                                     contador++;
                                     $('#tabla').DataTable().row.add([
-                                        "<center>" + contador + "</center>",
+                                        "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso3(' + obj['id_proceso_n3'] + ')"><i class="icon-trash"></i></a>' + "</center>",
                                         '',
                                         nivel0_nombre,
                                         nivel1_nombre,
@@ -358,6 +1049,7 @@ $(document).ready(function () {
                                 $("#tabla_wrapper").show();
                                 $("#nuevoProceso").show();
                                 $("#grabarProceso").show();
+                                $("#refrescar").show();
                             }
                         }
                     });
@@ -387,6 +1079,7 @@ $(document).ready(function () {
                                 $("#tabla_wrapper").show();
                                 $("#nuevoProceso").show();
                                 $("#grabarProceso").show();
+                                $("#refrescar").show();
                                 return false;
                             }
                             $('#tabla').DataTable().clear().draw();
@@ -394,7 +1087,7 @@ $(document).ready(function () {
                             $.each(result, function (key, obj) {
                                 contador++;
                                 $('#tabla').DataTable().row.add([
-                                    "<center>" + contador + "</center>",
+                                    "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso4(' + obj['id_proceso_n4'] + ')"><i class="icon-trash"></i></a>' + "</center>",
                                     '',
                                     nivel0_nombre,
                                     nivel1_nombre,
@@ -406,6 +1099,7 @@ $(document).ready(function () {
                             $("#tabla_wrapper").show();
                             $("#nuevoProceso").show();
                             $("#grabarProceso").show();
+                            $("#refrescar").show();
                         }
                     });
                 }
@@ -414,7 +1108,7 @@ $(document).ready(function () {
 
 
 
-        console.log(dataProceso);
+        //console.log(dataProceso);
     });
     //Nuevo proceso
     $("#nuevoProceso").click(function () {
@@ -565,6 +1259,7 @@ $(document).ready(function () {
         $("#n4_chzn").hide();
         $("#nuevoProceso").hide();
         $("#grabarProceso").hide();
+        $("#refrescar").hide();
     };
     var listaNivel0 = function () {
 
@@ -620,6 +1315,7 @@ $(document).ready(function () {
             $("#tabla_wrapper").hide();
             $("#nuevoProceso").hide();
             $("#grabarProceso").hide();
+            $("#refrescar").hide();
         } else if (nivel == 0) {
             $("#n0_chzn").hide();
             $("#n1_chzn").hide();
@@ -649,7 +1345,7 @@ $(document).ready(function () {
                     $.each(result, function (key, obj) {
                         contador++;
                         $('#tabla').DataTable().row.add([
-                            "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso(' + obj['id_proceso_n0'] + ')"><i class="icon-trash"></i></a>' + "</center>",
+                            "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso0(' + obj['id_proceso_n0'] + ')"><i class="icon-trash"></i></a>' + "</center>",
                             obj['codigo_tipoproceso'],
                             "<input type=hidden name=id_puesto value='" + obj['id_proceso_n0'] + "'><input type=text name=n0_" + contador + " id=n0_" + contador + " value='" + obj['descripcion'] + "' style='width:90%'>",
                             '',
@@ -662,6 +1358,7 @@ $(document).ready(function () {
                     $("#tabla_wrapper").show();
                     $("#nuevoProceso").show();
                     $("#grabarProceso").show();
+                    $("#refrescar").show();
                 }
             });
         } else if (nivel == 1) {
@@ -676,6 +1373,7 @@ $(document).ready(function () {
             $("#n4").hide();
             $("#nuevoProceso").hide();
             $("#grabarProceso").hide();
+            $("#refrescar").hide();
             $("#tabla").DataTable().column(0).visible(true);
             $("#tabla").DataTable().column(1).visible(true);
             $("#tabla").DataTable().column(2).visible(true);
@@ -697,6 +1395,7 @@ $(document).ready(function () {
             $("#n4_chzn").hide();
             $("#nuevoProceso").hide();
             $("#grabarProceso").hide();
+            $("#refrescar").hide();
             $("#tabla").DataTable().column(0).visible(true);
             $("#tabla").DataTable().column(1).visible(true);
             $("#tabla").DataTable().column(2).visible(true);
@@ -708,8 +1407,6 @@ $(document).ready(function () {
             $('#tabla').DataTable().clear().draw();
         } else if (nivel == 3) {
             $("#n0_chzn").show();
-            //$("#n1_chzn").show();
-
             $("#n1_chzn").hide();
             $("#n1").show();
             $("#n2_chzn").hide();
@@ -720,6 +1417,7 @@ $(document).ready(function () {
             $("#n4_chzn").hide();
             $("#nuevoProceso").hide();
             $("#grabarProceso").hide();
+            $("#refrescar").hide();
             $("#tabla").DataTable().column(0).visible(true);
             $("#tabla").DataTable().column(1).visible(true);
             $("#tabla").DataTable().column(2).visible(true);
@@ -741,6 +1439,7 @@ $(document).ready(function () {
             $("#n4_chzn").hide();
             $("#nuevoProceso").hide();
             $("#grabarProceso").hide();
+            $("#refrescar").hide();
             $("#tabla").DataTable().column(0).visible(true);
             $("#tabla").DataTable().column(1).visible(true);
             $("#tabla").DataTable().column(2).visible(true);
@@ -770,6 +1469,7 @@ $(document).ready(function () {
         $("#n4_chzn a span").empty().append('[Proceso nivel 4]');
     };
     setearListas();
+
     $("#n0").change(function () {
 
         var n0 = $("#n0").val();
@@ -779,6 +1479,7 @@ $(document).ready(function () {
         $("#tabla_wrapper").hide();
         $("#nuevoProceso").hide();
         $("#grabarProceso").hide();
+        $("#refrescar").hide();
         //Si no se ha seleccionado proceso y es nivel 0, 
         if (n0 == '' || nivel == 0) {
             return false
@@ -814,6 +1515,7 @@ $(document).ready(function () {
                         $("#tabla_wrapper").show();
                         $("#nuevoProceso").show();
                         $("#grabarProceso").show();
+                        $("#refrescar").show();
                         return false;
                     }
 
@@ -824,7 +1526,7 @@ $(document).ready(function () {
                         $.each(result, function (key, obj) {
                             contador++;
                             $('#tabla').DataTable().row.add([
-                                "<center>" + contador + "</center>",
+                                "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso1(' + obj['id_proceso_n1'] + ')"><i class="icon-trash"></i></a>' + "</center>",
                                 '',
                                 "<input type=hidden name=id_proceso_n0 value='" + n0 + "'>" + nom_n0,
                                 "<input type=hidden name=id_proceso_n1 value='" + obj['id_proceso_n1'] + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%'>",
@@ -836,16 +1538,19 @@ $(document).ready(function () {
                         $("#nuevoProceso").show();
                         $("#grabarProceso").show();
                         $("#tabla_wrapper").show();
+                        $("#refrescar").show();
                         return false;
                     }
 
                     $("#div_n1").empty().append('<select id="n1" name="n1"><option value="">[Proceso nivel 1]</option>');
                     if (nivel >= 2) {
                         $.each(result, function (key, obj) {
-                            contador++;
-                            $("#n1").append("<option value='" + obj['id_proceso_n1'] + "'>" + obj['descripcion'] + "</option>");
-                            $("#n1_chzn .chzn-drop .chzn-results").append('<li id="n1_chzn_o_' + contador + '" class="active-result" style="">' + obj['descripcion'] + '</li>');
-                            //$("#n1_chzn .chzn-drop .chzn-results").append('<li id="n1_chzn_o_' + contador + '" class="active-result" style="">' + obj['descripcion'] + '</li>');
+                            if (obj['tiene_actividad'] == 0) {
+                                contador++;
+                                $("#n1").append("<option value='" + obj['id_proceso_n1'] + "'>" + obj['descripcion'] + "</option>");
+                                $("#n1_chzn .chzn-drop .chzn-results").append('<li id="n1_chzn_o_' + contador + '" class="active-result" style="">' + obj['descripcion'] + '</li>');
+
+                            }
 
                         });
                         $("#div_n1").append("</select>");
@@ -861,6 +1566,7 @@ $(document).ready(function () {
                             $("#tabla_wrapper").hide();
                             $("#nuevoProceso").hide();
                             $("#grabarProceso").hide();
+                            $("#refrescar").hide();
                             //Si no se ha seleccionado proceso y es nivel 0, 
                             //no ejecutar ajax
                             if (n1 == '' || nivel == 1) {
@@ -894,6 +1600,7 @@ $(document).ready(function () {
                                             $("#tabla_wrapper").show();
                                             $("#nuevoProceso").show();
                                             $("#grabarProceso").show();
+                                            $("#refrescar").show();
                                         }
                                         return false;
                                     }
@@ -907,7 +1614,7 @@ $(document).ready(function () {
                                         $.each(result, function (key, obj) {
                                             contador++;
                                             $('#tabla').DataTable().row.add([
-                                                "<center>" + contador + "</center>",
+                                                "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso2(' + obj['id_proceso_n2'] + ')"><i class="icon-trash"></i></a>' + "</center>",
                                                 '',
                                                 nom_n0,
                                                 "<input type=hidden name=id_proceso_n1 value='" + n1 + "'>" + nom_n1,
@@ -919,21 +1626,25 @@ $(document).ready(function () {
                                         $("#nuevoProceso").show();
                                         $("#grabarProceso").show();
                                         $("#tabla_wrapper").show();
+                                        $("#refrescar").show();
                                         return false;
                                     }
 
                                     $("#div_n2").empty().append('<select id="n2" name="n2"><option value="">[Proceso nivel 2]</option>');
                                     if (nivel >= 3) {
                                         $.each(result, function (key, obj) {
-                                            contador++;
-                                            $("#n2").append("<option value='" + obj['id_proceso_n2'] + "'>" + obj['descripcion'] + "</option>");
-                                            $("#n2_chzn .chzn-results").append('<li id="n2_chzn_o_' + contador + '" class="active-result" style="">' + obj['descripcion'] + '</li>');
+                                            if (obj['tiene_actividad'] == 0) {
+                                                contador++;
+                                                $("#n2").append("<option value='" + obj['id_proceso_n2'] + "'>" + obj['descripcion'] + "</option>");
+                                                $("#n2_chzn .chzn-results").append('<li id="n2_chzn_o_' + contador + '" class="active-result" style="">' + obj['descripcion'] + '</li>');
+                                            }
                                         });
                                         $("#div_n2").append("</select>");
                                         $("#n2").chosen();
                                         $("#tabla_wrapper").hide();
                                         $("#nuevoProceso").hide();
                                         $("#grabarProceso").hide();
+                                        $("#refrescar").hide();
                                     }
                                     $("#n2").change(function () {
 
@@ -946,6 +1657,7 @@ $(document).ready(function () {
                                         $("#tabla_wrapper").hide();
                                         $("#nuevoProceso").hide();
                                         $("#grabarProceso").hide();
+                                        $("#refrescar").hide();
                                         //Si no se ha seleccionado proceso y es nivel 0, 
                                         //no ejecutar ajax
                                         if (n2 == '' || nivel == 2) {
@@ -970,6 +1682,7 @@ $(document).ready(function () {
                                                         $("#tabla_wrapper").show();
                                                         $("#nuevoProceso").show();
                                                         $("#grabarProceso").show();
+                                                        $("#refrescar").show();
                                                     }
                                                 }
                                                 $('#tabla').DataTable().clear().draw();
@@ -981,7 +1694,7 @@ $(document).ready(function () {
                                                     $.each(result, function (key, obj) {
                                                         contador++;
                                                         $('#tabla').DataTable().row.add([
-                                                            "<center>" + contador + "</center>",
+                                                            "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso3(' + obj['id_proceso_n3'] + ')"><i class="icon-trash"></i></a>' + "</center>",
                                                             '',
                                                             nom_n0,
                                                             nom_n1,
@@ -993,15 +1706,18 @@ $(document).ready(function () {
                                                     $("#tabla_wrapper").show();
                                                     $("#nuevoProceso").show();
                                                     $("#grabarProceso").show();
+                                                    $("#refrescar").show();
                                                     return false;
                                                 }
 
                                                 $("#div_n3").empty().append('<select id="n3" name="n3"><option value="">[Proceso nivel 3]</option>');
                                                 if (nivel >= 4) {
                                                     $.each(result, function (key, obj) {
-                                                        contador++;
-                                                        $("#n3").append("<option value='" + obj['id_proceso_n3'] + "'>" + obj['descripcion'] + "</option>");
-                                                        $("#n3_chzn .chzn-results").append('<li id="n3_chzn_o_' + contador + '" class="active-result" style="">' + obj['descripcion'] + '</li>');
+                                                        if (obj['tiene_actividad'] == 0) {
+                                                            contador++;
+                                                            $("#n3").append("<option value='" + obj['id_proceso_n3'] + "'>" + obj['descripcion'] + "</option>");
+                                                            $("#n3_chzn .chzn-results").append('<li id="n3_chzn_o_' + contador + '" class="active-result" style="">' + obj['descripcion'] + '</li>');
+                                                        }
                                                     });
                                                 }
                                                 $("#div_n3").append("</select>");
@@ -1018,6 +1734,7 @@ $(document).ready(function () {
                                                     $("#tabla_wrapper").hide();
                                                     $("#nuevoProceso").hide();
                                                     $("#grabarProceso").hide();
+                                                    $("#refrescar").hide();
                                                     //Si no se ha seleccionado proceso y es nivel 0, 
                                                     //no ejecutar ajax
                                                     if (n3 == '' || nivel == 3) {
@@ -1046,6 +1763,7 @@ $(document).ready(function () {
                                                                     $("#tabla_wrapper").show();
                                                                     $("#nuevoProceso").show();
                                                                     $("#grabarProceso").show();
+                                                                    $("#refrescar").show();
                                                                 }
                                                                 return false;
                                                             }
@@ -1056,7 +1774,7 @@ $(document).ready(function () {
                                                                 $.each(result, function (key, obj) {
                                                                     contador++;
                                                                     $('#tabla').DataTable().row.add([
-                                                                        "<center>" + contador + "</center>",
+                                                                        "<center>" + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarProceso4(' + obj['id_proceso_n4'] + ')"><i class="icon-trash"></i></a>' + "</center>",
                                                                         '',
                                                                         nom_n0,
                                                                         nom_n1,
@@ -1069,6 +1787,7 @@ $(document).ready(function () {
                                                                 $("#tabla_wrapper").show();
                                                                 $("#nuevoProceso").show();
                                                                 $("#grabarProceso").show();
+                                                                $("#refrescar").show();
                                                             }
                                                         }
                                                     });
