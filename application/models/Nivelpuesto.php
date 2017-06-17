@@ -33,9 +33,17 @@ class Application_Model_Nivelpuesto extends Zend_Db_Table {
 
     //Para el registro de puesto en pertinencia
     public function obtenerNiveles($grupo) {
-        return $this->getAdapter()->select()->from($this->_name)
+        
+        if (empty($grupo)) {
+            return $this->getAdapter()->select()->from($this->_name)
+                        ->query()->fetchAll();
+        } else {
+            return $this->getAdapter()->select()->from($this->_name)
                         ->where('codigo_grupo = ?', $grupo)
                         ->query()->fetchAll();
+        }
+        
+        
     }
 
 }

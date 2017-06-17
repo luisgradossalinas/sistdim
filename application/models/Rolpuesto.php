@@ -28,11 +28,10 @@ class Application_Model_Rolpuesto extends Zend_Db_Table {
 
         return $id;
     }
-    
-    public function combo()
-    {
-        return $this->getAdapter()->select()->from($this->_name,array('key' => 'codigo_rol_puesto', 'value' => 'descripcion'))
-                ->where('estado = ?',self::ESTADO_ACTIVO)->query()->fetchAll();
+
+    public function combo() {
+        return $this->getAdapter()->select()->from($this->_name, array('key' => 'codigo_rol_puesto', 'value' => 'descripcion'))
+                        ->where('estado = ?', self::ESTADO_ACTIVO)->query()->fetchAll();
     }
 
     public function listado() {
@@ -43,9 +42,15 @@ class Application_Model_Rolpuesto extends Zend_Db_Table {
 
     //Para el registro de puesto
     public function obtenerRoles($familia) {
-        return $this->getAdapter()->select()->from($this->_name)
-                        ->where('codigo_familia = ?', $familia)
-                        ->query()->fetchAll();
+
+        if (empty($familia)) {
+            return $this->getAdapter()->select()->from($this->_name)
+                            ->query()->fetchAll();
+        } else {
+            return $this->getAdapter()->select()->from($this->_name)
+                            ->where('codigo_familia = ?', $familia)
+                            ->query()->fetchAll();
+        }
     }
 
 }

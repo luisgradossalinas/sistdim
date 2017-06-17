@@ -11,7 +11,7 @@ class Application_Model_Categoriapuesto extends Zend_Db_Table {
     const TABLA = 'categoria_puesto';
 
     public function guardar($datos) {
-        
+
         $id = 0;
         if (!empty($datos["id"])) {
             $id = (int) $datos["id"];
@@ -29,12 +29,18 @@ class Application_Model_Categoriapuesto extends Zend_Db_Table {
 
         return $id;
     }
-    
+
     //Para el registro de puesto en pertinencia
     public function obtenerCategoria($familia) {
-        return $this->getAdapter()->select()->from($this->_name)
-                        ->where('codigo_famila = ?', $familia)
-                        ->query()->fetchAll();
+
+        if (empty($familia)) {
+            return $this->getAdapter()->select()->from($this->_name)
+                            ->query()->fetchAll();
+        } else {
+            return $this->getAdapter()->select()->from($this->_name)
+                            ->where('codigo_famila = ?', $familia)
+                            ->query()->fetchAll();
+        }
     }
 
 }
