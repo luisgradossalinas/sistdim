@@ -173,6 +173,27 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
         $this->_proceso4->eliminarProcesoN4($n4);
         echo Zend_Json::encode("Registro eliminado");
     }
+    
+    public function eliminarActividadAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        $act = $this->_getParam('act');
+        $idPuesto = $this->_actividad->eliminarActividad($act);
+        $this->_puesto->calcularDotacion($idPuesto);
+        
+        echo Zend_Json::encode("Registro eliminado" . $idPuesto);
+    }
 
     public function obtenerProcesos1Action() {
 
@@ -327,6 +348,30 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
             $nivel = 4;
             $dataActividad = $this->_actividad->obtenerActividadesVal($n4, $nivel);
             echo Zend_Json::encode($dataActividad);
+        }
+    }
+    
+    /*
+     * Función para validar las actividades  a la hora de eliminar el proceso de nivel 4
+     */
+    public function obtenerTareasValAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        if ($this->_hasParam('act')) {
+            $act = $this->_getParam('act');
+            $dataTarea = $this->_tarea->obtenerTareasVal($act);
+            echo Zend_Json::encode($dataTarea);
         }
     }
 
@@ -544,6 +589,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
                 }
 
                 $this->_actividad->guardar($dataActividad);
+                $this->_puesto->calcularDotacion($add[4]);
             }
 
             //Actualizar flag para indicar que tiene procesos hijos

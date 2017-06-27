@@ -141,7 +141,7 @@ class Application_Model_Puesto extends Zend_Db_Table {
     public function puestosSinDotacionInvitado($unidad) {
 
 
-        
+
         $sqlAct = $this->getAdapter()->select()->from(array('a' => Application_Model_Actividad::TABLA), null)
                 ->joinInner(array('p' => self::TABLA), 'p.id_puesto = a.id_puesto', array('id_puesto', 'puesto' => 'p.descripcion'))
                 ->where('a.id_uorganica = ?', $unidad)
@@ -155,31 +155,30 @@ class Application_Model_Puesto extends Zend_Db_Table {
                 ->where('a.id_periodicidad = ?', 0)
                 ->where('a.estado = ?', self::ESTADO_ACTIVO)
                 ->group(array('a.id_puesto'));
-        
+
         /*
-        $sqlDotacionVacia = $this->getAdapter()->select()->from(array('p' => self::TABLA), array('id_puesto', 'puesto' => 'p.descripcion'))
-                ->where('id_uorganica = ?', $unidad)
-                ->where('total_dotacion = ?', 0);
+          $sqlDotacionVacia = $this->getAdapter()->select()->from(array('p' => self::TABLA), array('id_puesto', 'puesto' => 'p.descripcion'))
+          ->where('id_uorganica = ?', $unidad)
+          ->where('total_dotacion = ?', 0);
          */
 
-        
+
         //$sqlUnion = $this->getAdapter()->select()->union(array($sqlAct, $sqlTarea, $sqlDotacionVacia));
         $sqlUnion = $this->getAdapter()->select()->union(array($sqlAct, $sqlTarea));
-        
+
         return $sqlUnion->query()->fetchAll();
-        
     }
 
     public function obtenerMapeoPuesto($proyecto) {
-
+       
         return $this->getAdapter()->select()->from(array('p' => self::TABLA), array('num_correlativo', 'puesto' => 'descripcion',
                             'cantidad', 'nombre_personal'))
                         ->joinInner(array('uo' => Application_Model_UnidadOrganica::TABLA), 'uo.id_uorganica = p.id_uorganica', array('unidad' => 'descripcion'))
                         ->joinInner(array('o' => Application_Model_Organo::TABLA), 'o.id_organo = uo.id_organo', array('organo'))
                         ->joinInner(array('nat' => Application_Model_Natuorganica::TABLA), 'nat.codigo_natuorganica = o.codigo_natuorganica', array('naturaleza' => 'descripcion'))
-                        ->joinInner(array('g' => Application_Model_Grupo::TABLA), 'g.codigo_grupo = p.codigo_grupo', array('grupo' => 'descripcion'))
-                        ->joinInner(array('f' => Application_Model_Familia::TABLA), 'f.codigo_familia = p.codigo_familia', array('familia' => 'descripcion'))
-                        ->joinInner(array('rp' => Application_Model_Rolpuesto::TABLA), 'rp.codigo_rol_puesto = p.codigo_rol_puesto', array('rpuesto' => 'descripcion'))
+                        ->joinLeft(array('g' => Application_Model_Grupo::TABLA), 'g.codigo_grupo = p.codigo_grupo', array('grupo' => 'descripcion'))
+                        ->joinLeft(array('f' => Application_Model_Familia::TABLA), 'f.codigo_familia = p.codigo_familia', array('familia' => 'descripcion'))
+                        ->joinLeft(array('rp' => Application_Model_Rolpuesto::TABLA), 'rp.codigo_rol_puesto = p.codigo_rol_puesto', array('rpuesto' => 'descripcion'))
                         ->where('o.id_proyecto = ?', $proyecto)
                         ->where('p.estado = ?', self::ESTADO_ACTIVO)
                         ->order(array('nat.descripcion asc', 'o.organo asc', 'uo.descripcion asc', 'p.descripcion asc'))
@@ -323,6 +322,34 @@ class Application_Model_Puesto extends Zend_Db_Table {
                         GROUP BY  np.`descripcion`)
                        t  GROUP BY nivel ')
                         ->fetchAll();
+    }
+
+    /*
+      Obtener la dotación actual (actividades y tareas) de un puesto (Usado cuando se actualizan las actividades)
+     *      */
+    public function calcularDotacion($puesto) {
+
+        $query = $this->getAdapter()->query("SELECT id_puesto,ROUND(SUM(dota),2) AS dota FROM (
+        SELECT a.id_puesto,SUM(((a.frecuencia*p.valor*t.valor*a.duracion)*1.1)/176) AS dota
+        FROM actividad a 
+         INNER JOIN periodicidad p ON p.id_periodicidad = a.id_periodicidad
+         INNER JOIN tiempo t ON t.id_tiempo = a.id_tiempo
+        WHERE a.id_puesto = 51 AND a.estado = 1 GROUP BY a.id_puesto
+        UNION ALL
+        SELECT a.id_puesto,SUM(((a.frecuencia*p.valor*t.valor*a.duracion)*1.1)/176) AS dota
+        FROM tarea a 
+         INNER JOIN periodicidad p ON p.id_periodicidad = a.id_periodicidad
+         INNER JOIN tiempo t ON t.id_tiempo = a.id_tiempo
+        WHERE a.id_puesto = '" . $puesto . "' AND a.estado = 1 GROUP BY a.id_puesto
+        ) X GROUP BY id_puesto")->fetchAll();
+
+        $dota = 0.00;
+        if (count($query) > 0) {
+            $dota = $query[0]['dota'];
+        }
+
+        $data['total_dotacion'] = $dota;
+        $this->update($data, $this->_primary . ' = ' . $puesto);
     }
 
 }

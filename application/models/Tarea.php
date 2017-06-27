@@ -91,5 +91,16 @@ class Application_Model_Tarea extends Zend_Db_Table {
 
         return 'Posición actualizada';
     }
+    
+    /*
+     * Función para validar las tareas a la hora de eliminar una actividad 
+     */
+    public function obtenerTareasVal($actividad) {
+        
+        return $this->getAdapter()->select()->from(array('n4' => $this->_name))
+                        ->where('estado = ?', self::ESTADO_ACTIVO)
+                        ->where('id_actividad = ?', $actividad)
+                        ->query()->fetchAll();
+    }
 
 }

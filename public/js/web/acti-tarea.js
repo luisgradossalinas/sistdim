@@ -1,6 +1,235 @@
 var sentencia_crud = '';
 $(document).ready(function () {
 
+    $("#refrescar").click(function () {
+        var nivel = $("#nivel").val();
+
+        var proceso;
+        var nom_proceso;
+
+        if (nivel == 1) {
+            proceso = $("#n1").val();
+            nom_proceso = $("#n1 option:selected").text();
+        } else if (nivel == 2) {
+            proceso = $("#n2").val();
+            nom_proceso = $("#n2 option:selected").text();
+        } else if (nivel == 3) {
+            proceso = $("#n3").val();
+            nom_proceso = $("#n3 option:selected").text();
+        } else if (nivel == 4) {
+            proceso = $("#n4").val();
+            nom_proceso = $("#n4 option:selected").text();
+        }
+
+
+        $.ajax({
+            url: urls.siteUrl + '/admin/procesos/obtener-actividad',
+            data: {proceso: proceso, nivel: nivel},
+            type: 'post',
+            dataType: 'json',
+            success: function (result) {
+
+                var contador = 0;
+                //Primero validar que se obtenga data
+                if (result == '' || result == []) {
+                    if (nivel == 4) {
+                        $('#tabla').DataTable().clear().draw();
+                        $("#tabla_wrapper").show();
+                        $("#nuevaActividad").show();
+                        $("#grabarActividad").show();
+                        $("#refrescar").show();
+                    }
+                    return false;
+                }
+
+                $('#tabla').DataTable().clear().draw();
+                $.each(result, function (key, obj) {
+                    contador++;
+                    //Evaluar si tiene tarea
+                    var select = '<div style="float:left"><select id=tarea_' + contador + '>';
+                    if (obj['tiene_tarea'] == 1) { //Si tiene tarea
+                        select += '<option value=1 selected>Sí</option>';
+                        select += '<option value=0>No</option>';
+
+                    } else {
+                        select += '<option value=1>Sí</option>';
+                        select += '<option value=0 selected>No</option>';
+                    }
+
+                    select += '</select></div>';
+                    var detalleTarea = '<div id="capa_tarea_' + contador + '" style="float:left">\n\
+                        <a id="nuevaTarea_' + contador + '" id_actividad=' + obj['id_actividad'] + ' nom_act="' + obj['descripcion'] + '" role="button" class="btn btn-default btn-xs tip-right" title="Ver/Añadir tareas" \n\
+                        ><li class="icon-list"></li></a></div>';
+
+                    $('#tabla').DataTable().row.add([
+                        contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + proceso + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>' + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarActividad(' + obj['id_actividad'] + ',' + proceso + ')"><i class="icon-trash"></i></a>',
+                        "<input type=hidden id='id_actividad' value='" + obj['id_actividad'] + "'><input type=hidden id='id_proceso' value='" + proceso + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%;font-size:8pt'>",
+                        select + detalleTarea,
+                        obj['unidad'] + '<span style="display:none">' + obj['descripcion'] + "</span>",
+                        obj['puesto']
+                    ]).draw(false);
+                    $("#tarea_" + contador).chosen();
+                    $("#tarea_" + contador + "_chzn").css('font-size', '7.5pt');
+                    $("#tarea_" + contador + "_chzn").css('width', '50px');
+                    $("#tarea_" + contador + "_chzn .chzn-drop .chzn-search input").css('width', '50px');
+
+                    if (obj['tiene_tarea'] == 0) {
+                        $("#capa_tarea_" + contador).hide();
+                    }
+
+                    $("#unidad_" + contador).chosen();
+                    $("#unidad_" + contador + "_chzn").css('font-size', '7.5pt');
+                    $("#unidad_" + contador + "_chzn").css('width', '230px');
+                    $("#puesto_" + contador).chosen();
+                    $("#puesto_" + contador + "_chzn").css('font-size', '7.5pt');
+                    $("#puesto_" + contador + "_chzn").css('width', '230px');
+
+                    if (obj['tiene_tarea'] == 1) { //Si tiene tarea
+                        $("#unidad_" + contador + "_chzn").hide();
+                        $("#puesto_" + contador + "_chzn").hide();
+                    }
+                });
+
+                $("#nuevaActividad").show();
+                $("#grabarActividad").show();
+                $("#refrescar").show();
+                $("#tabla_wrapper").show();
+            }
+        });
+    });
+
+    eliminarActividad = function (id_act, id_proceso) {
+
+        var nivel0_nombre = $("#n0 option:selected").text();
+        var nivel0 = $("#n0").val();
+
+        var nivel = $("#nivel").val();
+
+        $('#ventana-modal').empty().html('¿Está seguro que desea eliminar actividad?');
+        $('#ventana-modal').dialog({
+            height: 'auto',
+            width: 350,
+            modal: true,
+            resizable: false,
+            title: 'Mensaje del sistema',
+            buttons: {
+                "Eliminar": function () {
+                    $(this).dialog("close");
+                    dialog = $(this);
+                    $.ajax({
+                        url: urls.siteUrl + '/admin/procesos/obtener-tareas-val',
+                        data: {act: id_act},
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (result) {
+
+                            //Primero validar que se obtenga data
+                            if (result == '' || result == []) {
+                                $("#tabla_wrapper").show();
+
+                                $.ajax({
+                                    url: urls.siteUrl + '/admin/procesos/eliminar-actividad',
+                                    data: {act: id_act},
+                                    type: 'post',
+                                    dataType: 'json',
+                                    success: function (result) {
+                                        alert(result);
+                                        $("ventana-modal").dialog("close");
+
+                                        $.ajax({
+                                            url: urls.siteUrl + '/admin/procesos/obtener-actividad',
+                                            data: {proceso: id_proceso, nivel: nivel},
+                                            type: 'post',
+                                            dataType: 'json',
+                                            success: function (result) {
+                                                
+                                                $('#tabla').DataTable().clear().draw();
+                                                var contador = 0;
+                                                //Primero validar que se obtenga data
+                                                if (result == '' || result == []) {
+                                                    if (nivel == 4) {
+                                                        $('#tabla').DataTable().clear().draw();
+                                                        $("#tabla_wrapper").show();
+                                                        $("#nuevaActividad").show();
+                                                        $("#grabarActividad").show();
+                                                        $("#refrescar").show();
+                                                    }
+                                                    return false;
+                                                }
+
+                                                $('#tabla').DataTable().clear().draw();
+                                                $.each(result, function (key, obj) {
+                                                    contador++;
+                                                    //Evaluar si tiene tarea
+                                                    var select = '<div style="float:left"><select id=tarea_' + contador + '>';
+                                                    if (obj['tiene_tarea'] == 1) { //Si tiene tarea
+                                                        select += '<option value=1 selected>Sí</option>';
+                                                        select += '<option value=0>No</option>';
+
+                                                    } else {
+                                                        select += '<option value=1>Sí</option>';
+                                                        select += '<option value=0 selected>No</option>';
+                                                    }
+
+                                                    select += '</select></div>';
+                                                    var detalleTarea = '<div id="capa_tarea_' + contador + '" style="float:left">\n\
+                        <a id="nuevaTarea_' + contador + '" id_actividad=' + obj['id_actividad'] + ' nom_act="' + obj['descripcion'] + '" role="button" class="btn btn-default btn-xs tip-right" title="Ver/Añadir tareas" \n\
+                        ><li class="icon-list"></li></a></div>';
+
+                                                    $('#tabla').DataTable().row.add([
+                                                        contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + id_proceso + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>' + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarActividad(' + obj['id_actividad'] + ',' + id_proceso + ')"><i class="icon-trash"></i></a>',
+                                                        "<input type=hidden id='id_actividad' value='" + obj['id_actividad'] + "'><input type=hidden id='id_proceso' value='" + id_proceso + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%;font-size:8pt'>",
+                                                        select + detalleTarea,
+                                                        obj['unidad'] + '<span style="display:none">' + obj['descripcion'] + "</span>",
+                                                        obj['puesto']
+                                                    ]).draw(false);
+                                                    $("#tarea_" + contador).chosen();
+                                                    $("#tarea_" + contador + "_chzn").css('font-size', '7.5pt');
+                                                    $("#tarea_" + contador + "_chzn").css('width', '50px');
+                                                    $("#tarea_" + contador + "_chzn .chzn-drop .chzn-search input").css('width', '50px');
+
+                                                    if (obj['tiene_tarea'] == 0) {
+                                                        $("#capa_tarea_" + contador).hide();
+                                                    }
+
+                                                    $("#unidad_" + contador).chosen();
+                                                    $("#unidad_" + contador + "_chzn").css('font-size', '7.5pt');
+                                                    $("#unidad_" + contador + "_chzn").css('width', '230px');
+                                                    $("#puesto_" + contador).chosen();
+                                                    $("#puesto_" + contador + "_chzn").css('font-size', '7.5pt');
+                                                    $("#puesto_" + contador + "_chzn").css('width', '230px');
+
+                                                    if (obj['tiene_tarea'] == 1) { //Si tiene tarea
+                                                        $("#unidad_" + contador + "_chzn").hide();
+                                                        $("#puesto_" + contador + "_chzn").hide();
+                                                    }
+                                                });
+
+                                                $("#nuevaActividad").show();
+                                                $("#grabarActividad").show();
+                                                $("#refrescar").show();
+                                                $("#tabla_wrapper").show();
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                alert("No se puede eliminar, la actividad tiene tareas registradas.");
+                            }
+
+                        }
+                    })
+                },
+                "Cancelar": function () {
+                    $(this).dialog("close");
+                }
+            },
+            close: function () {
+            }
+        });
+    }
+
+
     //Ocultar tabla
     $("#tabla_wrapper").hide();
     //Grabar proceso
@@ -105,6 +334,7 @@ $(document).ready(function () {
                             $("#tabla_wrapper").show();
                             $("#nuevaActividad").show();
                             $("#grabarActividad").show();
+                            $("#refrescar").show();
                             return false;
                         }
 
@@ -130,7 +360,7 @@ $(document).ready(function () {
 
 
                             $('#tabla').DataTable().row.add([
-                                contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + obj['id_proceso'] + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>',
+                                contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + proceso + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>' + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarActividad(' + obj['id_actividad'] + ',' + proceso + ')"><i class="icon-trash"></i></a>',
                                 "<input type=hidden id='id_actividad' value='" + obj['id_actividad'] + "'><input type=hidden id='id_proceso' value='" + proceso + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%;font-size:8pt'>",
                                 select + detalleTarea,
                                 obj['unidad'] + '<span style="display:none">' + obj['descripcion'] + "</span>",
@@ -162,6 +392,7 @@ $(document).ready(function () {
 
                         $("#nuevaActividad").show();
                         $("#grabarActividad").show();
+                        $("#refrescar").show();
                         $("#tabla_wrapper").show();
                     }
                 });
@@ -181,6 +412,7 @@ $(document).ready(function () {
         $("#n4_chzn").hide();
         $("#nuevaActividad").hide();
         $("#grabarActividad").hide();
+        $("#refrescar").hide();
     };
 
     ocultarSelect();
@@ -320,6 +552,7 @@ $(document).ready(function () {
                                             $("#tabla_wrapper").show();
                                             $("#nuevaActividad").show();
                                             $("#grabarActividad").show();
+                                            $("#refrescar").show();
                                             return false;
                                         }
 
@@ -345,7 +578,7 @@ $(document).ready(function () {
 
 
                                             $('#tabla').DataTable().row.add([
-                                                contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + obj['id_proceso'] + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>',
+                                                contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + proceso + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>' + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarActividad(' + obj['id_actividad'] + ',' + proceso + ')"><i class="icon-trash"></i></a>',
                                                 "<input type=hidden id='id_actividad' value='" + obj['id_actividad'] + "'><input type=hidden id='id_proceso' value='" + proceso + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%;font-size:8pt'>",
                                                 select + detalleTarea,
                                                 obj['unidad'] + '<span style="display:none">' + obj['descripcion'] + "</span>",
@@ -377,6 +610,7 @@ $(document).ready(function () {
 
                                         $("#nuevaActividad").show();
                                         $("#grabarActividad").show();
+                                        $("#refrescar").show();
                                         $("#tabla_wrapper").show();
                                     }
                                 });
@@ -787,6 +1021,7 @@ $(document).ready(function () {
             $("#tabla_wrapper").hide();
             $("#nuevaActividad").hide();
             $("#grabarActividad").hide();
+            $("#refrescar").hide();
 
         } else if (nivel == 1) {
             $("#n0_chzn").show();
@@ -802,6 +1037,7 @@ $(document).ready(function () {
 
             $("#nuevaActividad").hide();
             $("#grabarActividad").hide();
+            $("#refrescar").hide();
             $("#tabla_wrapper").hide();
             $('#tabla').DataTable().clear().draw();
         } else if (nivel == 2) {
@@ -820,6 +1056,7 @@ $(document).ready(function () {
             $("#n4_chzn").hide();
             $("#nuevaActividad").hide();
             $("#grabarActividad").hide();
+            $("#refrescar").hide();
             $("#tabla_wrapper").hide();
             $('#tabla').DataTable().clear().draw();
         } else if (nivel == 3) {
@@ -837,6 +1074,7 @@ $(document).ready(function () {
             $("#n4_chzn").hide();
             $("#nuevaActividad").hide();
             $("#grabarActividad").hide();
+            $("#refrescar").hide();
             $("#tabla_wrapper").hide();
             $('#tabla').DataTable().clear().draw();
         } else if (nivel == 4) {
@@ -854,6 +1092,7 @@ $(document).ready(function () {
             $("#n4_chzn").hide();
             $("#nuevaActividad").hide();
             $("#grabarActividad").hide();
+            $("#refrescar").hide();
             $("#tabla_wrapper").hide();
             $('#tabla').DataTable().clear().draw();
 
@@ -886,6 +1125,7 @@ $(document).ready(function () {
         $("#tabla_wrapper").hide();
         $("#nuevaActividad").hide();
         $("#grabarActividad").hide();
+        $("#refrescar").hide();
         //Si no se ha seleccionado proceso y es nivel 0, 
         if (n0 == '' || nivel == 0) {
             return false
@@ -946,6 +1186,7 @@ $(document).ready(function () {
                         $("#tabla_wrapper").hide();
                         $("#nuevaActividad").hide();
                         $("#grabarActividad").hide();
+                        $("#refrescar").hide();
 
                         //Si no se ha seleccionado proceso y es nivel 0, 
                         //no ejecutar ajax
@@ -976,6 +1217,7 @@ $(document).ready(function () {
                                         $("#tabla_wrapper").show();
                                         $("#nuevaActividad").show();
                                         $("#grabarActividad").show();
+                                        $("#refrescar").show();
                                         //alert('Proceso no tiene nivel 2');
                                         //return false;
                                     }
@@ -993,6 +1235,7 @@ $(document).ready(function () {
                                         $("#tabla_wrapper").hide();
                                         $("#nuevaActividad").hide();
                                         $("#grabarActividad").hide();
+                                        $("#refrescar").hide();
 
                                         $("#n2").change(function () {
 
@@ -1002,6 +1245,7 @@ $(document).ready(function () {
                                             $("#tabla_wrapper").hide();
                                             $("#nuevaActividad").hide();
                                             $("#grabarActividad").hide();
+                                            $("#refrescar").hide();
                                             //Si no se ha seleccionado proceso y es nivel 0, 
                                             //no ejecutar ajax
                                             if (n2 == '' || nivel == '') {
@@ -1046,6 +1290,7 @@ $(document).ready(function () {
                                                             $("#tabla_wrapper").hide();
                                                             $("#nuevaActividad").hide();
                                                             $("#grabarActividad").hide();
+                                                            $("#refrescar").hide();
 
                                                             //Si no se ha seleccionado proceso y es nivel 0, 
                                                             //no ejecutar ajax
@@ -1091,6 +1336,7 @@ $(document).ready(function () {
                                                                             $("#tabla_wrapper").hide();
                                                                             $("#nuevaActividad").hide();
                                                                             $("#grabarActividad").hide();
+                                                                            $("#refrescar").hide();
 
                                                                             //Si no se ha seleccionado proceso y es nivel 0, 
                                                                             //no ejecutar ajax
@@ -1116,6 +1362,7 @@ $(document).ready(function () {
                                                                                             $("#tabla_wrapper").show();
                                                                                             $("#nuevaActividad").show();
                                                                                             $("#grabarActividad").show();
+                                                                                            $("#refrescar").show();
                                                                                         }
                                                                                         return false;
                                                                                     }
@@ -1140,7 +1387,7 @@ $(document).ready(function () {
                         ><li class="icon-list"></li></a></div>';
 
                                                                                         $('#tabla').DataTable().row.add([
-                                                                                            contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + n4 + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>',
+                                                                                            contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + n4 + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>' + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarActividad(' + obj['id_actividad'] + ',' + n4 + ')"><i class="icon-trash"></i></a>',
                                                                                             "<input type=hidden id='id_actividad' value='" + obj['id_actividad'] + "'><input type=hidden id='id_proceso' value='" + n4 + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%;font-size:8pt'>",
                                                                                             select + detalleTarea,
                                                                                             obj['unidad'] + '<span style="display:none">' + obj['descripcion'] + "</span>",
@@ -1170,6 +1417,7 @@ $(document).ready(function () {
 
                                                                                     $("#nuevaActividad").show();
                                                                                     $("#grabarActividad").show();
+                                                                                    $("#refrescar").show();
                                                                                     $("#tabla_wrapper").show();
 
                                                                                 }
@@ -1198,6 +1446,7 @@ $(document).ready(function () {
                                                                             $("#tabla_wrapper").show();
                                                                             $("#nuevaActividad").show();
                                                                             $("#grabarActividad").show();
+                                                                            $("#refrescar").show();
                                                                             return false;
                                                                         }
                                                                         $('#tabla').DataTable().clear().draw();
@@ -1219,7 +1468,7 @@ $(document).ready(function () {
                         <a id="nuevaTarea_' + contador + '" id_actividad=' + obj['id_actividad'] + ' nom_act="' + obj['descripcion'] + '" role="button" class="btn btn-default btn-xs tip-right" title="Ver/Añadir tareas" \n\
                         ><li class="icon-list"></li></a></div>';
                                                                             $('#tabla').DataTable().row.add([
-                                                                                contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + n3 + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>',
+                                                                                contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + n3 + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>' + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarActividad(' + obj['id_actividad'] + ',' + n3 + ')"><i class="icon-trash"></i></a>',
                                                                                 "<input type=hidden id='id_actividad' value='" + obj['id_actividad'] + "'><input type=hidden id='id_proceso' value='" + n3 + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%;font-size:8pt'>",
                                                                                 select + detalleTarea,
                                                                                 obj['unidad'] + '<span style="display:none">' + obj['descripcion'] + "</span>",
@@ -1249,6 +1498,7 @@ $(document).ready(function () {
 
                                                                         $("#nuevaActividad").show();
                                                                         $("#grabarActividad").show();
+                                                                        $("#refrescar").show();
                                                                         $("#tabla_wrapper").show();
                                                                     }
                                                                 });
@@ -1274,6 +1524,7 @@ $(document).ready(function () {
                                                             $("#tabla_wrapper").show();
                                                             $("#nuevaActividad").show();
                                                             $("#grabarActividad").show();
+                                                            $("#refrescar").show();
                                                             return false;
                                                         }
                                                         $('#tabla').DataTable().clear().draw();
@@ -1296,7 +1547,7 @@ $(document).ready(function () {
                         <a id="nuevaTarea_' + contador + '" id_actividad=' + obj['id_actividad'] + ' nom_act="' + obj['descripcion'] + '" role="button" class="btn btn-default btn-xs tip-right" title="Ver/Añadir tareas" \n\
                         ><li class="icon-list"></li></a></div>';
                                                             $('#tabla').DataTable().row.add([
-                                                                contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + n2 + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>',
+                                                                contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + n2 + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>' + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarActividad(' + obj['id_actividad'] + ',' + n2 + ')"><i class="icon-trash"></i></a>',
                                                                 "<input type=hidden id='id_actividad' value='" + obj['id_actividad'] + "'><input type=hidden id='id_proceso' value='" + n2 + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%;font-size:8pt'>",
                                                                 select + detalleTarea,
                                                                 obj['unidad'] + '<span style="display:none">' + obj['descripcion'] + "</span>",
@@ -1326,6 +1577,7 @@ $(document).ready(function () {
 
                                                         $("#nuevaActividad").show();
                                                         $("#grabarActividad").show();
+                                                        $("#refrescar").show();
                                                         $("#tabla_wrapper").show();
                                                     }
                                                 });
@@ -1344,6 +1596,7 @@ $(document).ready(function () {
                                 type: 'post',
                                 dataType: 'json',
                                 success: function (result) {
+                                    //alert(1);
                                     var contador = 0;
                                     $("#n2").empty().append("<option value=''>[Proceso nivel 2]</option>");
                                     $("#n2_chzn .chzn-results").empty().append('<li id="n2_chzn_o_0" class="active-result" style="">[Proceso nivel 2]</li>');
@@ -1357,6 +1610,7 @@ $(document).ready(function () {
                                         $("#tabla_wrapper").show();
                                         $("#nuevaActividad").show();
                                         $("#grabarActividad").show();
+                                        $("#refrescar").show();
                                         return false;
                                     }
                                     $('#tabla').DataTable().clear().draw();
@@ -1379,7 +1633,7 @@ $(document).ready(function () {
                         <a id="nuevaTarea_' + contador + '" id_actividad=' + obj['id_actividad'] + ' nom_act="' + obj['descripcion'] + '" role="button" class="btn btn-default btn-xs tip-right" title="Ver/Añadir tareas" \n\
                         ><li class="icon-list"></li></a></div>';
                                         $('#tabla').DataTable().row.add([
-                                            contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + n1 + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>',
+                                            contador + " " + '<a id="editPosicion_' + contador + '"' + " posicion=" + obj['codigo_actividad'] + " id_proceso=" + n1 + " id_actividad='" + obj['id_actividad'] + "' nom_act='" + obj['descripcion'] + "'" + ' role="button" class="btn btn-default btn-xs tip-right" title="Cambiar posición"><li class="icon-list"></li></a>' + '<a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarActividad(' + obj['id_actividad'] + ',' + n1 + ')"><i class="icon-trash"></i></a>',
                                             "<input type=hidden id='id_actividad' value='" + obj['id_actividad'] + "'><input type=hidden id='id_proceso' value='" + n1 + "'><input type=text name=n1_" + contador + " id=n1_" + contador + " value='" + obj['descripcion'] + "' style='width:95%;font-size:8pt'>",
                                             select + detalleTarea,
                                             obj['unidad'] + '<span style="display:none">' + obj['descripcion'] + "</span>",
@@ -1408,6 +1662,7 @@ $(document).ready(function () {
                                     });
                                     $("#nuevaActividad").show();
                                     $("#grabarActividad").show();
+                                    $("#refrescar").show();
                                     $("#tabla_wrapper").show();
                                 }
                             });

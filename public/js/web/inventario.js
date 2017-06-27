@@ -82,15 +82,6 @@ $(document).ready(function () {
 
         var nivel0_nombre = $("#n0 option:selected").text();
         var nivel0 = $("#n0").val();
-        /*
-         var nivel1_nombre = $("#n1 option:selected").text();
-         var nivel2;
-         var nivel2_nombre = $("#n2 option:selected").text();
-         var nivel3;
-         var nivel3_nombre = $("#n3 option:selected").text();
-         var nivel4;
-         var nivel4_nombre = $("#n4 option:selected").text();
-         */
 
         $('#ventana-modal').empty().html('¿Está seguro que desea eliminar proceso?');
         $('#ventana-modal').dialog({
@@ -176,14 +167,6 @@ $(document).ready(function () {
 
         var nivel1_nombre = $("#n1 option:selected").text();
         var nivel1 = $("#n1").val();
-        /*
-         var nivel2;
-         var nivel2_nombre = $("#n2 option:selected").text();
-         var nivel3;
-         var nivel3_nombre = $("#n3 option:selected").text();
-         var nivel4;
-         var nivel4_nombre = $("#n4 option:selected").text();
-         */
 
         $('#ventana-modal').empty().html('¿Está seguro que desea eliminar proceso?');
         $('#ventana-modal').dialog({
@@ -275,13 +258,6 @@ $(document).ready(function () {
 
         var nivel2_nombre = $("#n2 option:selected").text();
         var nivel2 = $("#n2").val();
-
-        /*
-         var nivel3;
-         var nivel3_nombre = $("#n3 option:selected").text();
-         var nivel4;
-         var nivel4_nombre = $("#n4 option:selected").text();
-         */
 
         $('#ventana-modal').empty().html('¿Está seguro que desea eliminar proceso?');
         $('#ventana-modal').dialog({
@@ -732,7 +708,7 @@ $(document).ready(function () {
 
 
 
-    })
+    });
 
     //Ocultar tabla
     $("#tabla_wrapper").hide();
