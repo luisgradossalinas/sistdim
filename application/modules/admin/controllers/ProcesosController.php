@@ -192,7 +192,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
         $idPuesto = $this->_actividad->eliminarActividad($act);
         $this->_puesto->calcularDotacion($idPuesto);
         
-        echo Zend_Json::encode("Registro eliminado" . $idPuesto);
+        echo Zend_Json::encode("Registro eliminado");
     }
 
     public function obtenerProcesos1Action() {
