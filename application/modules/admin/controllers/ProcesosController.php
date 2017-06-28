@@ -173,7 +173,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
         $this->_proceso4->eliminarProcesoN4($n4);
         echo Zend_Json::encode("Registro eliminado");
     }
-    
+
     public function eliminarActividadAction() {
 
         $this->_helper->layout->disableLayout();
@@ -191,7 +191,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
         $act = $this->_getParam('act');
         $idPuesto = $this->_actividad->eliminarActividad($act);
         $this->_puesto->calcularDotacion($idPuesto);
-        
+
         echo Zend_Json::encode("Registro eliminado");
     }
 
@@ -329,6 +329,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
     /*
      * Función para validar las actividades  a la hora de eliminar el proceso de nivel 4
      */
+
     public function obtenerActividadesValAction() {
 
         $this->_helper->layout->disableLayout();
@@ -350,10 +351,11 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
             echo Zend_Json::encode($dataActividad);
         }
     }
-    
+
     /*
      * Función para validar las actividades  a la hora de eliminar el proceso de nivel 4
      */
+
     public function obtenerTareasValAction() {
 
         $this->_helper->layout->disableLayout();
@@ -568,7 +570,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
         if (count($actividad) > 0) {
 
             foreach ($actividad as $reg) {
-
+                $actualiza = true;
                 $add = explode("|", $reg);
                 $actividad = $add[0];
                 $maxCodigo = $this->_actividad->obtenerMaxPosicion($nivel, $add[1]) + 1;
@@ -576,6 +578,7 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
                     $dataActividad = array('id_actividad' => $add[0], 'descripcion' => $add[2], 'id_proceso' => $add[1], 'nivel' => $nivel,
                         'id_uorganica' => $add[3], 'id_puesto' => $add[4], 'tiene_tarea' => $add[5], 'codigo_actividad' => $maxCodigo, 'nombre_puesto' => '',
                         'id_proyecto' => $this->_proyecto, 'usuario_crea' => $this->_usuario, 'fecha_crea' => date("Y-m-d H:i:s"));
+                    $actualiza = false;
                 } else {
                     $dataActividad = array('id_actividad' => $add[0], 'descripcion' => $add[2], 'id_proceso' => $add[1], 'nivel' => $nivel,
                         'id_uorganica' => $add[3], 'id_puesto' => $add[4], 'tiene_tarea' => $add[5],
@@ -586,10 +589,14 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
                     //Cambiar de estado a elimnado a las tareas que tuvo la actividad si antes se registraron tareas
                     $where = $this->getAdapter()->quoteInto('id_actividad = ?', $actividad);
                     $this->_tarea->update(array('estado' => 0), $where);
+                } else {
+                    $actualiza = false;
                 }
 
                 $this->_actividad->guardar($dataActividad);
-                $this->_puesto->calcularDotacion($add[4]);
+                if ($actualiza) {
+                    $this->_puesto->calcularDotacion($add[4]);
+                }
             }
 
             //Actualizar flag para indicar que tiene procesos hijos

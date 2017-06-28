@@ -52,14 +52,15 @@ class Application_Model_Proceso0 extends Zend_Db_Table {
     }
 
     public function obtenerInventarioProcesos($proyecto) {
-       
+
         return $this->getAdapter()->select()->from(array('n0' => self::TABLA), array('tipoproceso' => 'tp.descripcion', 'nivel0' => 'descripcion'))
                         ->joinLeft(array('tp' => Application_Model_Tipoproceso::TABLA), 'tp.codigo_tipoproceso = n0.codigo_tipoproceso', null)
-                        ->joinLeft(array('n1' => Application_Model_Proceso1::TABLA), 'n1.id_proceso_n0 = n0.id_proceso_n0', array('nivel1' => "IFNULL(n1.descripcion,'')"))
-                        ->joinLeft(array('n2' => Application_Model_Proceso2::TABLA), 'n2.id_proceso_n1 = n1.id_proceso_n1', array('nivel2' => "IFNULL(n2.descripcion,'')"))
-                        ->joinLeft(array('n3' => Application_Model_Proceso3::TABLA), 'n3.id_proceso_n2 = n2.id_proceso_n2', array('nivel3' => "IFNULL(n3.descripcion,'')"))
-                        ->joinLeft(array('n4' => Application_Model_Proceso4::TABLA), 'n4.id_proceso_n3 = n3.id_proceso_n3', array('nivel4' => "IFNULL(n4.descripcion,'')"))
+                        ->joinLeft(array('n1' => Application_Model_Proceso1::TABLA), 'n1.id_proceso_n0 = n0.id_proceso_n0 and n1.estado = 1', array('nivel1' => "IFNULL(n1.descripcion,'')"))
+                        ->joinLeft(array('n2' => Application_Model_Proceso2::TABLA), 'n2.id_proceso_n1 = n1.id_proceso_n1 and n2.estado = 1', array('nivel2' => "IFNULL(n2.descripcion,'')"))
+                        ->joinLeft(array('n3' => Application_Model_Proceso3::TABLA), 'n3.id_proceso_n2 = n2.id_proceso_n2 and n3.estado = 1', array('nivel3' => "IFNULL(n3.descripcion,'')"))
+                        ->joinLeft(array('n4' => Application_Model_Proceso4::TABLA), 'n4.id_proceso_n3 = n3.id_proceso_n3 and n4.estado = 1', array('nivel4' => "IFNULL(n4.descripcion,'')"))
                         ->where('n0.id_proyecto = ?', $proyecto)
+                        ->where('n0.estado = ?', self::ESTADO_ACTIVO)
                         //->where('n0.descripcion not like ?', '%No relacionada%') -- Antes no se mostraba los procesos No relacionados
                         ->order(array('tp.orden asc', 'n0.descripcion asc', 'n1.descripcion asc', 'n2.descripcion asc', 'n3.descripcion'))->query()->fetchAll();
     }
@@ -99,11 +100,11 @@ IFNULL(per.descripcion,'') AS periodicidad,
  ELSE '' END AS nombre_puesto
   FROM `proceso_n0` AS `n0` 
  LEFT JOIN  `tipoproceso` AS `tp` ON tp.codigo_tipoproceso = n0.codigo_tipoproceso 
- LEFT JOIN `proceso_n1` AS `n1` ON n1.id_proceso_n0 = n0.id_proceso_n0 
- LEFT JOIN `proceso_n2` AS `n2` ON n2.id_proceso_n1 = n1.id_proceso_n1 
- LEFT JOIN `proceso_n3` AS `n3` ON n3.id_proceso_n2 = n2.id_proceso_n2 
- LEFT JOIN `proceso_n4` AS `n4` ON n4.id_proceso_n3 = n3.id_proceso_n3 
-  LEFT JOIN actividad a ON (n1.`id_proceso_n1` = a.`id_proceso` AND a.`nivel` = 1) OR (n2.`id_proceso_n2` = a.`id_proceso` AND a.`nivel` = 2) 
+ LEFT JOIN `proceso_n1` AS `n1` ON n1.id_proceso_n0 = n0.id_proceso_n0 AND n1.estado = 1
+ LEFT JOIN `proceso_n2` AS `n2` ON n2.id_proceso_n1 = n1.id_proceso_n1 AND n2.estado = 1
+ LEFT JOIN `proceso_n3` AS `n3` ON n3.id_proceso_n2 = n2.id_proceso_n2 AND n3.estado = 1
+ LEFT JOIN `proceso_n4` AS `n4` ON n4.id_proceso_n3 = n3.id_proceso_n3 AND n4.estado = 1
+  LEFT JOIN actividad a ON (n1.`id_proceso_n1` = a.`id_proceso` AND a.`nivel` = 1 AND a.estado = 1) OR (n2.`id_proceso_n2` = a.`id_proceso` AND a.`nivel` = 2 AND a.estado = 1) 
   OR (n3.`id_proceso_n3` = a.`id_proceso` AND a.`nivel` = 3) OR (n4.`id_proceso_n4` = a.`id_proceso` AND a.`nivel` = 4)  
   LEFT JOIN tarea t ON t.`id_actividad` = a.`id_actividad`
   LEFT JOIN puesto p ON (p.id_puesto = t.id_puesto) OR (p.id_puesto = a.id_puesto)
@@ -117,16 +118,14 @@ IFNULL(per.descripcion,'') AS periodicidad,
  LEFT JOIN rolpuesto rp ON rp.codigo_rol_puesto = p.codigo_rol_puesto
  LEFT JOIN nivel_puesto np ON (np.id_nivel_puesto = a.id_nivel_puesto) OR (np.id_nivel_puesto = t.id_nivel_puesto)
  LEFT JOIN categoria_puesto cp ON (cp.id_categoria_puesto = a.id_categoria_puesto) OR (cp.id_categoria_puesto = t.id_categoria_puesto)
- WHERE (n0.id_proyecto = '" . $proyecto . "') ORDER BY `tp`.`orden` ASC, `n0`.`descripcion` ASC, `n1`.`descripcion` ASC, `n2`.`descripcion` ASC, `n3`.`descripcion` ASC,
+ WHERE (n0.id_proyecto = '".$proyecto."') AND (n0.estado = 1) ORDER BY `tp`.`orden` ASC, `n0`.`descripcion` ASC, `n1`.`descripcion` ASC, `n2`.`descripcion` ASC, `n3`.`descripcion` ASC,
  a.`codigo_actividad` ASC,t.`codigo_tarea` ASC")->fetchAll();
     }
 
     public function eliminarProcesoN0($proceso) {
-        
+
         $data['estado'] = self::ESTADO_ELIMINADO;
         $this->update($data, $this->_primary . ' = ' . $proceso);
-        
     }
-    
-    
+
 }

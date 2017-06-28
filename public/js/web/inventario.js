@@ -145,7 +145,7 @@ $(document).ready(function () {
                                     }
                                 });
                             } else {
-                                alert("No se puede eliminar, el proceso tiene niveles hijos o actividades registrados.");
+                                alert("No se puede eliminar, el proceso tiene niveles hijos o actividades registradas.");
                             }
 
                         }
@@ -233,7 +233,7 @@ $(document).ready(function () {
                                     }
                                 });
                             } else {
-                                alert("No se puede eliminar, el proceso tiene niveles hijos o actividades registrados.");
+                                alert("No se puede eliminar, el proceso tiene niveles hijos o actividades registradas.");
                             }
 
                         }
@@ -324,7 +324,7 @@ $(document).ready(function () {
                                     }
                                 });
                             } else {
-                                alert("No se puede eliminar, el proceso tiene niveles hijos o actividades registrados.");
+                                alert("No se puede eliminar, el proceso tiene niveles hijos o actividades registradas.");
                             }
 
                         }
