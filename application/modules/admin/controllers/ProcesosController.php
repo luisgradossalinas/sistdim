@@ -219,7 +219,6 @@ class Admin_ProcesosController extends App_Controller_Action_Admin {
     /*
      * Función para validar los procesos nivel 1 a la hora de eliminar el proceso de nivel 0
      */
-
     public function obtenerProcesos1ValAction() {
 
         $this->_helper->layout->disableLayout();

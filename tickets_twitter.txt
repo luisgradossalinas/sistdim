@@ -3,3 +3,5 @@
 3. Estadísticas con jQuery jGrap 
 
 UPDATE tipoproceso SET orden = 4 WHERE codigo_tipoproceso = 4;
+
+UPDATE puesto SET codigo_grupo = 0,codigo_familia = 0, codigo_rol_puesto = 0;

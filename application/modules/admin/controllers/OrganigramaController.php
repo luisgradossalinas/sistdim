@@ -14,6 +14,7 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
     private $_categoriaPuesto;
     private $_proyecto;
     private $_usuario;
+    private $_actividad;
     private $_mapaPuesto;
     private $_rol; //Rol de usuario
 
@@ -33,6 +34,7 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
         $this->_rolPuestoModel = new Application_Model_Rolpuesto;
         $this->_nivelPuesto = new Application_Model_Nivelpuesto;
         $this->_categoriaPuesto = new Application_Model_Categoriapuesto;
+        $this->_actividad = new Application_Model_Actividad;
 
         $sesion_usuario = new Zend_Session_Namespace('sesion_usuario');
         $this->_proyecto = $sesion_usuario->sesion_usuario['id_proyecto'];
@@ -390,6 +392,52 @@ class Admin_OrganigramaController extends App_Controller_Action_Admin {
 
         $dataCategoria = $this->_categoriaPuesto->obtenerCategoria($data['familia']);
         echo Zend_Json::encode($dataCategoria);
+    }
+
+    /*
+     * Función para validar las actividades / tareas a la hora de eliminar un puesto
+     */
+    public function obtenerActiTareaAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        if ($this->_hasParam('puesto')) {
+            $puesto = $this->_getParam('puesto');
+            $dataPuesto = $this->_actividad->obtenerActividadTareaDotacion($puesto);
+            echo Zend_Json::encode($dataPuesto);
+        }
+           
+    }
+    
+    public function eliminarPuestoAction() {
+
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        $data = $this->_getAllParams();
+        //Previene vulnerabilidad XSS (Cross-site scripting)
+        $filtro = new Zend_Filter_StripTags();
+        foreach ($data as $key => $val) {
+            $data[$key] = $filtro->filter(trim($val));
+        }
+
+        if (!$this->getRequest()->isXmlHttpRequest())
+            exit('Acción solo válida para peticiones ajax');
+
+        $puesto = $this->_getParam('puesto');
+        $this->_puestoModel->eliminarPuesto($puesto);
+        $this->_puestoModel->calcularDotacion($puesto);
+
+        echo Zend_Json::encode("Puesto eliminado");
     }
 
 }

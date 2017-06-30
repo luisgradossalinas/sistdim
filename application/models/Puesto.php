@@ -46,6 +46,7 @@ class Application_Model_Puesto extends Zend_Db_Table {
                          * */
                         ->joinInner(array('no' => Application_Model_Natuorganica::TABLA), 'o.codigo_natuorganica = no.codigo_natuorganica', array('naturaleza' => 'descripcion'))
                         ->where('p.id_uorganica = ?', $unidad)
+                        ->where('p.estado = ?', self::ESTADO_ACTIVO)
                         ->order('p.descripcion asc')
                         ->query()->fetchAll();
     }
@@ -350,6 +351,13 @@ class Application_Model_Puesto extends Zend_Db_Table {
 
         $data['total_dotacion'] = $dota;
         $this->update($data, $this->_primary . ' = ' . $puesto);
+    }
+    
+    public function eliminarPuesto($puesto) {
+
+        $data['estado'] = self::ESTADO_ELIMINADO;
+        $this->update($data, $this->_primary . ' = ' . $puesto);
+
     }
 
 }

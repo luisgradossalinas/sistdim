@@ -2,6 +2,104 @@ var codigo = 0;
 var sentencia_crud = '';
 $(document).ready(function () {
 
+    eliminarPuesto = function (id_puesto) {
+
+        $('#ventana-modal').empty().html('¿Está seguro que desea eliminar puesto?');
+        $('#ventana-modal').dialog({
+            height: 'auto',
+            width: 350,
+            modal: true,
+            resizable: false,
+            title: 'Mensaje del sistema',
+            buttons: {
+                "Eliminar": function () {
+                    $(this).dialog("close");
+                    dialog = $(this);
+                    $.ajax({
+                        url: urls.siteUrl + '/admin/organigrama/obtener-acti-tarea',
+                        data: {puesto: id_puesto},
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (result) {
+
+                            //Primero validar que se obtenga data
+                            if (result == '' || result == []) {
+                                $("#tabla_wrapper").show();
+
+                                $.ajax({
+                                    url: urls.siteUrl + '/admin/organigrama/eliminar-puesto',
+                                    data: {puesto: id_puesto},
+                                    type: 'post',
+                                    dataType: 'json',
+                                    success: function (result) {
+                                        alert(result);
+                                        $("ventana-modal").dialog("close");
+
+                                        //Actualizar
+                                        //Buscar y pintar la tabla de los puestos obtenidos
+                                        $.ajax({
+                                            url: urls.siteUrl + '/admin/organigrama/obtener-puestos',
+                                            data: {
+                                                unidad: $("#unidad").val()
+                                            },
+                                            type: 'post',
+                                            dataType: 'json',
+                                            success: function (result) {
+
+                                                var html = '';
+                                                var contador = 0;
+
+                                                if (result == '' || result == []) {
+                                                    alert('No existen puestos, ingrese Nuevos puestos');
+                                                    $('#tabla').DataTable().clear().draw();
+                                                    $("#nuevoPuesto").show();
+                                                    $("#grabarPuestos").show();
+                                                    return false;
+                                                }
+
+                                                $('#tabla').DataTable().clear().draw();
+                                                $.each(result, function (key, obj) {
+                                                    contador++;
+                                                    $('#tabla').DataTable().row.add([
+                                                        '<center><a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarPuesto(' + obj['id_puesto'] + ')"><i class="icon-trash"></i></a><center>',
+                                                        "<input type=hidden name=id_puesto value='" + obj['id_puesto'] + "'>" + obj['organo'] + '<span style="display:none">' + obj['organo'] + "</span>" + '<span style="display:none">' + obj['unidad'] + "</span>" + '<span style="display:none">' + obj['puesto'] + "</span>",
+                                                        obj['unidad'],
+                                                        "<input type=number name=num_cor value='" + obj['numcor'] + "' style='width:50%'>",
+                                                        "<input type=text name=puesto value='" + obj['puesto'] + "'>",
+                                                        "<input type=number name=cantidad value='" + obj['cantidad'] + "' style='width:50%'>",
+                                                        /*obj['grupo'],
+                                                         obj['familia'],
+                                                         obj['rpuesto'] + "<input type=hidden name=unidadT value='" + unidad + "'>",*/
+                                                        "<input type=hidden name=unidadT value='" + unidad + "'>" + "<input type=text name=nom_personal value='" + obj['nombre_personal'] + "' style='width:80%'>"
+                                                    ]).draw(false);
+                                                });
+                                                $("#nuevoPuesto").show();
+                                                $("#grabarPuestos").show();
+                                            }
+                                        });
+
+                                    }
+                                });
+                            } else {
+                                alert("No se puede eliminar, el puesto tiene actividades y/o tareas asignadas.");
+                            }
+
+                        }
+                    })
+                },
+                "Cancelar": function () {
+                    $(this).dialog("close");
+                }
+            },
+            close: function () {
+            }
+        });
+
+    }
+
+
+
+
     //Ocultar el botón listar puestos y nuevo puesto;
     $("#nuevoPuesto").hide();
     $("#grabarPuestos").hide();
@@ -260,7 +358,7 @@ $(document).ready(function () {
                         $.each(result, function (key, obj) {
                             contador++;
                             $('#tabla').DataTable().row.add([
-                                contador,
+                                '<center><a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarPuesto(' + obj['id_puesto'] + ')"><i class="icon-trash"></i></a><center>',
                                 "<input type=hidden name=id_puesto value='" + obj['id_puesto'] + "'>" + obj['organo'],
                                 obj['unidad'],
                                 "<input type=number name=num_cor value='" + obj['numcor'] + "' style='width:50%'>",
@@ -338,18 +436,6 @@ $(document).ready(function () {
                 $("#capa").html(result);
                 $("#unidad").chosen();
 
-                /*
-                 var contador = 0;
-                 $("#unidad").empty().append("<option value=''>[Seleccione unidad]</option>");
-                 $("#unidad_chzn .chzn-results").empty().append('<li id="unidad_chzn_o_0" class="active-result result-selected" style="">[Seleccione unidad]</li>');
-                 $("#unidad_chzn a span").empty().append('[Seleccione unidad]');
-                 $.each(result, function (key, obj) {
-                 contador++;
-                 $("#unidad").append("<option value='" + obj['id_uorganica'] + "'>" + obj['descripcion'] + "</option>");
-                 $("#unidad_chzn .chzn-results").append('<li id="unidad_chzn_o_'+contador+'" class="active-result" style="">'+obj['descripcion']+'</li>');
-                 });
-                 */
-
                 $("#unidad").change(function () {
 
                     var organo = $("#organo").val();
@@ -392,7 +478,7 @@ $(document).ready(function () {
                             $.each(result, function (key, obj) {
                                 contador++;
                                 $('#tabla').DataTable().row.add([
-                                    contador,
+                                    '<center><a data-original-title="Eliminar" class="tip-top" href="#myModal" data-toggle="modal" onclick="eliminarPuesto(' + obj['id_puesto'] + ')"><i class="icon-trash"></i></a><center>',
                                     "<input type=hidden name=id_puesto value='" + obj['id_puesto'] + "'>" + obj['organo'] + '<span style="display:none">' + obj['organo'] + "</span>" + '<span style="display:none">' + obj['unidad'] + "</span>" + '<span style="display:none">' + obj['puesto'] + "</span>",
                                     obj['unidad'],
                                     "<input type=number name=num_cor value='" + obj['numcor'] + "' style='width:50%'>",
